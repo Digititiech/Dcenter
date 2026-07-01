@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html class="dark" dir="rtl" lang="ar">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>منهجية الجدوى والاستشارات | مركز القرار</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#604403",
+                        "surface-container-lowest": "#000d27",
+                        "on-tertiary": "#2b3137",
+                        "inverse-on-surface": "#20304f",
+                        "surface-tint": "#b9c7e4",
+                        "inverse-primary": "#515f78",
+                        "on-primary-fixed-variant": "#39475f",
+                        "inverse-surface": "#d8e2ff",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed": "#0d1c32",
+                        "on-secondary-fixed-variant": "#5d4201",
+                        "on-secondary-fixed": "#261900",
+                        "surface-dim": "#011230",
+                        "secondary-fixed-dim": "#e9c176",
+                        "on-secondary-container": "#dab36a",
+                        "tertiary-container": "#141a1f",
+                        "on-tertiary-fixed-variant": "#41474e",
+                        "on-error": "#690005",
+                        "primary-container": "#0a192f",
+                        "on-primary-container": "#74829d",
+                        "error": "#ffb4ab",
+                        "primary": "#b9c7e4",
+                        "tertiary-fixed-dim": "#c1c7cf",
+                        "outline-variant": "#44474d",
+                        "outline": "#8f9097",
+                        "tertiary": "#c1c7cf",
+                        "on-secondary": "#412d00",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#d6e3ff",
+                        "background": "#011230",
+                        "secondary": "#e9c176",
+                        "on-tertiary-container": "#7c838a",
+                        "surface-container-highest": "#253453",
+                        "surface-container": "#0e1f3d",
+                        "on-surface": "#d8e2ff",
+                        "surface-variant": "#253453",
+                        "surface-container-low": "#091b39",
+                        "surface-bright": "#293958",
+                        "on-surface-variant": "#c5c6cd",
+                        "surface-container-high": "#192a48",
+                        "on-background": "#d8e2ff",
+                        "on-primary": "#233148",
+                        "primary-fixed-dim": "#b9c7e4",
+                        "tertiary-fixed": "#dde3eb",
+                        "surface": "#011230",
+                        "on-tertiary-fixed": "#161c22",
+                        "secondary-fixed": "#ffdea5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "64px",
+                        "margin-mobile": "20px",
+                        "base": "8px",
+                        "gutter": "24px",
+                        "section-gap": "120px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter", "sans-serif"],
+                        "display-lg-mobile": ["Playfair Display", "serif"],
+                        "body-lg": ["Inter", "sans-serif"],
+                        "data-tabular": ["Inter", "sans-serif"],
+                        "label-caps": ["Inter", "sans-serif"],
+                        "headline-md": ["Playfair Display", "serif"],
+                        "display-lg": ["Playfair Display", "serif"],
+                        "body-sm": ["Inter", "sans-serif"],
+                        "headline-lg": ["Playfair Display", "serif"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg-mobile": ["40px", {"lineHeight": "48px", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                        "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "display-lg": ["60px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["48px", {"lineHeight": "56px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- TopNavBar -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-background border-b border-outline-variant/20 h-20 transition-all duration-300">
+        <nav class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto h-full">
+            <!-- Brand Logo -->
+            <a class="font-headline-md text-headline-md font-bold text-on-background tracking-tighter flex items-center gap-2" href="index.html">
+                <span class="material-symbols-outlined text-secondary text-3xl" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+                <span>مركز القرار</span>
+            </a>
+            <!-- Desktop Navigation -->
+            <ul class="hidden md:flex gap-8 items-center h-full">
+                <li class="h-full flex items-center">
+                    <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="index.html">الرئيسية</a>
+                </li>
+                <li class="h-full flex items-center">
+                    <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="about.html">شركتنا</a>
+                </li>
+                <li class="h-full flex items-center">
+                    <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="services.html">خدماتنا</a>
+                </li>
+                <li class="h-full flex items-center">
+                    <a class="text-secondary border-b-2 border-secondary pb-1 font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="methodology.html">منهجيتنا</a>
+                </li>
+                <li class="h-full flex items-center">
+                    <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="ai-assistant.html">المساعد الذكي</a>
+                </li>
+                <li class="h-full flex items-center">
+                    <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="contact.html">اتصل بنا</a>
+                </li>
+            </ul>
+            <!-- Actions -->
+            <div class="hidden md:flex items-center gap-4">
+                <a class="flex items-center gap-2 px-3 py-1.5 border border-secondary/30 rounded-none text-secondary hover:bg-secondary/10 transition-all duration-300 font-label-caps text-label-caps" href="../methodology.html">
+                    <span class="material-symbols-outlined text-[18px]">language</span>
+                    <span>EN</span>
+                </a>
+                <a class="bg-secondary text-background hover:bg-transparent hover:text-secondary border border-secondary transition-all duration-300 px-6 py-2 rounded-none font-label-caps text-label-caps" href="contact.html">
+                    طلب استشارة
+                </a>
+            </div>
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-toggle" class="md:hidden text-on-background">
+                <span class="material-symbols-outlined text-2xl">menu</span>
+            </button>
+        </nav>
+        <!-- Mobile Dropdown Menu -->
+        <div id="mobile-menu" class="hidden absolute top-20 left-0 right-0 bg-background border-b border-outline-variant/20 px-margin-mobile py-6 flex flex-col gap-4 md:hidden z-40">
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="index.html">الرئيسية</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="about.html">شركتنا</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="services.html">خدماتنا</a>
+            <a class="font-label-caps text-label-caps text-secondary font-bold" href="methodology.html">منهجيتنا</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="ai-assistant.html">المساعد الذكي</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="contact.html">اتصل بنا</a>
+            <div class="h-px bg-outline-variant/20 my-2"></div>
+            <a class="flex items-center justify-center gap-2 px-3 py-1.5 border border-secondary/30 rounded-none text-secondary hover:bg-secondary/10 transition-all duration-300 font-label-caps text-label-caps text-center" href="../methodology.html">
+                <span class="material-symbols-outlined text-[18px]">language</span>
+                <span>EN</span>
+            </a>
+            <a class="bg-secondary text-background hover:bg-transparent hover:text-secondary border border-secondary transition-all duration-300 px-6 py-3 rounded-none font-label-caps text-label-caps text-center" href="contact.html">
+                طلب استشارة
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-grow pt-20">
+        <!-- Hero Section -->
+        <section class="px-margin-mobile md:px-margin-desktop py-section-gap max-w-container-max mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+                <div class="md:col-span-8">
+                    <h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-background mb-6">
+                        منهجية العمل المعتمدة
+                    </h1>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant max-w-3xl">
+                        منهجيتنا المكونة من 5 خطوات تضمن بناء مشروعك على أسس بحثية متينة واستراتيجية واضحة، مصممة لمساعدتك على اتخاذ قرارات واثقة.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5-Step Methodology Flow -->
+        <section class="px-margin-mobile md:px-margin-desktop pb-section-gap max-w-container-max mx-auto">
+            <div class="relative">
+                <!-- Connecting Line -->
+                <div class="hidden lg:block absolute top-1/2 left-0 w-full h-[1px] bg-outline-variant/30 -translate-y-1/2 z-0"></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-gutter relative z-10">
+                    <!-- Step 1 -->
+                    <div class="bg-primary-container border border-outline-variant/20 p-6 relative group hover:border-secondary/50 transition-colors duration-300">
+                        <div class="text-secondary font-headline-md text-headline-md mb-4">01</div>
+                        <h3 class="font-label-caps text-label-caps text-on-background mb-2">الاستماع</h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant">نكرس الوقت الكافي لفهم أهدافك ووضعك الحالي بشكل كامل.</p>
+                        <!-- Chevron indicator (inverted for RTL) -->
+                        <div class="absolute -left-3 top-1/2 -translate-y-1/2 hidden lg:flex items-center justify-center w-6 h-6 bg-background border border-outline-variant/20 rounded-full text-secondary">
+                            <span class="material-symbols-outlined text-sm">chevron_left</span>
+                        </div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="bg-primary-container border border-outline-variant/20 p-6 relative group hover:border-secondary/50 transition-colors duration-300 lg:mt-8">
+                        <div class="text-secondary font-headline-md text-headline-md mb-4">02</div>
+                        <h3 class="font-label-caps text-label-caps text-on-background mb-2">التحليل</h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant">نراجع الحقائق ونبحث عن أفضل الفرص لضمان نجاحك.</p>
+                        <div class="absolute -left-3 top-1/2 -translate-y-1/2 hidden lg:flex items-center justify-center w-6 h-6 bg-background border border-outline-variant/20 rounded-full text-secondary">
+                            <span class="material-symbols-outlined text-sm">chevron_left</span>
+                        </div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="bg-primary-container border border-secondary/50 p-6 relative group lg:-mt-4 shadow-[0_0_15px_rgba(197,160,89,0.1)]">
+                        <div class="text-secondary font-headline-md text-headline-md mb-4">03</div>
+                        <h3 class="font-label-caps text-label-caps text-on-background mb-2">التخطيط</h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant">نبتكر حلولاً واضحة وخارطة طريق مفصلة لمشروعك.</p>
+                        <div class="absolute -left-3 top-1/2 -translate-y-1/2 hidden lg:flex items-center justify-center w-6 h-6 bg-background border border-secondary/50 rounded-full text-secondary shadow-[0_0_10px_rgba(197,160,89,0.2)]">
+                            <span class="material-symbols-outlined text-sm">chevron_left</span>
+                        </div>
+                        <!-- Active State Indicator -->
+                        <div class="absolute top-0 left-0 w-full h-[2px] bg-secondary"></div>
+                    </div>
+                    <!-- Step 4 -->
+                    <div class="bg-primary-container border border-outline-variant/20 p-6 relative group hover:border-secondary/50 transition-colors duration-300 lg:mt-8">
+                        <div class="text-secondary font-headline-md text-headline-md mb-4">04</div>
+                        <h3 class="font-label-caps text-label-caps text-on-background mb-2">التنفيذ</h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant">نقدم النتائج النهائية وكافة الأدوات اللازمة للمضي قدماً.</p>
+                        <div class="absolute -left-3 top-1/2 -translate-y-1/2 hidden lg:flex items-center justify-center w-6 h-6 bg-background border border-outline-variant/20 rounded-full text-secondary">
+                            <span class="material-symbols-outlined text-sm">chevron_left</span>
+                        </div>
+                    </div>
+                    <!-- Step 5 -->
+                    <div class="bg-primary-container border border-outline-variant/20 p-6 relative group hover:border-secondary/50 transition-colors duration-300">
+                        <div class="text-secondary font-headline-md text-headline-md mb-4">05</div>
+                        <h3 class="font-label-caps text-label-caps text-on-background mb-2">الدعم</h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant">نقدم استشارات ودعماً مستمراً لضمان بقاء مشروعك في المسار الصحيح.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Decision-Ready Deliverables Dashboard -->
+        <section class="px-margin-mobile md:px-margin-desktop pb-section-gap max-w-container-max mx-auto">
+            <div class="mb-12 border-b border-outline-variant/30 pb-6 flex justify-between items-end">
+                <div>
+                    <h2 class="font-headline-md text-headline-md text-on-background mb-2">مخرجاتنا الاستشارية</h2>
+                    <p class="font-body-md text-body-md text-on-surface-variant">تقارير وأدوات مهنية واضحة جاهزة للتطبيق الفوري.</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+                <!-- Main Preview Panel (Bento Large) -->
+                <div class="lg:col-span-8 bg-surface-container border border-outline-variant/20 flex flex-col">
+                    <div class="p-4 border-b border-outline-variant/20 bg-surface-container-high flex justify-between items-center">
+                        <span class="font-label-caps text-label-caps text-on-surface-variant">النماذج المالية</span>
+                        <div class="flex space-x-reverse space-x-2">
+                            <span class="material-symbols-outlined text-on-surface-variant text-sm">fullscreen</span>
+                            <span class="material-symbols-outlined text-on-surface-variant text-sm">download</span>
+                        </div>
+                    </div>
+                    <div class="relative flex-grow min-h-[400px] overflow-hidden">
+                        <!-- Abstract Data Viz / Model Preview -->
+                        <div class="absolute inset-0 bg-cover bg-center opacity-80 mix-blend-luminosity" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCml0ilORVcyUeJju1CIYv8bOcpOFXuCOqPBSvvy3o5lUAqZQZzu3kdI2mA-S98o4oq_02Be54n_IOmHc8hYpGzvCu8lSNVzsyIX4tbYbbdY-KIwgk_ehytsztZ_3BPKtWvsSyy7lbl1uFntHbBEDOPcBUxjpFafhgx06l7JiOeAhrkdocrgWGOErKY8LKa2KpIrSvam0KhcapZKOJYEIrs8lE4EhTDXWcUpoazsPZ1gkTA_C5lJxMDUMkc6a70kNb69hqmkiE5wMeP')"></div>
+                        <!-- Overlay UI elements -->
+                        <div class="absolute bottom-6 left-6 right-6 grid grid-cols-3 gap-4">
+                            <div class="bg-background/90 backdrop-blur-sm border border-outline-variant/30 p-4">
+                                <div class="font-label-caps text-label-caps text-on-surface-variant mb-1">القيمة التقديرية</div>
+                                <div class="font-data-tabular text-data-tabular text-secondary text-lg" dir="ltr">142.5M $</div>
+                            </div>
+                            <div class="bg-background/90 backdrop-blur-sm border border-outline-variant/30 p-4">
+                                <div class="font-label-caps text-label-caps text-on-surface-variant mb-1">معدل العائد</div>
+                                <div class="font-data-tabular text-data-tabular text-on-background text-lg" dir="ltr">18.4%</div>
+                            </div>
+                            <div class="bg-background/90 backdrop-blur-sm border border-outline-variant/30 p-4">
+                                <div class="font-label-caps text-label-caps text-on-surface-variant mb-1">فترة الاسترداد</div>
+                                <div class="font-data-tabular text-data-tabular text-on-background text-lg">4.2 سنوات</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Right Column Stack -->
+                <div class="lg:col-span-4 flex flex-col gap-gutter">
+                    <!-- Report Item 1 -->
+                    <div class="bg-primary-container border border-outline-variant/20 p-6 hover:border-secondary/50 transition-all cursor-pointer group">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">gavel</span>
+                            <span class="text-xs font-data-tabular text-on-surface-variant px-2 py-1 bg-surface-container-high border border-outline-variant/10">تقرير</span>
+                        </div>
+                        <h4 class="font-body-md text-body-md font-semibold text-on-background mb-2">تقارير الخبراء</h4>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant mb-4">تقارير مفصلة توضح نتائج التحليل والتوصيات المهنية.</p>
+                        <div class="w-full h-[1px] bg-outline-variant/20 group-hover:bg-secondary/30 transition-colors"></div>
+                    </div>
+                    <!-- Report Item 2 -->
+                    <div class="bg-primary-container border border-outline-variant/20 p-6 hover:border-secondary/50 transition-all cursor-pointer group">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">description</span>
+                            <span class="text-xs font-data-tabular text-on-surface-variant px-2 py-1 bg-surface-container-high border border-outline-variant/10">عرض تقديمي</span>
+                        </div>
+                        <h4 class="font-body-md text-body-md font-semibold text-on-background mb-2">خطط الاستثمار</h4>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant mb-4">ملخصات تنفيذية مصممة لمساعدتك في جذب التمويل والشركاء.</p>
+                        <div class="w-full h-[1px] bg-outline-variant/20 group-hover:bg-secondary/30 transition-colors"></div>
+                    </div>
+                    <!-- Report Item 3 -->
+                    <div class="bg-primary-container border border-outline-variant/20 p-6 hover:border-secondary/50 transition-all cursor-pointer group flex-grow">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">shield</span>
+                            <span class="text-xs font-data-tabular text-on-surface-variant px-2 py-1 bg-surface-container-high border border-outline-variant/10">مستندات</span>
+                        </div>
+                        <h4 class="font-body-md text-body-md font-semibold text-on-background mb-2">الطلبات المصرفية</h4>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant mb-4">كافة الوثائق والمستندات اللازمة للحصول على التمويلات والموافقات البنكية.</p>
+                        <div class="w-full h-[1px] bg-outline-variant/20 group-hover:bg-secondary/30 transition-colors"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface-container-lowest border-t border-outline-variant/30 mt-auto">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter px-margin-mobile md:px-margin-desktop py-section-gap max-w-container-max mx-auto">
+            <div class="md:col-span-4 flex flex-col justify-between mb-8 md:mb-0">
+                <div class="font-headline-md text-headline-md font-bold text-secondary mb-4">
+                    مركز القرار
+                </div>
+                <div class="text-on-surface-variant text-sm mt-auto">
+                    © 2024 مركز القرار. جميع الحقوق محفوظة. مسجل في صحار، سلطنة عمان.
+                </div>
+            </div>
+            <div class="md:col-span-8 flex flex-col md:flex-row justify-end space-y-6 md:space-y-0 md:space-x-reverse md:space-x-12">
+                <div class="flex flex-col space-y-3">
+                    <span class="font-label-caps text-label-caps text-on-surface-variant mb-2">الاتصال</span>
+                    <a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">صحار، عمان</a>
+                    <a class="text-on-surface-variant hover:text-secondary transition-colors" dir="ltr" href="#">+968 96680001</a>
+                    <a class="text-on-surface-variant hover:text-secondary transition-colors" href="mailto:dcenterfe@gmail.com">dcenterfe@gmail.com</a>
+                </div>
+                <div class="flex flex-col space-y-3">
+                    <span class="font-label-caps text-label-caps text-on-surface-variant mb-2">روابط هامة</span>
+                    <ul class="flex flex-col gap-2 font-body-sm text-body-sm">
+                        <li class=""><a class="text-on-surface-variant hover:text-secondary transition-colors" href="index.html">الرئيسية</a></li>
+                        <li class=""><a class="text-on-surface-variant hover:text-secondary transition-colors" href="about.html">شركتنا</a></li>
+                        <li class=""><a class="text-on-surface-variant hover:text-secondary transition-colors" href="services.html">خدماتنا</a></li>
+                        <li class=""><a class="text-on-surface-variant hover:text-secondary transition-colors" href="methodology.html">منهجيتنا</a></li>
+                        <li class=""><a class="text-on-surface-variant hover:text-secondary transition-colors" href="ai-assistant.html">المساعد الذكي</a></li>
+                        <li class=""><a class="text-on-surface-variant hover:text-secondary transition-colors" href="contact.html">اتصل بنا</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Sticky Header Transition
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (header) {
+                if (window.scrollY > 50) {
+                    header.classList.add('bg-background/95', 'backdrop-blur-md', 'shadow-2xl');
+                } else {
+                    header.classList.remove('bg-background/95', 'backdrop-blur-md', 'shadow-2xl');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html class="dark" dir="rtl" lang="ar">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>مركز اتخاذ القرار - استشارات الذكاء الاصطناعي ومحرك التأهيل</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;family=Noto+Sans+Arabic:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#604403",
+                        "surface-container-lowest": "#000d27",
+                        "on-tertiary": "#2b3137",
+                        "inverse-on-surface": "#20304f",
+                        "surface-tint": "#b9c7e4",
+                        "inverse-primary": "#515f78",
+                        "on-primary-fixed-variant": "#39475f",
+                        "inverse-surface": "#d8e2ff",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed": "#0d1c32",
+                        "on-secondary-fixed-variant": "#5d4201",
+                        "on-secondary-fixed": "#261900",
+                        "surface-dim": "#011230",
+                        "secondary-fixed-dim": "#e9c176",
+                        "on-secondary-container": "#dab36a",
+                        "tertiary-container": "#141a1f",
+                        "on-tertiary-fixed-variant": "#41474e",
+                        "on-error": "#690005",
+                        "primary-container": "#0a192f",
+                        "on-primary-container": "#74829d",
+                        "error": "#ffb4ab",
+                        "primary": "#b9c7e4",
+                        "tertiary-fixed-dim": "#c1c7cf",
+                        "outline-variant": "#44474d",
+                        "outline": "#8f9097",
+                        "tertiary": "#c1c7cf",
+                        "on-secondary": "#412d00",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#d6e3ff",
+                        "background": "#011230",
+                        "secondary": "#e9c176",
+                        "on-tertiary-container": "#7c838a",
+                        "surface-container-highest": "#253453",
+                        "surface-container": "#0e1f3d",
+                        "on-surface": "#d8e2ff",
+                        "surface-variant": "#253453",
+                        "surface-container-low": "#091b39",
+                        "surface-bright": "#293958",
+                        "on-surface-variant": "#c5c6cd",
+                        "surface-container-high": "#192a48",
+                        "on-background": "#d8e2ff",
+                        "on-primary": "#233148",
+                        "primary-fixed-dim": "#b9c7e4",
+                        "tertiary-fixed": "#dde3eb",
+                        "surface": "#011230",
+                        "on-tertiary-fixed": "#161c22",
+                        "secondary-fixed": "#ffdea5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "64px",
+                        "margin-mobile": "20px",
+                        "base": "8px",
+                        "gutter": "24px",
+                        "section-gap": "120px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Noto Sans Arabic", "Inter"],
+                        "display-lg-mobile": ["Playfair Display", "Noto Sans Arabic"],
+                        "body-lg": ["Noto Sans Arabic", "Inter"],
+                        "data-tabular": ["Noto Sans Arabic", "Inter"],
+                        "label-caps": ["Noto Sans Arabic", "Inter"],
+                        "headline-md": ["Playfair Display", "Noto Sans Arabic"],
+                        "display-lg": ["Playfair Display", "Noto Sans Arabic"],
+                        "body-sm": ["Noto Sans Arabic", "Inter"],
+                        "headline-lg": ["Playfair Display", "Noto Sans Arabic"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "48px", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "data-tabular": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "display-lg": ["60px", { "lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg": ["48px", { "lineHeight": "56px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gold-border-focus:focus-within {
+            border-color: #e9c176 !important;
+        }
+        .btn-gold {
+            background-color: #e9c176;
+            color: #011230;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        .btn-gold:hover {
+            background-color: transparent;
+            color: #e9c176;
+            border-color: #e9c176;
+        }
+        .card-hover:hover {
+            border-color: #e9c176 !important;
+            transform: translateY(-4px);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- TopNavBar -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-background border-b border-outline-variant/20 h-20 transition-all duration-300">
+        <nav class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto h-full">
+            <!-- Brand Logo -->
+            <a class="font-headline-md text-headline-md font-bold text-on-background tracking-tighter flex items-center gap-2" href="index.html">
+                <span class="material-symbols-outlined text-secondary text-3xl" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+                <span>مركز القرار</span>
+            </a>
+            <!-- Desktop Navigation -->
+            <ul class="hidden md:flex gap-8 items-center h-full">
+                <li class="h-full flex items-center">
+                    <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="index.html">الرئيسية</a>
+                </li>
+                <li class="h-full flex items-center">
+                    <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="about.html">شركتنا</a>
+                </li>
+                <li class="h-full flex items-center">
+                    <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="services.html">خدماتنا</a>
+                </li>
+                <li class="h-full flex items-center">
+                    <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="methodology.html">منهجيتنا</a>
+                </li>
+                <li class="h-full flex items-center">
+                    <a class="text-secondary border-b-2 border-secondary pb-1 font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="ai-assistant.html">المساعد الذكي</a>
+                </li>
+                <li class="h-full flex items-center">
+                    <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="contact.html">اتصل بنا</a>
+                </li>
+            </ul>
+            <!-- Actions -->
+            <div class="hidden md:flex items-center gap-4">
+                <a class="flex items-center gap-2 px-3 py-1.5 border border-secondary/30 rounded-none text-secondary hover:bg-secondary/10 transition-all duration-300 font-label-caps text-label-caps" href="../ai-assistant.html">
+                    <span class="material-symbols-outlined text-[18px]">language</span>
+                    <span>EN</span>
+                </a>
+                <a class="bg-secondary text-background hover:bg-transparent hover:text-secondary border border-secondary transition-all duration-300 px-6 py-2 rounded-none font-label-caps text-label-caps" href="contact.html">
+                    طلب استشارة
+                </a>
+            </div>
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-toggle" class="md:hidden text-on-background">
+                <span class="material-symbols-outlined text-2xl">menu</span>
+            </button>
+        </nav>
+        <!-- Mobile Dropdown Menu -->
+        <div id="mobile-menu" class="hidden absolute top-20 left-0 right-0 bg-background border-b border-outline-variant/20 px-margin-mobile py-6 flex flex-col gap-4 md:hidden z-40">
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="index.html">الرئيسية</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="about.html">شركتنا</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="services.html">خدماتنا</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="methodology.html">منهجيتنا</a>
+            <a class="font-label-caps text-label-caps text-secondary font-bold" href="ai-assistant.html">المساعد الذكي</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="contact.html">اتصل بنا</a>
+            <div class="h-px bg-outline-variant/20 my-2"></div>
+            <a class="flex items-center justify-center gap-2 px-3 py-1.5 border border-secondary/30 rounded-none text-secondary hover:bg-secondary/10 transition-all duration-300 font-label-caps text-label-caps text-center" href="../ai-assistant.html">
+                <span class="material-symbols-outlined text-[18px]">language</span>
+                <span>EN</span>
+            </a>
+            <a class="bg-secondary text-background hover:bg-transparent hover:text-secondary border border-secondary transition-all duration-300 px-6 py-3 rounded-none font-label-caps text-label-caps text-center" href="contact.html">
+                طلب استشارة
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-section-gap grid grid-cols-1 lg:grid-cols-12 gap-gutter pt-36">
+        <!-- Left Panel: AI Consultant Chat -->
+        <div class="lg:col-span-7 flex flex-col h-[700px] border border-outline-variant/20 bg-primary-container rounded-none relative overflow-hidden">
+            <!-- Header -->
+            <div class="p-6 border-b border-outline-variant/20 bg-surface-container-high flex justify-between items-center">
+                <div>
+                    <h2 class="font-headline-md text-headline-md text-on-background">مساعد الذكاء الاصطناعي لاتخاذ القرار</h2>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">محرك التأهيل المؤسسي</p>
+                </div>
+                <span class="material-symbols-outlined text-secondary text-2xl" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+            </div>
+            <!-- Chat Area -->
+            <div id="chat-messages" class="flex-grow p-6 overflow-y-auto space-y-6">
+                <!-- AI Message -->
+                <div class="flex gap-4">
+                    <div class="w-10 h-10 rounded-none bg-surface-container-highest flex items-center justify-center border border-outline-variant/30 flex-shrink-0">
+                        <span class="material-symbols-outlined text-secondary">memory</span>
+                    </div>
+                    <div class="bg-surface-container-highest border border-outline-variant/20 p-4 rounded-none max-w-[85%]">
+                        <p class="font-body-md text-body-md text-on-background">
+                            مرحباً. أنا مستشارك الرقمي. يمكنني مساعدتك في مراجعة المشاريع، أو التحضير للتمويل البنكي، أو الإجابة على التساؤلات المصرفية. كيف يمكنني مساعدتك اليوم؟
+                        </p>
+                    </div>
+                </div>
+                <!-- Quick Actions -->
+                <div id="quick-actions-container" class="pr-14 space-y-3">
+                    <button onclick="handleQuickAction('تحقق من قيمة المشروع')" class="w-full text-right p-4 border border-outline-variant/20 bg-surface-container-lowest hover:bg-surface-container-low transition-colors rounded-none flex items-center justify-between group">
+                        <span class="font-data-tabular text-data-tabular text-on-background">تحقق من قيمة المشروع</span>
+                        <span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary transition-colors transform rotate-180">arrow_forward</span>
+                    </button>
+                    <button onclick="handleQuickAction('الاستعداد للتمويل البنكي')" class="w-full text-right p-4 border border-outline-variant/20 bg-surface-container-lowest hover:bg-surface-container-low transition-colors rounded-none flex items-center justify-between group">
+                        <span class="font-data-tabular text-data-tabular text-on-background">الاستعداد للتمويل البنكي</span>
+                        <span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary transition-colors transform rotate-180">arrow_forward</span>
+                    </button>
+                    <button onclick="handleQuickAction('استشارة مصرفية')" class="w-full text-right p-4 border border-outline-variant/20 bg-surface-container-lowest hover:bg-surface-container-low transition-colors rounded-none flex items-center justify-between group">
+                        <span class="font-data-tabular text-data-tabular text-on-background">استشارة مصرفية</span>
+                        <span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary transition-colors transform rotate-180">arrow_forward</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Input Area -->
+            <div class="p-4 border-t border-outline-variant/20 bg-surface-container-high">
+                <div class="flex gap-4 gold-border-focus">
+                    <input id="chat-input" class="flex-grow bg-surface-container-lowest border border-outline-variant/30 text-on-background font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:ring-0 focus:border-secondary" placeholder="فصل متطلباتك المؤسسية..." type="text"/>
+                    <button onclick="handleSendMessage()" class="btn-gold px-4 py-3 rounded-none flex items-center justify-center">
+                        <span class="material-symbols-outlined transform">send</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Right Panel: Filters & Form -->
+        <div class="lg:col-span-5 flex flex-col gap-8">
+            <!-- Target Sector Filter -->
+            <div class="border border-outline-variant/20 bg-primary-container p-6 rounded-none">
+                <h3 class="font-label-caps text-label-caps text-secondary mb-4 border-b border-outline-variant/20 pb-2">التوافق مع رؤية عمان 2040</h3>
+                <div class="flex flex-wrap gap-2">
+                    <button class="border border-secondary text-secondary bg-secondary/10 px-3 py-1 font-body-sm text-body-sm rounded-full transition-colors">الخدمات اللوجستية</button>
+                    <button class="border border-outline-variant/50 text-on-surface-variant hover:border-secondary hover:text-secondary px-3 py-1 font-body-sm text-body-sm rounded-full transition-colors">الطاقة</button>
+                    <button class="border border-outline-variant/50 text-on-surface-variant hover:border-secondary hover:text-secondary px-3 py-1 font-body-sm text-body-sm rounded-full transition-colors">التعدين</button>
+                    <button class="border border-outline-variant/50 text-on-surface-variant hover:border-secondary hover:text-secondary px-3 py-1 font-body-sm text-body-sm rounded-full transition-colors">السياحة</button>
+                    <button class="border border-outline-variant/50 text-on-surface-variant hover:border-secondary hover:text-secondary px-3 py-1 font-body-sm text-body-sm rounded-full transition-colors">المؤسسات الصغيرة والمتوسطة</button>
+                    <button class="border border-outline-variant/50 text-on-surface-variant hover:border-secondary hover:text-secondary px-3 py-1 font-body-sm text-body-sm rounded-full transition-colors">العقار</button>
+                </div>
+            </div>
+            <!-- Capture Form -->
+            <div class="border border-outline-variant/20 bg-surface-container-highest p-6 rounded-none flex-grow relative overflow-hidden">
+                <!-- Abstract visual element -->
+                <div class="absolute -left-16 -top-16 w-32 h-32 border border-secondary/20 rounded-full"></div>
+                <h3 class="font-headline-md text-headline-md text-on-background mb-6">جدولة تنفيذية</h3>
+                <form class="space-y-5">
+                    <div class="space-y-1">
+                        <label class="font-body-sm text-body-sm text-on-background">الاسم الكامل</label>
+                        <input class="w-full bg-surface-container-lowest border border-outline-variant/30 text-on-background font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors" placeholder="مثال: عبدالله البوسعيدي" type="text"/>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-body-sm text-body-sm text-on-background">اسم الشركة</label>
+                        <input class="w-full bg-surface-container-lowest border border-outline-variant/30 text-on-background font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors" placeholder="مثال: صندوق مسقط السيادي" type="text"/>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-body-sm text-body-sm text-on-background">متى تود الاجتماع؟</label>
+                        <select class="w-full bg-surface-container-lowest border border-outline-variant/30 text-on-background font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors appearance-none">
+                            <option>عاجل (1-3 أيام عمل)</option>
+                            <option>اعتيادي (1-2 أسبوع)</option>
+                            <option>استكشافي (الربع الثالث 2024)</option>
+                        </select>
+                    </div>
+                    <div class="pt-4">
+                        <a href="contact.html" class="w-full btn-gold font-label-caps text-label-caps uppercase px-6 py-4 rounded-none flex justify-center items-center gap-2">
+                            <span class="">طلب جلسة آمنة</span>
+                            <span class="material-symbols-outlined" style="font-size: 18px;">lock</span>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant/30 mt-auto">
+        <div class="grid grid-cols-12 gap-gutter px-margin-desktop py-section-gap max-w-container-max mx-auto w-full">
+            <div class="col-span-12 md:col-span-4 flex flex-col gap-4">
+                <div class="font-headline-md text-headline-md font-bold text-secondary">
+                    مركز اتخاذ القرار
+                </div>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                    © 2024 مركز اتخاذ القرار. جميع الحقوق محفوظة. مسجل في صحار، سلطنة عمان.
+                </p>
+            </div>
+            <div class="col-span-12 md:col-span-8 flex flex-col md:flex-row justify-start gap-12 pt-4 md:pt-0">
+                <div class="flex flex-col gap-3">
+                    <span class="font-label-caps text-label-caps uppercase text-on-surface-variant">اتصل بنا</span>
+                    <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">صحار، عمان</a>
+                    <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">+968 96680001</a>
+                    <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary transition-colors duration-200" href="mailto:dcenterfe@gmail.com">dcenterfe@gmail.com</a>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <span class="font-label-caps text-label-caps uppercase text-on-surface-variant">روابط هامة</span>
+                    <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary transition-colors duration-200" href="index.html">الرئيسية</a>
+                    <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary transition-colors duration-200" href="about.html">شركتنا</a>
+                    <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary transition-colors duration-200" href="services.html">خدماتنا</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Sticky Header Transition
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (header) {
+                if (window.scrollY > 50) {
+                    header.classList.add('bg-background/95', 'backdrop-blur-md', 'shadow-2xl');
+                } else {
+                    header.classList.remove('bg-background/95', 'backdrop-blur-md', 'shadow-2xl');
+                }
+            }
+        });
+
+        // Interactive Chat simulation
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const quickActionsContainer = document.getElementById('quick-actions-container');
+
+        const responses = {
+            "تحقق من قيمة المشروع": "لتقييم القيمة المالية لمشروعك، نقوم بإجراء نمذجة كاملة للتدفقات النقدية المخصومة (DCF)، وتحليل معدل العائد الداخلي (IRR)، وتقديرات المتوسط المرجح لتكلفة رأس المال (WACC). هل ترغب في جدولة تقييم رسمي؟",
+            "الاستعداد للتمويل البنكي": "يتطلب التحضير للحصول على تمويل بنكي إعداد دراسة جدوى متكاملة تتوافق تماماً مع المعايير المصرفية في سلطنة عُمان. نحن نجمع بحوث السوق، وهياكل العمليات، وملفات تخفيف المخاطر. هل نقوم بحجز موعد تحضيري؟",
+            "استشارة مصرفية": "يمتلك مركز القرار عقوداً من القيادة المصرفية الإقليمية. نقدم المشورة بشأن إعادة الهيكلة، وهيكلة رأس المال، والمفاوضات المتعلقة بالديون، والامتثال لإدارة مخاطر المؤسسات (ERM). يرجى توضيح حجم التمويل المستهدف."
+        };
+
+        function addMessageBubble(sender, text) {
+            const bubble = document.createElement('div');
+            bubble.className = "flex gap-4";
+            
+            const avatar = document.createElement('div');
+            avatar.className = sender === 'ai' ? 
+                "w-10 h-10 rounded-none bg-surface-container-highest flex items-center justify-center border border-outline-variant/30 flex-shrink-0" : 
+                "w-10 h-10 rounded-none bg-secondary flex items-center justify-center text-background font-bold flex-shrink-0";
+            avatar.innerHTML = sender === 'ai' ? 
+                `<span class="material-symbols-outlined text-secondary">memory</span>` : 
+                `ع`;
+                
+            const content = document.createElement('div');
+            content.className = sender === 'ai' ? 
+                "bg-surface-container-highest border border-outline-variant/20 p-4 rounded-none max-w-[85%]" :
+                "bg-surface-container border border-outline-variant/20 p-4 rounded-none max-w-[85%] mr-auto text-right";
+                
+            const textNode = document.createElement('p');
+            textNode.className = "font-body-md text-body-md text-on-background";
+            textNode.textContent = text;
+            
+            content.appendChild(textNode);
+            
+            if (sender === 'ai') {
+                bubble.appendChild(avatar);
+                bubble.appendChild(content);
+            } else {
+                bubble.appendChild(content);
+                bubble.appendChild(avatar);
+            }
+            
+            chatMessages.appendChild(bubble);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function handleQuickAction(actionName) {
+            // Remove quick actions
+            if (quickActionsContainer) {
+                quickActionsContainer.style.display = 'none';
+            }
+            
+            // Add user message
+            addMessageBubble('user', actionName);
+            
+            // Add typing state
+            setTimeout(() => {
+                const responseText = responses[actionName] || "شكراً لك. دعني أراجع هذا الطلب وأعود إليك قريباً.";
+                addMessageBubble('ai', responseText);
+            }, 800);
+        }
+
+        function handleSendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+            
+            chatInput.value = '';
+            if (quickActionsContainer) {
+                quickActionsContainer.style.display = 'none';
+            }
+            
+            addMessageBubble('user', text);
+            
+            setTimeout(() => {
+                addMessageBubble('ai', "شكراً لك على التفاصيل. تم إدراج طلبك في محرك التأهيل الخاص بنا. سيقوم فريق الاستشارات الاستراتيجية لدينا بمراجعة طلبك والتواصل معك. يمكنك أيضاً طلب جلسة تنفيذية باستخدام النموذج الموجود على اليسار.");
+            }, 800);
+        }
+
+        // Enter key listener
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleSendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

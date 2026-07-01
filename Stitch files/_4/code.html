@@ -1,0 +1,383 @@
+<!DOCTYPE html><html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>مركز اتخاذ القرار - عن الشركة والقيادة</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary-container": "#604403",
+                        "surface-container-lowest": "#000d27",
+                        "on-tertiary": "#2b3137",
+                        "inverse-on-surface": "#20304f",
+                        "surface-tint": "#b9c7e4",
+                        "inverse-primary": "#515f78",
+                        "on-primary-fixed-variant": "#39475f",
+                        "inverse-surface": "#d8e2ff",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed": "#0d1c32",
+                        "on-secondary-fixed-variant": "#5d4201",
+                        "on-secondary-fixed": "#261900",
+                        "surface-dim": "#011230",
+                        "secondary-fixed-dim": "#e9c176",
+                        "on-secondary-container": "#dab36a",
+                        "tertiary-container": "#141a1f",
+                        "on-tertiary-fixed-variant": "#41474e",
+                        "on-error": "#690005",
+                        "primary-container": "#0a192f",
+                        "on-primary-container": "#74829d",
+                        "error": "#ffb4ab",
+                        "primary": "#b9c7e4",
+                        "tertiary-fixed-dim": "#c1c7cf",
+                        "outline-variant": "#44474d",
+                        "outline": "#8f9097",
+                        "tertiary": "#c1c7cf",
+                        "on-secondary": "#412d00",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#d6e3ff",
+                        "background": "#011230",
+                        "secondary": "#e9c176",
+                        "on-tertiary-container": "#7c838a",
+                        "surface-container-highest": "#253453",
+                        "surface-container": "#0e1f3d",
+                        "on-surface": "#d8e2ff",
+                        "surface-variant": "#253453",
+                        "surface-container-low": "#091b39",
+                        "surface-bright": "#293958",
+                        "on-surface-variant": "#c5c6cd",
+                        "surface-container-high": "#192a48",
+                        "on-background": "#d8e2ff",
+                        "on-primary": "#233148",
+                        "primary-fixed-dim": "#b9c7e4",
+                        "tertiary-fixed": "#dde3eb",
+                        "surface": "#011230",
+                        "on-tertiary-fixed": "#161c22",
+                        "secondary-fixed": "#ffdea5"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "margin-desktop": "64px",
+                        "margin-mobile": "20px",
+                        "base": "8px",
+                        "gutter": "24px",
+                        "section-gap": "120px",
+                        "container-max": "1280px"
+                    },
+                    fontFamily: {
+                        "body-md": ["Inter"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "body-lg": ["Inter"],
+                        "data-tabular": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Playfair Display"]
+                    },
+                    fontSize: {
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "display-lg-mobile": ["40px", { lineHeight: "48px", fontWeight: "700" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                        "data-tabular": ["14px", { lineHeight: "20px", fontWeight: "500" }],
+                        "label-caps": ["12px", { lineHeight: "16px", letterSpacing: "0.1em", fontWeight: "600" }],
+                        "headline-md": ["32px", { lineHeight: "40px", fontWeight: "600" }],
+                        "display-lg": ["60px", { lineHeight: "72px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "headline-lg": ["48px", { lineHeight: "56px", fontWeight: "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .gold-button {
+            background-color: theme('colors.secondary');
+            color: theme('colors.primary-container');
+            border: 1px solid theme('colors.secondary');
+            transition: all 0.3s ease;
+        }
+        .gold-button:hover {
+            background-color: transparent;
+            color: theme('colors.secondary');
+        }
+        .institutional-border {
+            border: 1px solid rgba(226, 232, 240, 0.1);
+        }
+        .nav-active {
+            color: theme('colors.secondary') !important;
+            border-bottom: 2px solid theme('colors.secondary');
+            padding-bottom: 4px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased selection:bg-secondary selection:text-background">
+<!-- TopNavBar -->
+<header class="bg-background/95 backdrop-blur-md border-b border-outline-variant/10 sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-container-max mx-auto h-20">
+<!-- Brand -->
+<div class="font-headline-md text-headline-md font-bold text-on-background tracking-tighter cursor-pointer">
+                مركز اتخاذ القرار
+            </div>
+<!-- Navigation -->
+<nav class="hidden md:flex space-x-8 space-x-reverse">
+<a class="font-label-caps text-label-caps nav-active" href="#">عن الشركة</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="#">القيادة</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="#">الخدمات</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="#">تواصل معنا</a>
+</nav>
+<!-- Actions -->
+<div class="hidden md:flex items-center space-x-6 space-x-reverse">
+<button class="flex items-center gap-2 px-3 py-1.5 border border-secondary/30 rounded-none font-label-caps text-label-caps text-secondary hover:bg-secondary/10 transition-all duration-200">
+<span class="material-symbols-outlined text-[18px]">language</span>
+<span>AR / EN</span>
+</button>
+<button class="gold-button font-label-caps text-label-caps px-6 py-3 rounded-none tracking-widest uppercase">
+                    طلب استشارة
+                </button>
+</div>
+<button class="md:hidden text-on-background">
+<span class="material-symbols-outlined text-3xl">menu</span>
+</button>
+</div>
+</header>
+<main class="flex-grow">
+<!-- Section 1: About Decision Center -->
+<section class="relative py-section-gap overflow-hidden">
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at 20% 50%, rgba(233, 193, 118, 0.1) 0%, transparent 50%);"></div>
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-center">
+<div class="lg:col-span-6 space-y-8">
+<span class="font-label-caps text-label-caps text-secondary tracking-widest block">نظرة عامة مؤسسية</span>
+<h1 class="font-display-lg text-display-lg text-on-background leading-tight">
+                            حول مركز <br><span class="text-secondary">اتخاذ القرار</span>
+</h1>
+<div class="w-20 h-1 bg-secondary"></div>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed max-w-xl">
+                            نحن لسنا مجرد شركة استشارية؛ نحن مهندسو الاستقرار المالي. في مركز اتخاذ القرار، نؤمن بأن القيمة الحقيقية تكمن في التطبيق العملي لا في النظريات المجردة. نحن نركز على النتائج الملموسة والحلول القابلة للتنفيذ التي تخدم الكيانات السيادية والمؤسسات الكبرى.
+                        </p>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed max-w-xl">
+                            منذ تأسيسنا، التزمنا بتفكيك التعقيدات المالية وتحويلها إلى استراتيجيات نمو واضحة، معتمدين على فهمنا العميق لديناميكيات السوق الإقليمية وشبكة علاقاتنا المؤسسية الواسعة.
+                        </p>
+</div>
+<div class="lg:col-span-6 relative">
+<div class="aspect-square bg-surface-container-high relative overflow-hidden institutional-border p-1">
+<div class="w-full h-full bg-cover bg-center grayscale hover:grayscale-0 transition-all duration-700" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDHF-gQoWOwyIS5QPtcyQpKttCwKERJfaHll6JpQP5oadYqE_qEAxW_R9euhdt8axVnPJqN_SW-lmiHaH5ApU9bQ9YHPwMOFXU2I-AQ0fb75h4Dl0RLdIZ_XXnu5G0jZfygyRNNZYtuff5CfhWBhqEj_LkxMtEkTjRLdtyxccQ98VO66b370JzAjmpZ2tZIsnlLTO9UEGCuZKHkiuFvWcOYI14g4s0Qc4i18XBKM9aC7qCX_L9kfSeIUR0b6rn8F1toZeOuRoCuiiUz');"></div>
+</div>
+<div class="absolute -bottom-10 -right-10 w-64 h-64 bg-surface-container-highest border border-secondary/20 p-8 hidden md:block">
+<div class="text-secondary font-display-lg text-5xl mb-2">30+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">عاماً من الخبرة المؤسسية المتراكمة</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Vision, Mission & Values -->
+<section class="bg-surface-container-lowest py-section-gap border-y border-outline-variant/10">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-16 mb-24">
+<div class="space-y-6">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary text-4xl">visibility</span>
+<h2 class="font-headline-md text-headline-md">رؤيتنا</h2>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+                            أن نكون المرجع الاستراتيجي الأول للكيانات السيادية وقادة المؤسسات في المنطقة، من خلال صياغة أطر مالية تضمن الاستدامة عبر الأجيال وتحقق ميزات تنافسية حاسمة.
+                        </p>
+</div>
+<div class="space-y-6">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary text-4xl">flag</span>
+<h2 class="font-headline-md text-headline-md">مهمتنا</h2>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+                            تمكين صناع القرار من خلال دقة تحليلية صارمة، ومعلومات استخباراتية عميقة عن السوق، وتنفيذ خالٍ من العيوب للهياكل المالية المعقدة التي تواجه تحديات العصر.
+                        </p>
+</div>
+</div>
+<div class="text-center mb-16">
+<span class="font-label-caps text-label-caps text-secondary block mb-4">قيمنا الراسخة</span>
+<h2 class="font-headline-lg text-headline-lg">المبادئ التي تقودنا</h2>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Value Items -->
+<div class="p-8 bg-background institutional-border hover:border-secondary transition-all group">
+<div class="text-secondary mb-6"><span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">gavel</span></div>
+<h3 class="font-headline-md text-2xl mb-4">النزاهة</h3>
+<p class="font-body-sm text-on-surface-variant">الالتزام بأعلى المعايير الأخلاقية والمهنية في كل تعامل واستشارة، لبناء علاقات قائمة على الثقة المطلقة.</p>
+</div>
+<div class="p-8 bg-background institutional-border hover:border-secondary transition-all group">
+<div class="text-secondary mb-6"><span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">lock</span></div>
+<h3 class="font-headline-md text-2xl mb-4">السرية</h3>
+<p class="font-body-sm text-on-surface-variant">حماية المعلومات الحساسة لعملائنا هي أولوية قصوى، حيث نتبع بروتوكولات صارمة لضمان خصوصية الارتباطات السيادية.</p>
+</div>
+<div class="p-8 bg-background institutional-border hover:border-secondary transition-all group">
+<div class="text-secondary mb-6"><span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">verified</span></div>
+<h3 class="font-headline-md text-2xl mb-4">الاحترافية</h3>
+<p class="font-body-sm text-on-surface-variant">فريقنا يجسد الانضباط والخبرة التقنية العالية، مما يضمن تقديم مخرجات بمستوى يليق بكبرى المؤسسات العالمية.</p>
+</div>
+<div class="p-8 bg-background institutional-border hover:border-secondary transition-all group">
+<div class="text-secondary mb-6"><span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">workspace_premium</span></div>
+<h3 class="font-headline-md text-2xl mb-4">الجودة</h3>
+<p class="font-body-sm text-on-surface-variant">السعي الدائم نحو الكمال في النمذجة المالية والتخطيط الاستراتيجي، مع التركيز على الدقة في كل التفاصيل.</p>
+</div>
+<div class="p-8 bg-background institutional-border hover:border-secondary transition-all group">
+<div class="text-secondary mb-6"><span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">lightbulb</span></div>
+<h3 class="font-headline-md text-2xl mb-4">الابتكار</h3>
+<p class="font-body-sm text-on-surface-variant">تطوير أدوات تحليلية ومنهجيات مالية مبتكرة تسبق تحولات السوق وتخلق فرصاً غير مسبوقة لعملائنا.</p>
+</div>
+<div class="p-8 bg-background institutional-border hover:border-secondary transition-all group">
+<div class="text-secondary mb-6"><span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">eco</span></div>
+<h3 class="font-headline-md text-2xl mb-4">الاستدامة</h3>
+<p class="font-body-sm text-on-surface-variant">بناء هياكل مالية ليست فقط ناجحة اليوم، بل قادرة على الصمود والنمو المستدام للأجيال القادمة.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Founder Profile -->
+<section class="py-section-gap bg-background">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+<!-- Founder Image Side -->
+<div class="lg:col-span-5 relative">
+<div class="relative z-10 institutional-border p-4 bg-surface-container-low shadow-2xl">
+<div class="aspect-[4/5] bg-surface-container overflow-hidden">
+<img alt="Abdullah Al Rushdi" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-bvF8dSN2MQZhRHcgeQIRktds4enzh7p0YWlgz2qayYe3o2-1VDiVDFbDpBdt3wp9I_QQvDxmt_IRV_y0_HZbbsUxN1nsC2SCUzT-IdgOTP7zluazS8wFlYZK0BWoiH_QEbzJQTVRtpmEBwsEFzm7M4KJ_gf83CpGQv3mwlEsJK8LXxbZXH_7q2NC2VsAZaf3GAPY2zMpNikueQ4LG5NLQ1y0pizNI66pHJU6D-H7XCMjt0dX9FYJHP5DTU6DAWrPVayc3VEPjxIz">
+</div>
+<div class="mt-8">
+<h3 class="font-headline-md text-3xl mb-1">عبدالله الرشدي</h3>
+<p class="font-label-caps text-secondary tracking-[0.2em]">المؤسس والرئيس التنفيذي</p>
+</div>
+</div>
+<div class="absolute -top-10 -left-10 w-full h-full border border-secondary/10 z-0"></div>
+</div>
+<!-- Biography Side -->
+<div class="lg:col-span-7 space-y-10">
+<div>
+<span class="font-label-caps text-secondary mb-4 block">قيادة تنفيذية</span>
+<h2 class="font-headline-lg text-4xl mb-8">عقود من الخبرة في قلب النظام المالي</h2>
+<div class="space-y-6 font-body-lg text-on-surface-variant leading-relaxed">
+<p>
+                                    يتمتع عبدالله الرشدي بمسيرة مهنية استثنائية تمتد لأكثر من 30 عاماً في قمة القطاع المالي والمصرفي في سلطنة عُمان والمنطقة. قبل تأسيس "مركز اتخاذ القرار"، شغل مناصب قيادية عليا في أبرز المؤسسات المالية، بما في ذلك بنك مسقط وبنك ظفار.
+                                </p>
+<p>
+                                    تميزت فترة عمله بقيادة استراتيجيات التحول الكبرى، وإدارة محافظ قروض ضخمة، وهيكلة تمويل المشاريع الوطنية الاستراتيجية. يُعرف عبدالله بدقته التحليلية المتناهية وقدرته الفذة على إدارة المخاطر في أكثر الظروف الاقتصادية تقلباً، مما جعله مستشاراً موثوقاً للعديد من الهيئات السيادية ومجالس الإدارات.
+                                </p>
+</div>
+</div>
+<!-- Expertise List -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 pt-8 border-t border-outline-variant/20">
+<div>
+<h4 class="font-label-caps text-on-background mb-4 text-sm opacity-60">مجالات الخبرة الرئيسية</h4>
+<ul class="space-y-3">
+<li class="flex items-center gap-3 text-on-surface">
+<span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>
+<span class="font-body-sm">الإدارة المصرفية العليا</span>
+</li>
+<li class="flex items-center gap-3 text-on-surface">
+<span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>
+<span class="font-body-sm">حوكمة الشركات والامتثال</span>
+</li>
+<li class="flex items-center gap-3 text-on-surface">
+<span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>
+<span class="font-body-sm">إدارة مخاطر المؤسسات (ERM)</span>
+</li>
+<li class="flex items-center gap-3 text-on-surface">
+<span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>
+<span class="font-body-sm">هيكلة رأس المال والتمويل المعقد</span>
+</li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-caps text-on-background mb-4 text-sm opacity-60">التركيز الاستراتيجي</h4>
+<ul class="space-y-3">
+<li class="flex items-center gap-3 text-on-surface">
+<span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>
+<span class="font-body-sm">تطوير السياسات المالية السيادية</span>
+</li>
+<li class="flex items-center gap-3 text-on-surface">
+<span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>
+<span class="font-body-sm">استراتيجيات مواءمة الثروة</span>
+</li>
+<li class="flex items-center gap-3 text-on-surface">
+<span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>
+<span class="font-body-sm">تحسين أداء الأرباح والخسائر</span>
+</li>
+<li class="flex items-center gap-3 text-on-surface">
+<span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>
+<span class="font-body-sm">التحول الرقمي للقطاع المالي</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant/10">
+<div class="max-w-container-max mx-auto px-margin-desktop py-20">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-16">
+<div class="md:col-span-5 space-y-6">
+<div class="font-headline-md text-secondary text-2xl font-bold">مركز اتخاذ القرار</div>
+<p class="font-body-sm text-on-surface-variant max-w-sm">
+                        مؤسسة استشارية مالية رائدة متخصصة في توفير الحلول الاستراتيجية وإدارة المخاطر للقطاعات المؤسسية والسيادية في سلطنة عمان.
+                    </p>
+<div class="flex gap-4">
+<a class="w-10 h-10 flex items-center justify-center border border-outline-variant/30 hover:border-secondary transition-colors text-on-surface-variant hover:text-secondary" href="#">
+<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"></path></svg>
+</a>
+<a class="w-10 h-10 flex items-center justify-center border border-outline-variant/30 hover:border-secondary transition-colors text-on-surface-variant hover:text-secondary" href="#">
+<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path></svg>
+</a>
+</div>
+</div>
+<div class="md:col-span-3 space-y-6">
+<h4 class="font-label-caps text-secondary">روابط سريعة</h4>
+<ul class="space-y-3 font-body-sm text-on-surface-variant">
+<li><a class="hover:text-secondary transition-colors" href="#">عن الشركة</a></li>
+<li><a class="hover:text-secondary transition-colors" href="#">منهجية العمل</a></li>
+<li><a class="hover:text-secondary transition-colors" href="#">القيادة</a></li>
+<li><a class="hover:text-secondary transition-colors" href="#">سجل الإنجازات</a></li>
+</ul>
+</div>
+<div class="md:col-span-4 space-y-6">
+<h4 class="font-label-caps text-secondary">اتصل بنا</h4>
+<ul class="space-y-4 font-body-sm text-on-surface-variant">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-xl">location_on</span>
+<span>صحار، سلطنة عُمان</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-xl">call</span>
+<span dir="ltr">+968 0000 0000</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-xl">mail</span>
+<span>Dcenterfe@gmail.com</span>
+</li>
+</ul>
+</div>
+</div>
+<div class="mt-20 pt-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="font-body-sm text-on-surface-variant opacity-60 text-xs">
+                    © 2024 مركز اتخاذ القرار. جميع الحقوق محفوظة.
+                </p>
+<div class="flex gap-8 font-body-sm text-xs text-on-surface-variant opacity-60">
+<a class="hover:text-secondary" href="#">سياسة الخصوصية</a>
+<a class="hover:text-secondary" href="#">شروط الاستخدام</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

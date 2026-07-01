@@ -1,0 +1,312 @@
+<!DOCTYPE html><html class="dark" dir="ltr" lang="en"><head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Decision Center | Corporate Advisory Services</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-container": "#604403",
+                      "surface-container-lowest": "#000d27",
+                      "on-tertiary": "#2b3137",
+                      "inverse-on-surface": "#20304f",
+                      "surface-tint": "#b9c7e4",
+                      "inverse-primary": "#515f78",
+                      "on-primary-fixed-variant": "#39475f",
+                      "inverse-surface": "#d8e2ff",
+                      "on-error-container": "#ffdad6",
+                      "on-primary-fixed": "#0d1c32",
+                      "on-secondary-fixed-variant": "#5d4201",
+                      "on-secondary-fixed": "#261900",
+                      "surface-dim": "#011230",
+                      "secondary-fixed-dim": "#e9c176",
+                      "on-secondary-container": "#dab36a",
+                      "tertiary-container": "#141a1f",
+                      "on-tertiary-fixed-variant": "#41474e",
+                      "on-error": "#690005",
+                      "primary-container": "#0a192f",
+                      "on-primary-container": "#74829d",
+                      "error": "#ffb4ab",
+                      "primary": "#b9c7e4",
+                      "tertiary-fixed-dim": "#c1c7cf",
+                      "outline-variant": "#44474d",
+                      "outline": "#8f9097",
+                      "tertiary": "#c1c7cf",
+                      "on-secondary": "#412d00",
+                      "error-container": "#93000a",
+                      "primary-fixed": "#d6e3ff",
+                      "background": "#011230",
+                      "secondary": "#e9c176",
+                      "on-tertiary-container": "#7c838a",
+                      "surface-container-highest": "#253453",
+                      "surface-container": "#0e1f3d",
+                      "on-surface": "#d8e2ff",
+                      "surface-variant": "#253453",
+                      "surface-container-low": "#091b39",
+                      "surface-bright": "#293958",
+                      "on-surface-variant": "#c5c6cd",
+                      "surface-container-high": "#192a48",
+                      "on-background": "#d8e2ff",
+                      "on-primary": "#233148",
+                      "primary-fixed-dim": "#b9c7e4",
+                      "tertiary-fixed": "#dde3eb",
+                      "surface": "#011230",
+                      "on-tertiary-fixed": "#161c22",
+                      "secondary-fixed": "#ffdea5"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-desktop": "64px",
+                      "margin-mobile": "20px",
+                      "base": "8px",
+                      "gutter": "24px",
+                      "section-gap": "120px",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "body-md": ["Inter"],
+                      "display-lg-mobile": ["Playfair Display"],
+                      "body-lg": ["Inter"],
+                      "data-tabular": ["Inter"],
+                      "label-caps": ["Inter"],
+                      "headline-md": ["Playfair Display"],
+                      "display-lg": ["Playfair Display"],
+                      "body-sm": ["Inter"],
+                      "headline-lg": ["Playfair Display"]
+              },
+              "fontSize": {
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "display-lg-mobile": ["40px", {"lineHeight": "48px", "fontWeight": "700"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                      "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                      "display-lg": ["60px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-lg": ["48px", {"lineHeight": "56px", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+    <!-- TopNavBar -->
+    <header class="bg-background dark:bg-background border-b border-outline-variant/20 sticky top-0 z-50">
+        <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto h-20">
+            <div class="h-12 w-auto flex items-center"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuApiDG4JoSQCkK14QfeV8oPMsC_rgMOo6sXJ8W_wRiV36BqDMaJT0RHhvtAC4JsjV2uz2dgIYxAqwK-8o9xnKCxqm2NAY0sUFR0A5RbN0VrDFbJixolVGyQrfaooWhkQQ0bTVUkwI_ZurRl-bZiIwJisSUAE2HQdoazUu6uo_xL0c5f2BqLKy8NqtO4xqxAfSvlP_jVAREWMUayi5u5YogG9wcT_nO1j2f9tcPwwOFvhaTreBUqYyp7CF6MS0pxRW_aWAPD9BIMvLke" alt="Decision Center Logo" class="h-full w-auto object-contain"></div>
+            <nav class="hidden md:flex space-x-8">
+                <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps" href="#">About Us</a>
+                <a class="text-secondary border-b-2 border-secondary pb-1 font-label-caps text-label-caps" href="#">Services</a>
+                <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps" href="#">Insights</a>
+                <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps" href="#">Track Record</a>
+            </nav>
+            <div class="hidden md:flex items-center space-x-4">
+                <button class="flex items-center space-x-2 px-3 py-1.5 border border-secondary/30 hover:border-secondary transition-all">
+                    <span class="material-symbols-outlined text-sm text-secondary">language</span>
+                    <span class="font-label-caps text-label-caps text-secondary">AR</span>
+                </button>
+                <a class="bg-secondary text-primary-container px-6 py-3 font-label-caps text-label-caps hover:bg-transparent hover:text-secondary border border-transparent hover:border-secondary transition-all" href="#">Book a Consultation</a>
+            </div>
+            <button class="md:hidden text-on-background">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        <!-- Hero Section -->
+        <section class="px-margin-mobile md:px-margin-desktop pt-section-gap pb-16 max-w-container-max mx-auto">
+            <div class="max-w-4xl">
+                <h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-background mb-6">
+                    Corporate Advisory Services
+                </h1>
+                <p class="font-body-lg text-body-lg text-on-surface-variant">
+                    Providing integrated solutions that combine financial precision and operational excellence, designed to support decision-makers in complex business environments.
+                </p>
+            </div>
+        </section>
+
+        <!-- Services Grid -->
+        <section class="px-margin-mobile md:px-margin-desktop pb-12 max-w-container-max mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Financial Consulting -->
+                <div class="bg-surface-container border border-outline-variant/20 p-8 flex flex-col hover:border-secondary/40 transition-colors">
+                    <span class="material-symbols-outlined text-secondary text-4xl mb-6">account_balance</span>
+                    <h3 class="font-headline-md text-2xl text-on-background mb-4">Financial Consulting</h3>
+                    <ul class="space-y-3 font-body-md text-on-surface-variant mb-6 flex-grow">
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>Advanced Financial Analysis</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>Performance Evaluation</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>Debt Management Strategies</li>
+                    </ul>
+                    <a class="inline-flex items-center text-secondary font-label-caps text-label-caps gap-2 group" href="#">
+                        Explore More <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </a>
+                </div>
+
+                <!-- Finance & Investment -->
+                <div class="bg-surface-container border border-outline-variant/20 p-8 flex flex-col hover:border-secondary/40 transition-colors">
+                    <span class="material-symbols-outlined text-secondary text-4xl mb-6">payments</span>
+                    <h3 class="font-headline-md text-2xl text-on-background mb-4">Funding &amp; Investment</h3>
+                    <ul class="space-y-3 font-body-md text-on-surface-variant mb-6 flex-grow">
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>Project Structuring</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>Bank Negotiations</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>M&amp;A Advisory</li>
+                    </ul>
+                    <a class="inline-flex items-center text-secondary font-label-caps text-label-caps gap-2 group" href="#">
+                        Explore More <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </a>
+                </div>
+
+                <!-- Governance & Institutional -->
+                <div class="bg-surface-container border border-outline-variant/20 p-8 flex flex-col hover:border-secondary/40 transition-colors">
+                    <span class="material-symbols-outlined text-secondary text-4xl mb-6">corporate_fare</span>
+                    <h3 class="font-headline-md text-2xl text-on-background mb-4">Governance &amp; Development</h3>
+                    <ul class="space-y-3 font-body-md text-on-surface-variant mb-6 flex-grow">
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>Organizational Structures</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>Performance Systems</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>Policies &amp; Procedures</li>
+                    </ul>
+                    <a class="inline-flex items-center text-secondary font-label-caps text-label-caps gap-2 group" href="#">
+                        Explore More <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </a>
+                </div>
+
+                <!-- Digital Transformation -->
+                <div class="bg-surface-container border border-outline-variant/20 p-8 flex flex-col hover:border-secondary/40 transition-colors md:col-span-2 lg:col-span-1">
+                    <span class="material-symbols-outlined text-secondary text-4xl mb-6">precision_manufacturing</span>
+                    <h3 class="font-headline-md text-2xl text-on-background mb-4">Digital Transformation</h3>
+                    <ul class="space-y-3 font-body-md text-on-surface-variant mb-6 flex-grow">
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>Process Automation</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>AI Applications</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>Data Analysis</li>
+                    </ul>
+                    <a class="inline-flex items-center text-secondary font-label-caps text-label-caps gap-2 group" href="#">
+                        Explore More <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </a>
+                </div>
+
+                <!-- Feasibility Studies Teaser -->
+                <div class="md:col-span-2 bg-secondary/5 border border-secondary/20 p-8 flex flex-col md:flex-row gap-8 items-center overflow-hidden relative">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-secondary/10 blur-3xl translate-x-1/2 -translate-y-1/2 rounded-full"></div>
+                    <div class="flex-grow z-10">
+                        <span class="inline-block px-3 py-1 bg-secondary text-primary-container font-label-caps text-[10px] mb-4">PREMIUM SERVICE</span>
+                        <h3 class="font-headline-md text-2xl text-on-background mb-4">Integrated Feasibility Studies</h3>
+                        <p class="font-body-md text-on-surface-variant mb-6">
+                            We provide comprehensive project analyses ensuring economic, technical, and legal viability before resources are allocated.
+                        </p>
+                        <a class="bg-secondary text-primary-container px-8 py-3 font-label-caps text-label-caps inline-block hover:bg-transparent hover:text-secondary border border-transparent hover:border-secondary transition-all" href="#feasibility">
+                            Full Details
+                        </a>
+                    </div>
+                    <div class="hidden lg:block w-48 h-48 bg-surface-container-high border border-outline-variant/30 -rotate-12 flex items-center justify-center opacity-50">
+                        <span class="material-symbols-outlined text-secondary text-6xl">fact_check</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Deep Dive: Feasibility Studies -->
+        <section class="bg-surface-container-low py-section-gap" id="feasibility">
+            <div class="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+                    <div class="lg:col-span-5">
+                        <h2 class="font-headline-md text-headline-md text-on-background mb-8 leading-tight">Feasibility Studies: The Cornerstone of Every Successful Investment</h2>
+                        <p class="font-body-lg text-body-lg text-on-surface-variant mb-8">
+                            Why do we need professional feasibility studies? Because project success begins before capital is committed. We provide bankable roadmaps that protect capital from uncalculated risks and identify real growth opportunities in a changing market.
+                        </p>
+                        <div class="space-y-6">
+                            <div class="flex gap-4">
+                                <div class="bg-secondary/10 p-2 h-fit"><span class="material-symbols-outlined text-secondary">trending_up</span></div>
+                                <div>
+                                    <h4 class="font-bold text-on-background mb-1">Risk Mitigation</h4>
+                                    <p class="text-body-sm text-on-surface-variant">Identifying potential obstacles and defining contingency plans before implementation.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="bg-secondary/10 p-2 h-fit"><span class="material-symbols-outlined text-secondary">insights</span></div>
+                                <div>
+                                    <h4 class="font-bold text-on-background mb-1">Resource Optimization</h4>
+                                    <p class="text-body-sm text-on-surface-variant">Ensuring investments are directed toward the most profitable and sustainable channels.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-7">
+                        <div class="bg-background border border-outline-variant/20 p-8">
+                            <h3 class="font-label-caps text-label-caps text-secondary mb-8 border-b border-outline-variant/20 pb-4">STUDY COMPONENTS &amp; DELIVERABLES</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                                <div class="group">
+                                    <div class="text-secondary font-data-tabular mb-2">01. Market Analysis</div>
+                                    <p class="text-body-sm text-on-surface-variant group-hover:text-on-background transition-colors">Demand estimation, competitor analysis, and targeted marketing strategies.</p>
+                                </div>
+                                <div class="group">
+                                    <div class="text-secondary font-data-tabular mb-2">02. Technical Feasibility</div>
+                                    <p class="text-body-sm text-on-surface-variant group-hover:text-on-background transition-colors">Evaluating operational and technical requirements and supply chains.</p>
+                                </div>
+                                <div class="group">
+                                    <div class="text-secondary font-data-tabular mb-2">03. Financial Modeling</div>
+                                    <p class="text-body-sm text-on-surface-variant group-hover:text-on-background transition-colors">Cash flow projections, payback period, and IRR/NPV analysis.</p>
+                                </div>
+                                <div class="group">
+                                    <div class="text-secondary font-data-tabular mb-2">04. Risk Assessment</div>
+                                    <p class="text-body-sm text-on-surface-variant group-hover:text-on-background transition-colors">Sensitivity analysis, potential risk identification, and mitigation strategies.</p>
+                                </div>
+                                <div class="group">
+                                    <div class="text-secondary font-data-tabular mb-2">05. Legal Review</div>
+                                    <p class="text-body-sm text-on-surface-variant group-hover:text-on-background transition-colors">Compliance with local laws, regulations, and contractual agreements.</p>
+                                </div>
+                                <div class="group">
+                                    <div class="text-secondary font-data-tabular mb-2">06. Final Decision Report</div>
+                                    <p class="text-body-sm text-on-surface-variant group-hover:text-on-background transition-colors">Executive recommendations and a clear roadmap for next steps.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="px-margin-mobile md:px-margin-desktop py-section-gap max-w-container-max mx-auto text-center">
+            <h2 class="font-headline-md text-headline-md text-on-background mb-6">Are you ready to make your next big decision?</h2>
+            <p class="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-2xl mx-auto">
+                Our experts are ready to transform your challenges into sustainable growth opportunities based on data-driven consultations.
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <a class="bg-secondary text-primary-container px-10 py-4 font-label-caps text-label-caps hover:bg-transparent hover:text-secondary border border-transparent hover:border-secondary transition-all" href="#">Book a Consultation</a>
+                <a class="border border-outline-variant/40 text-on-background px-10 py-4 font-label-caps text-label-caps hover:bg-surface-container-high transition-all" href="#">Download Service Profile (PDF)</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface-container-lowest border-t border-outline-variant/30">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter px-margin-mobile md:px-margin-desktop py-section-gap max-w-container-max mx-auto">
+            <div class="md:col-span-4 flex flex-col justify-between mb-8 md:mb-0">
+                <div class="h-16 w-auto mb-4 flex items-center"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAe_qkyt8n0ZoQa12doJqf2e4_zji_flgdtZ8EkhGV4IXMut6rHYdceY1hxHsqU1LifmL7A-7OqfAniZVpTEy-7QqGBStF2BH7NrXxgZnN0Rl2sFbJ5_ZWVlLZIJP3zqSXetQyxuSOd8ropUAbzmSgLsNKUHAlK-kwGM07nR8rVO09eO6SS6Q8FQ8dQX-h94uP6m_ylx7GE7VSoc_XZxqReI-fslZNO5QsPlaEz15xEx3f46VRL9a_hSDzVaL40WJG3eX8A6K7m3uF-" alt="Decision Center Logo" class="h-full w-auto object-contain"></div>
+                <div class="text-on-surface-variant text-sm mt-auto">
+                    © 2024 Decision Center for Advisory Services. All rights reserved.
+                </div>
+            </div>
+            <div class="md:col-span-8 flex flex-col md:flex-row justify-end space-y-8 md:space-y-0 md:space-x-16">
+                <div class="flex flex-col space-y-4">
+                    <span class="font-label-caps text-label-caps text-on-surface-variant">Contact Us</span>
+                    <a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Sohar, Sultanate of Oman</a>
+                    <a class="text-on-surface-variant hover:text-secondary transition-colors" href="tel:+96800000000">+968 0000 0000</a>
+                    <a class="text-on-surface-variant hover:text-secondary transition-colors" href="mailto:Dcenterfe@gmail.com">Dcenterfe@gmail.com</a>
+                </div>
+                <div class="flex flex-col space-y-4">
+                    <span class="font-label-caps text-label-caps text-on-surface-variant">Legal
+
+</span></div></div></div></footer></body></html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Decision Center - Final Conversion Engine</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#604403",
+                        "surface-container-lowest": "#000d27",
+                        "on-tertiary": "#2b3137",
+                        "inverse-on-surface": "#20304f",
+                        "surface-tint": "#b9c7e4",
+                        "inverse-primary": "#515f78",
+                        "on-primary-fixed-variant": "#39475f",
+                        "inverse-surface": "#d8e2ff",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed": "#0d1c32",
+                        "on-secondary-fixed-variant": "#5d4201",
+                        "on-secondary-fixed": "#261900",
+                        "surface-dim": "#011230",
+                        "secondary-fixed-dim": "#e9c176",
+                        "on-secondary-container": "#dab36a",
+                        "tertiary-container": "#141a1f",
+                        "on-tertiary-fixed-variant": "#41474e",
+                        "on-error": "#690005",
+                        "primary-container": "#0a192f",
+                        "on-primary-container": "#74829d",
+                        "error": "#ffb4ab",
+                        "primary": "#b9c7e4",
+                        "tertiary-fixed-dim": "#c1c7cf",
+                        "outline-variant": "#44474d",
+                        "outline": "#8f9097",
+                        "tertiary": "#c1c7cf",
+                        "on-secondary": "#412d00",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#d6e3ff",
+                        "background": "#011230",
+                        "secondary": "#e9c176",
+                        "on-tertiary-container": "#7c838a",
+                        "surface-container-highest": "#253453",
+                        "surface-container": "#0e1f3d",
+                        "on-surface": "#d8e2ff",
+                        "surface-variant": "#253453",
+                        "surface-container-low": "#091b39",
+                        "surface-bright": "#293958",
+                        "on-surface-variant": "#c5c6cd",
+                        "surface-container-high": "#192a48",
+                        "on-background": "#d8e2ff",
+                        "on-primary": "#233148",
+                        "primary-fixed-dim": "#b9c7e4",
+                        "tertiary-fixed": "#dde3eb",
+                        "surface": "#011230",
+                        "on-tertiary-fixed": "#161c22",
+                        "secondary-fixed": "#ffdea5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "64px",
+                        "margin-mobile": "20px",
+                        "base": "8px",
+                        "gutter": "24px",
+                        "section-gap": "120px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "body-lg": ["Inter"],
+                        "data-tabular": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "48px", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "data-tabular": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "display-lg": ["60px", { "lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg": ["48px", { "lineHeight": "56px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+        .accordion-content {
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .accordion-content.active {
+            max-height: 500px;
+            opacity: 1;
+        }
+        .accordion-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+        .accordion-icon.active {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased overflow-x-hidden min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-background dark:bg-background docked full-width top-0 border-b border-outline-variant/20 z-50 sticky">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-container-max mx-auto h-20">
+<div class="font-headline-md text-headline-md font-bold text-on-background tracking-tighter">
+                Decision Center
+            </div>
+<div class="hidden md:flex items-center space-x-8"><a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps hover:bg-secondary/10 transition-all duration-300 px-2 py-1" href="#">Home</a><a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps hover:bg-secondary/10 transition-all duration-300 px-2 py-1" href="#">About Us</a><a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps hover:bg-secondary/10 transition-all duration-300 px-2 py-1" href="#">Services</a><a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps hover:bg-secondary/10 transition-all duration-300 px-2 py-1" href="#">Insights</a><a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps hover:bg-secondary/10 transition-all duration-300 px-2 py-1" href="#">Contact</a></div>
+<div class="flex items-center space-x-4">
+<button class="flex items-center gap-1 px-3 py-1 border border-secondary/30 rounded-full font-label-caps text-label-caps text-secondary hover:bg-secondary/10 hover:border-secondary transition-all duration-300"><span class="material-symbols-outlined text-[16px]" style="font-size: 16px;">language</span><span class="">AR / EN</span></button>
+<button class="hidden md:inline-flex bg-secondary text-primary-container px-6 py-2 border border-secondary hover:bg-transparent hover:text-secondary transition-colors duration-300 font-label-caps text-label-caps items-center">Book a Consultation</button>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow">
+<!-- Section: Conversion Header & Objection Handling -->
+<section class="px-margin-mobile md:px-margin-desktop py-section-gap max-w-container-max mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<div class="md:col-span-5 flex flex-col justify-center">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-background mb-6">
+                        Proceed with <span class="text-secondary">Absolute Clarity.</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-8">
+                        Our institutional-grade reporting structure leaves no ambiguity. Address your concerns directly below.
+                    </p>
+</div>
+<div class="md:col-span-6 md:col-start-7 flex flex-col justify-center space-y-4">
+<!-- Accordion Item 1 -->
+<div class="border border-outline-variant/30 bg-surface-container-high rounded-DEFAULT overflow-hidden">
+<button class="w-full px-6 py-4 flex justify-between items-center text-left focus:outline-none" onclick="toggleAccordion('acc1', 'icon1')">
+<span class="font-body-md text-body-md text-on-background font-semibold">Is my information safe?</span>
+<span class="material-symbols-outlined accordion-icon text-secondary" data-icon="expand_more" id="icon1">expand_more</span>
+</button>
+<div class="accordion-content bg-surface px-6 pb-4" id="acc1">
+<div class="w-full h-px bg-outline-variant/10 mb-4"></div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                                Decision Center employs bank-grade encryption and sovereign-level data isolation protocols. All proprietary client data is housed in strictly segregated, offline-capable environments.
+                            </p>
+</div>
+</div>
+<!-- Accordion Item 2 -->
+<div class="border border-outline-variant/30 bg-surface-container-high rounded-DEFAULT overflow-hidden">
+<button class="w-full px-6 py-4 flex justify-between items-center text-left focus:outline-none" onclick="toggleAccordion('acc2', 'icon2')">
+<span class="font-body-md text-body-md text-on-background font-semibold">Are the reports accepted officially?</span>
+<span class="material-symbols-outlined accordion-icon text-secondary" data-icon="expand_more" id="icon2">expand_more</span>
+</button>
+<div class="accordion-content bg-surface px-6 pb-4" id="acc2">
+<div class="w-full h-px bg-outline-variant/10 mb-4"></div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                                Yes. Our forensic accounting and valuation reports are strictly formatted to adhere to the evidentiary requirements of the Sultanate of Oman's judicial system, providing robust support in litigation and arbitration.
+                            </p>
+</div>
+</div>
+<!-- Accordion Item 3 -->
+<div class="border border-outline-variant/30 bg-surface-container-high rounded-DEFAULT overflow-hidden">
+<button class="w-full px-6 py-4 flex justify-between items-center text-left focus:outline-none" onclick="toggleAccordion('acc3', 'icon3')">
+<span class="font-body-md text-body-md text-on-background font-semibold">What is the success rate?</span>
+<span class="material-symbols-outlined accordion-icon text-secondary" data-icon="expand_more" id="icon3">expand_more</span>
+</button>
+<div class="accordion-content bg-surface px-6 pb-4" id="acc3">
+<div class="w-full h-px bg-outline-variant/10 mb-4"></div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                                Feasibility studies prepared by Decision Center maintain an institutional acceptance rate exceeding 94% across major Omani banks and sovereign wealth funds.
+                            </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Divider -->
+<div class="w-full max-w-container-max mx-auto px-margin-desktop h-px bg-outline-variant/30"></div>
+<!-- Section: Secure Contact & Scheduling -->
+<section class="px-margin-mobile md:px-margin-desktop py-section-gap max-w-container-max mx-auto relative">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Trust & Coordinates Box -->
+<div class="md:col-span-4 bg-surface-container-high border border-outline-variant/20 p-8 flex flex-col h-full">
+<h3 class="font-headline-md text-headline-md text-on-background mb-8 border-b border-outline-variant/20 pb-4">Contact Us</h3>
+<div class="space-y-6 flex-grow">
+<div class="flex items-start space-x-4">
+<span class="material-symbols-outlined text-secondary mt-1" data-icon="location_on" data-weight="fill" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1">Our Office</p>
+<p class="font-body-md text-body-md text-on-background">Sohar, Sultanate of Oman</p>
+</div>
+</div>
+<div class="flex items-start space-x-4">
+<span class="material-symbols-outlined text-secondary mt-1" data-icon="phone_enabled" data-weight="fill" style="font-variation-settings: 'FILL' 1;">phone_enabled</span>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1">Call Us</p>
+<p class="font-body-md text-body-md text-on-background">+968 96680001</p>
+</div>
+</div>
+<div class="flex items-start space-x-4">
+<span class="material-symbols-outlined text-secondary mt-1" data-icon="mail" data-weight="fill" style="font-variation-settings: 'FILL' 1;">mail</span>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1">Email Us</p>
+<p class="font-body-md text-body-md text-on-background">Dcenterfe@gmail.com</p>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-8 border-t border-outline-variant/20 flex space-x-4 items-center">
+<span class="material-symbols-outlined text-outline text-3xl" data-icon="verified_user">verified_user</span>
+<p class="font-body-sm text-body-sm text-outline">Encrypted Communication Protocol Active</p>
+</div>
+</div>
+<!-- Scheduling Interface -->
+<div class="md:col-span-8 bg-surface-container border border-outline-variant/20 p-8 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+<h3 class="font-headline-md text-headline-md text-on-background mb-2">Book Your Consultation Now</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-8">Select a time slot for your confidential session.</p>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Calendar Widget -->
+<div class="border border-outline-variant/20 bg-surface-dim p-4">
+<div class="flex justify-between items-center mb-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-secondary" data-icon="chevron_left">chevron_left</span>
+<span class="font-data-tabular text-data-tabular text-on-background">October 2024</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-secondary" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="grid grid-cols-7 gap-1 text-center mb-2">
+<div class="font-label-caps text-label-caps text-on-surface-variant text-[10px]">S</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant text-[10px]">M</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant text-[10px]">T</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant text-[10px]">W</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant text-[10px]">T</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant text-[10px]">F</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant text-[10px]">S</div>
+</div>
+<div class="grid grid-cols-7 gap-1 text-center">
+<div></div><div></div>
+<div class="p-2 font-data-tabular text-data-tabular text-outline-variant">1</div>
+<div class="p-2 font-data-tabular text-data-tabular text-outline-variant">2</div>
+<div class="p-2 font-data-tabular text-data-tabular text-on-background cursor-pointer hover:border hover:border-secondary">3</div>
+<div class="p-2 font-data-tabular text-data-tabular text-on-background cursor-pointer hover:border hover:border-secondary">4</div>
+<div class="p-2 font-data-tabular text-data-tabular text-outline-variant">5</div>
+<div class="p-2 font-data-tabular text-data-tabular text-outline-variant">6</div>
+<div class="p-2 font-data-tabular text-data-tabular text-on-background cursor-pointer hover:border hover:border-secondary">7</div>
+<div class="p-2 font-data-tabular text-data-tabular text-on-background cursor-pointer border border-secondary text-secondary bg-secondary/10">8</div>
+<div class="p-2 font-data-tabular text-data-tabular text-on-background cursor-pointer hover:border hover:border-secondary">9</div>
+<div class="p-2 font-data-tabular text-data-tabular text-on-background cursor-pointer hover:border hover:border-secondary">10</div>
+<div class="p-2 font-data-tabular text-data-tabular text-outline-variant">11</div>
+<div class="p-2 font-data-tabular text-data-tabular text-outline-variant">12</div>
+<div class="p-2 font-data-tabular text-data-tabular text-on-background cursor-pointer hover:border hover:border-secondary">13</div>
+<div class="p-2 font-data-tabular text-data-tabular text-on-background cursor-pointer hover:border hover:border-secondary">14</div>
+<div class="p-2 font-data-tabular text-data-tabular text-on-background cursor-pointer hover:border hover:border-secondary">15</div>
+</div>
+</div>
+<!-- Time Slots & CTA -->
+<div class="flex flex-col">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-4">Available Slots for Oct 8</p>
+<div class="grid grid-cols-2 gap-3 mb-8">
+<button class="border border-outline-variant/30 py-2 font-data-tabular text-data-tabular text-on-background hover:border-secondary hover:text-secondary transition-colors bg-surface-dim">09:00 GST</button>
+<button class="border border-secondary py-2 font-data-tabular text-data-tabular text-secondary bg-secondary/10 transition-colors">11:30 GST</button>
+<button class="border border-outline-variant/30 py-2 font-data-tabular text-data-tabular text-on-background hover:border-secondary hover:text-secondary transition-colors bg-surface-dim">14:00 GST</button>
+<button class="border border-outline-variant/30 py-2 font-data-tabular text-data-tabular text-on-background hover:border-secondary hover:text-secondary transition-colors bg-surface-dim">16:00 GST</button>
+</div>
+<button class="w-full bg-secondary text-primary-container py-4 font-label-caps text-label-caps font-semibold border border-secondary hover:bg-transparent hover:text-secondary transition-all duration-300 mt-auto shadow-[0_0_15px_rgba(197,160,89,0.2)]">
+                                Confirm Consultation
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest full-width bottom-0 border-t border-outline-variant/30 transition-opacity duration-200">
+<div class="grid grid-cols-12 gap-gutter px-margin-desktop py-section-gap max-w-container-max mx-auto">
+<div class="col-span-12 md:col-span-4 mb-8 md:mb-0">
+<div class="font-headline-md text-headline-md font-bold text-secondary mb-4">Decision Center</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">© 2024 Decision Center. All rights reserved. Registered in Sohar, Sultanate of Oman.</p>
+</div>
+<div class="col-span-12 md:col-span-8 flex flex-wrap md:justify-end gap-x-8 gap-y-4 items-center">
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors" href="#">Sohar, Oman</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors" href="#">+968 96680001</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors" href="#">Dcenterfe@gmail.com</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors" href="#">Privacy Policy</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors" href="#">Terms of Service</a>
+</div>
+</div>
+</footer>
+<script>
+        function toggleAccordion(contentId, iconId) {
+            const content = document.getElementById(contentId);
+            const icon = document.getElementById(iconId);
+            content.classList.toggle('active');
+            icon.classList.toggle('active');
+        }
+    </script>
+</body></html>

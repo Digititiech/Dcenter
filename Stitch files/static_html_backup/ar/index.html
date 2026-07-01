@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html class="dark" dir="rtl" lang="ar">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>مركز القرار | استشارات مالية واقتصادية سيادية</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#604403",
+                        "surface-container-lowest": "#000d27",
+                        "on-tertiary": "#2b3137",
+                        "inverse-on-surface": "#20304f",
+                        "surface-tint": "#b9c7e4",
+                        "inverse-primary": "#515f78",
+                        "on-primary-fixed-variant": "#39475f",
+                        "inverse-surface": "#d8e2ff",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed": "#0d1c32",
+                        "on-secondary-fixed-variant": "#5d4201",
+                        "on-secondary-fixed": "#261900",
+                        "surface-dim": "#011230",
+                        "secondary-fixed-dim": "#e9c176",
+                        "on-secondary-container": "#dab36a",
+                        "tertiary-container": "#141a1f",
+                        "on-tertiary-fixed-variant": "#41474e",
+                        "on-error": "#690005",
+                        "primary-container": "#0a192f",
+                        "on-primary-container": "#74829d",
+                        "error": "#ffb4ab",
+                        "primary": "#b9c7e4",
+                        "tertiary-fixed-dim": "#c1c7cf",
+                        "outline-variant": "#44474d",
+                        "outline": "#8f9097",
+                        "tertiary": "#c1c7cf",
+                        "on-secondary": "#412d00",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#d6e3ff",
+                        "background": "#011230",
+                        "secondary": "#e9c176",
+                        "on-tertiary-container": "#7c838a",
+                        "surface-container-highest": "#253453",
+                        "surface-container": "#0e1f3d",
+                        "on-surface": "#d8e2ff",
+                        "surface-variant": "#253453",
+                        "surface-container-low": "#091b39",
+                        "surface-bright": "#293958",
+                        "on-surface-variant": "#c5c6cd",
+                        "surface-container-high": "#192a48",
+                        "on-background": "#d8e2ff",
+                        "on-primary": "#233148",
+                        "primary-fixed-dim": "#b9c7e4",
+                        "tertiary-fixed": "#dde3eb",
+                        "surface": "#011230",
+                        "on-tertiary-fixed": "#161c22",
+                        "secondary-fixed": "#ffdea5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "64px",
+                        "margin-mobile": "20px",
+                        "base": "8px",
+                        "gutter": "24px",
+                        "section-gap": "120px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "body-lg": ["Inter"],
+                        "data-tabular": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "48px", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "data-tabular": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "display-lg": ["60px", { "lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg": ["48px", { "lineHeight": "56px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .service-card:hover .service-border {
+            border-color: #e9c176;
+            transform: translateY(-4px);
+        }
+        .service-card:hover .service-icon {
+            color: #e9c176;
+        }
+        .authority-badge {
+            position: relative;
+        }
+        .authority-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 2px;
+            height: 100%;
+            background-color: #e9c176;
+        }
+        .step-number {
+            -webkit-text-stroke: 1px rgba(233, 193, 118, 0.3);
+            color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased selection:bg-secondary selection:text-background min-h-screen flex flex-col">
+
+    <!-- TopNavBar -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-background border-b border-outline-variant/20 h-20 transition-all duration-300">
+        <nav class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto h-full">
+            <!-- Brand Logo -->
+            <a class="font-headline-md text-headline-md font-bold text-on-background tracking-tighter flex items-center gap-2" href="index.html">
+                <span class="material-symbols-outlined text-secondary text-3xl" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+                <span>مركز القرار</span>
+            </a>
+            <!-- Desktop Navigation -->
+            <ul class="hidden md:flex gap-8 items-center h-full">
+                <li class="h-full flex items-center">
+                    <a class="text-secondary border-b-2 border-secondary pb-1 font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="index.html">الرئيسية</a>
+                </li>
+                <li class="h-full flex items-center">
+                    <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="about.html">شركتنا</a>
+                </li>
+                <li class="h-full flex items-center">
+                    <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="services.html">خدماتنا</a>
+                </li>
+                <li class="h-full flex items-center">
+                    <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="methodology.html">منهجيتنا</a>
+                </li>
+                <li class="h-full flex items-center">
+                    <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="ai-assistant.html">المساعد الذكي</a>
+                </li>
+                <li class="h-full flex items-center">
+                    <a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300" href="contact.html">اتصل بنا</a>
+                </li>
+            </ul>
+            <!-- Actions -->
+            <div class="hidden md:flex items-center gap-4">
+                <a class="flex items-center gap-2 px-3 py-1.5 border border-secondary/30 rounded-none text-secondary hover:bg-secondary/10 transition-all duration-300 font-label-caps text-label-caps" href="../index.html">
+                    <span class="material-symbols-outlined text-[18px]">language</span>
+                    <span>EN</span>
+                </a>
+                <a class="bg-secondary text-background hover:bg-transparent hover:text-secondary border border-secondary transition-all duration-300 px-6 py-2 rounded-none font-label-caps text-label-caps" href="contact.html">
+                    طلب استشارة
+                </a>
+            </div>
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-toggle" class="md:hidden text-on-background">
+                <span class="material-symbols-outlined text-2xl">menu</span>
+            </button>
+        </nav>
+        <!-- Mobile Dropdown Menu -->
+        <div id="mobile-menu" class="hidden absolute top-20 left-0 right-0 bg-background border-b border-outline-variant/20 px-margin-mobile py-6 flex flex-col gap-4 md:hidden z-40">
+            <a class="font-label-caps text-label-caps text-secondary font-bold" href="index.html">الرئيسية</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="about.html">شركتنا</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="services.html">خدماتنا</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="methodology.html">منهجيتنا</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="ai-assistant.html">المساعد الذكي</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors" href="contact.html">اتصل بنا</a>
+            <div class="h-px bg-outline-variant/20 my-2"></div>
+            <a class="flex items-center justify-center gap-2 px-3 py-1.5 border border-secondary/30 rounded-none text-secondary hover:bg-secondary/10 transition-all duration-300 font-label-caps text-label-caps text-center" href="../index.html">
+                <span class="material-symbols-outlined text-[18px]">language</span>
+                <span>EN</span>
+            </a>
+            <a class="bg-secondary text-background hover:bg-transparent hover:text-secondary border border-secondary transition-all duration-300 px-6 py-3 rounded-none font-label-caps text-label-caps text-center" href="contact.html">
+                طلب استشارة
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-grow pt-20">
+        <!-- Hero Section -->
+        <section class="relative pt-32 pb-section-gap px-margin-mobile md:px-margin-desktop overflow-hidden border-b border-outline-variant/30 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-surface-container-high/20 via-background to-background">
+            <div class="absolute inset-0 z-0 opacity-5 pointer-events-none" style="background-image: linear-gradient(to right, #8f9097 1px, transparent 1px), linear-gradient(to bottom, #8f9097 1px, transparent 1px); background-size: 64px 64px;"></div>
+            <div class="max-w-container-max mx-auto relative z-10 grid md:grid-cols-12 gap-gutter items-center">
+                <div class="md:col-span-8 flex flex-col gap-6">
+                    <div class="inline-flex items-center gap-2 bg-surface-container-high border border-outline-variant/30 px-3 py-1 rounded-none self-start">
+                        <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                        <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest">حيث تلتقي الرؤية بالقرار</span>
+                    </div>
+                    <h1 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-background leading-tight">
+                        مركز القرار <br>
+                        <span class="text-secondary">للاستشارات المالية والاقتصادية</span>
+                    </h1>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                        شريككم الاستراتيجي في صياغة المستقبل المالي. نوفر خبرات معمقة في التحليل الاقتصادي، وهيكلة الأصول، ودعم القرارات السيادية والمؤسسية لتحقيق استدامة اقتصادية استثنائية.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                        <a href="contact.html" class="bg-secondary text-background hover:brightness-110 transition-all duration-300 px-10 py-4 rounded-none font-label-caps text-label-caps text-center flex items-center justify-center gap-2">
+                            احجز استشارة
+                            <span class="material-symbols-outlined text-xl">arrow_back</span>
+                        </a>
+                        <a href="contact.html" class="bg-transparent text-on-background hover:bg-surface-container-high border border-outline-variant/30 transition-all duration-300 px-10 py-4 rounded-none font-label-caps text-label-caps text-center">
+                            اطلب عرض سعر
+                        </a>
+                    </div>
+                </div>
+                <div class="md:col-span-4 mt-12 md:mt-0 relative">
+                    <div class="aspect-[4/5] bg-surface-container-high border border-outline-variant/30 rounded-none relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10"></div>
+                        <img alt="Sovereign Financial Consulting" class="w-full h-full object-cover opacity-60 mix-blend-luminosity grayscale group-hover:grayscale-0 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjMtjEXKk5EzhtpOe6f3JPB3wK4DKOgec5Ey-6ZFaqVCF3xifNhTR-KDVTl55Mnb9k5WcLEZgVXhj3JPB8keM6GrA8X5gIOMrb3gnVP8OVY5JjgncqbysRTA5O5IH3XrZygCIiwA97RtWm-_GRGiFBsMVlh5_IslHqZz4yk_TxZOD66LrbvpskRFwuTg_IqCWbQ4dAS_ttcXjsxBj71H5dRZ5-B2D8RgIdkerpLakIIDWdsarMsHA4095HVHkVNHl6385gR-Q9DBBC">
+                    </div>
+                    <div class="absolute -bottom-6 -right-6 w-32 h-32 border-b-4 border-r-4 border-secondary/30 -z-10"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Numbers that Talk Section -->
+        <section class="py-16 bg-surface-container-low border-b border-outline-variant/30 px-margin-mobile md:px-margin-desktop">
+            <div class="max-w-container-max mx-auto">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
+                    <div class="authority-badge pr-4">
+                        <h3 class="font-headline-md text-headline-md text-on-background">+30</h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">عاماً من القيادة</p>
+                    </div>
+                    <div class="authority-badge pr-4">
+                        <h3 class="font-headline-md text-headline-md text-on-background">100M+</h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">ريال محفظة مدارة</p>
+                    </div>
+                    <div class="authority-badge pr-4">
+                        <h3 class="font-headline-md text-headline-md text-on-background">+32</h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">فرعاً محلياً</p>
+                    </div>
+                    <div class="authority-badge pr-4">
+                        <h3 class="font-headline-md text-headline-md text-on-background">+5</h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">محافظات مغطاة</p>
+                    </div>
+                    <div class="authority-badge pr-4 col-span-2 md:col-span-1">
+                        <h3 class="font-headline-md text-headline-md text-on-background">مئات</h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">العملاء الواثقين</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Decision Center? Section -->
+        <section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-background">
+            <div class="max-w-container-max mx-auto">
+                <div class="text-center mb-20">
+                    <h2 class="font-headline-lg text-headline-lg text-on-background mb-4">لماذا مركز القرار؟</h2>
+                    <div class="w-20 h-1 bg-secondary mx-auto"></div>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="p-8 border border-outline-variant/20 hover:border-secondary/50 transition-all duration-300 bg-surface-container-low/50">
+                        <span class="material-symbols-outlined text-4xl text-secondary mb-6">insights</span>
+                        <h3 class="font-headline-md text-headline-md text-on-background mb-4 text-2xl">تقييم الفرص</h3>
+                        <p class="text-on-surface-variant">تقييم دقيق للفرص الاستثمارية والمشاريع لضمان أقصى درجات الربحية والنمو.</p>
+                    </div>
+                    <div class="p-8 border border-outline-variant/20 hover:border-secondary/50 transition-all duration-300 bg-surface-container-low/50">
+                        <span class="material-symbols-outlined text-4xl text-secondary mb-6">account_balance</span>
+                        <h3 class="font-headline-md text-headline-md text-on-background mb-4 text-2xl">تحسين التمويل</h3>
+                        <p class="text-on-surface-variant">هيكلة حلول تمويلية مبتكرة تدعم التوسع المؤسسي وتخفض تكلفة رأس المال.</p>
+                    </div>
+                    <div class="p-8 border border-outline-variant/20 hover:border-secondary/50 transition-all duration-300 bg-surface-container-low/50">
+                        <span class="material-symbols-outlined text-4xl text-secondary mb-6">public</span>
+                        <h3 class="font-headline-md text-headline-md text-on-background mb-4 text-2xl">فهم الأسواق</h3>
+                        <p class="text-on-surface-variant">تحليلات اقتصادية معمقة للأسواق المحلية والإقليمية لتوجيه قراراتكم بثقة.</p>
+                    </div>
+                    <div class="p-8 border border-outline-variant/20 hover:border-secondary/50 transition-all duration-300 bg-surface-container-low/50">
+                        <span class="material-symbols-outlined text-4xl text-secondary mb-6">trending_up</span>
+                        <h3 class="font-headline-md text-headline-md text-on-background mb-4 text-2xl">استراتيجيات النمو</h3>
+                        <p class="text-on-surface-variant">بناء خارطة طريق واضحة للنمو المستدام في بيئات اقتصادية متغيرة.</p>
+                    </div>
+                    <div class="p-8 border border-outline-variant/20 hover:border-secondary/50 transition-all duration-300 bg-surface-container-low/50">
+                        <span class="material-symbols-outlined text-4xl text-secondary mb-6">gavel</span>
+                        <h3 class="font-headline-md text-headline-md text-on-background mb-4 text-2xl">الحوكمة والامتثال</h3>
+                        <p class="text-on-surface-variant">تأسيس نظم رقابة وامتثال متطورة تحمي المؤسسة وتعزز شفافيتها.</p>
+                    </div>
+                    <div class="p-8 border border-outline-variant/20 hover:border-secondary/50 transition-all duration-300 bg-surface-container-low/50">
+                        <span class="material-symbols-outlined text-4xl text-secondary mb-6">psychology</span>
+                        <h3 class="font-headline-md text-headline-md text-on-background mb-4 text-2xl">الذكاء الاقتصادي</h3>
+                        <p class="text-on-surface-variant">تحويل البيانات إلى قرارات تنفيذية تدعم التفوق التنافسي لمؤسستكم.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How We Work Section -->
+        <section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-surface-container-low border-y border-outline-variant/20">
+            <div class="max-w-container-max mx-auto">
+                <div class="grid md:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <h2 class="font-headline-lg text-headline-lg text-on-background mb-6">منهجية العمل</h2>
+                        <p class="font-body-lg text-body-lg text-on-surface-variant mb-12">نتبع مساراً استشارياً دقيقاً يضمن ترجمة التحديات إلى فرص نجاح ملموسة عبر أربع مراحل تكاملية.</p>
+                        <div class="space-y-12">
+                            <div class="flex gap-6 items-start">
+                                <span class="font-display-lg text-5xl step-number opacity-50">01</span>
+                                <div>
+                                    <h4 class="font-headline-md text-2xl text-on-background mb-2">الفهم (نستمع)</h4>
+                                    <p class="text-on-surface-variant">تحليل عميق لاحتياجاتكم وأهدافكم لفهم السياق التشغيلي والمالي.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-6 items-start">
+                                <span class="font-display-lg text-5xl step-number opacity-50">02</span>
+                                <div>
+                                    <h4 class="font-headline-md text-2xl text-on-background mb-2">التحليل (نشخص)</h4>
+                                    <p class="text-on-surface-variant">استخدام أدوات تحليلية متقدمة لتحديد الفجوات والفرص الكامنة.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-6 items-start">
+                                <span class="font-display-lg text-5xl step-number opacity-50">03</span>
+                                <div>
+                                    <h4 class="font-headline-md text-2xl text-on-background mb-2">الحلول (نبني)</h4>
+                                    <p class="text-on-surface-variant">صياغة استراتيجيات وحلول مالية مخصصة وقابلة للتطبيق العملي.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-6 items-start">
+                                <span class="font-display-lg text-5xl step-number opacity-50">04</span>
+                                <div>
+                                    <h4 class="font-headline-md text-2xl text-on-background mb-2">التنفيذ (ندعم)</h4>
+                                    <p class="text-on-surface-variant">مرافقة دائمة خلال مرحلة التطبيق لضمان تحقيق النتائج المرجوة.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative flex justify-center">
+                        <div class="aspect-square bg-surface-container-high rounded-full overflow-hidden border border-outline-variant/20 p-8 w-full max-w-md relative">
+                            <div class="w-full h-full rounded-full border-4 border-dashed border-secondary/20 animate-[spin_20s_linear_infinite] absolute inset-0"></div>
+                            <img alt="Strategic Process" class="w-full h-full object-cover rounded-full mix-blend-luminosity opacity-40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCx2zozE-CIVO3DgYGQY3Zl8bvhUza6CnGZdcTOqMZeRcdw8ynyXJAmlhfbbAo08hb0Q-_X8oLHlCbieZD0GGIg8bNwpWEF62w49N5eTOvVZnt6bvbJWBrn3cSyt48IcmYMGZNA2cV_tHVumF5b4irP0Jyxqzs1ha7qmzsW0cAk4zlkX6eKy6HqNbK0y2xFbIVSj0cakXgev2Kl-zi6RvJjH2dzvQFBBdgZ6hYuXN86m2HtVPUGC-1657ahvZ3dQAPC8dSUj954kIpf">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Who We Serve Section -->
+        <section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-background">
+            <div class="max-w-container-max mx-auto text-center">
+                <h2 class="font-headline-lg text-headline-lg text-on-background mb-4">شركاء النجاح</h2>
+                <p class="font-body-md text-body-md text-on-surface-variant mb-16 max-w-2xl mx-auto">نعتز بخدمة نخبة من الكيانات الاقتصادية والمستثمرين لتمكينهم من تحقيق تطلعاتهم المالية.</p>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <div class="bg-surface-container-low p-6 border border-outline-variant/10 hover:bg-surface-container transition-colors rounded-none flex flex-col items-center gap-4">
+                        <span class="material-symbols-outlined text-3xl text-secondary">payments</span>
+                        <span class="font-label-caps text-xs">المستثمرون</span>
+                    </div>
+                    <div class="bg-surface-container-low p-6 border border-outline-variant/10 hover:bg-surface-container transition-colors rounded-none flex flex-col items-center gap-4">
+                        <span class="material-symbols-outlined text-3xl text-secondary">business_center</span>
+                        <span class="font-label-caps text-xs">الشركات الصغيرة والمتوسطة</span>
+                    </div>
+                    <div class="bg-surface-container-low p-6 border border-outline-variant/10 hover:bg-surface-container transition-colors rounded-none flex flex-col items-center gap-4">
+                        <span class="material-symbols-outlined text-3xl text-secondary">family_restroom</span>
+                        <span class="font-label-caps text-xs">الشركات العائلية</span>
+                    </div>
+                    <div class="bg-surface-container-low p-6 border border-outline-variant/10 hover:bg-surface-container transition-colors rounded-none flex flex-col items-center gap-4">
+                        <span class="material-symbols-outlined text-3xl text-secondary">corporate_fare</span>
+                        <span class="font-label-caps text-xs">المؤسسات الكبرى</span>
+                    </div>
+                    <div class="bg-surface-container-low p-6 border border-outline-variant/10 hover:bg-surface-container transition-colors rounded-none flex flex-col items-center gap-4">
+                        <span class="material-symbols-outlined text-3xl text-secondary">account_balance</span>
+                        <span class="font-label-caps text-xs">الجهات الحكومية</span>
+                    </div>
+                    <div class="bg-surface-container-low p-6 border border-outline-variant/10 hover:bg-surface-container transition-colors rounded-none flex flex-col items-center gap-4">
+                        <span class="material-symbols-outlined text-3xl text-secondary">assured_workload</span>
+                        <span class="font-label-caps text-xs">البنوك والمؤسسات المالية</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface-container-lowest dark:bg-surface-container-lowest full-width bottom-0 border-t border-outline-variant/30 text-secondary dark:text-secondary mt-auto">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter px-margin-mobile md:px-margin-desktop py-section-gap max-w-container-max mx-auto transition-opacity duration-200">
+            <div class="col-span-1 md:col-span-4 flex flex-col gap-6">
+                <a class="font-headline-md text-headline-md font-bold text-secondary flex items-center gap-2" href="index.html">
+                    <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+                    <span>مركز القرار</span>
+                </a>
+                <p class="font-body-sm text-body-sm text-on-surface-variant max-w-sm">
+                    خبرة مالية واستشارية موثوقة. نقدم حلولاً مهنية للكيانات المؤسسية والسيادية لضمان مستقبل مالي مستقر في سلطنة عمان والمنطقة.
+                </p>
+            </div>
+            <div class="col-span-1 md:col-span-4 flex flex-col gap-4">
+                <h4 class="font-label-caps text-label-caps text-on-background mb-2">تواصل معنا</h4>
+                <ul class="flex flex-col gap-3 font-body-sm text-body-sm">
+                    <li class=""><a class="text-on-surface-variant hover:text-secondary transition-colors flex items-center gap-2" href="#"><span class="material-symbols-outlined text-[18px]">location_on</span> صحار، سلطنة عمان</a></li>
+                    <li class=""><a class="text-on-surface-variant hover:text-secondary transition-colors flex items-center gap-2" href="#"><span class="material-symbols-outlined text-[18px]">call</span> +968 96680001</a></li>
+                    <li class=""><a class="text-on-surface-variant hover:text-secondary transition-colors flex items-center gap-2" href="mailto:dcenterfe@gmail.com"><span class="material-symbols-outlined text-[18px]">mail</span> dcenterfe@gmail.com</a></li>
+                </ul>
+            </div>
+            <div class="col-span-1 md:col-span-4 flex flex-col gap-4">
+                <h4 class="font-label-caps text-label-caps text-on-background mb-2">روابط هامة</h4>
+                <ul class="flex flex-col gap-3 font-body-sm text-body-sm">
+                    <li class=""><a class="text-on-surface-variant hover:text-secondary transition-colors" href="index.html">الرئيسية</a></li>
+                    <li class=""><a class="text-on-surface-variant hover:text-secondary transition-colors" href="about.html">شركتنا</a></li>
+                    <li class=""><a class="text-on-surface-variant hover:text-secondary transition-colors" href="services.html">خدماتنا</a></li>
+                    <li class=""><a class="text-on-surface-variant hover:text-secondary transition-colors" href="methodology.html">منهجيتنا</a></li>
+                    <li class=""><a class="text-on-surface-variant hover:text-secondary transition-colors" href="ai-assistant.html">المساعد الذكي</a></li>
+                    <li class=""><a class="text-on-surface-variant hover:text-secondary transition-colors" href="contact.html">اتصل بنا</a></li>
+                </ul>
+            </div>
+            <div class="col-span-1 md:col-span-12 mt-12 pt-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="font-body-sm text-body-sm text-on-surface-variant">© 2024 مركز القرار. جميع الحقوق محفوظة. مسجل في سلطنة عمان.</p>
+                <div class="flex gap-4">
+                    <a class="text-on-surface-variant hover:text-secondary transition-colors" href="#"><span class="material-symbols-outlined">language</span></a>
+                    <a class="text-on-surface-variant hover:text-secondary transition-colors" href="#"><span class="material-symbols-outlined">public</span></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Sticky Header Transition
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (header) {
+                if (window.scrollY > 50) {
+                    header.classList.add('bg-background/95', 'backdrop-blur-md', 'shadow-2xl');
+                } else {
+                    header.classList.remove('bg-background/95', 'backdrop-blur-md', 'shadow-2xl');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
