@@ -21,6 +21,17 @@ export default function AIAssistant() {
   const [inputValue, setInputValue] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  const [name, setName] = useState("");
+  const [company, setCompany] = useState("");
+  const [timeframe, setTimeframe] = useState("Immediate (1-3 Business Days)");
+
+  const handleRequestSession = (e: React.FormEvent) => {
+    e.preventDefault();
+    const message = `Hello Decision Center, I would like to request a secure consulting session.\nName: ${name}\nCompany: ${company}\nPreferred Timeframe: ${timeframe}`;
+    const waUrl = `https://wa.me/96896680001?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, "_blank");
+  };
+
   const responses: Record<string, string> = {
     "Check Project Value":
       "To evaluate your project's financial value, we perform full discounted cash flow (DCF) modeling, IRR analysis, and weighted average cost of capital (WACC) estimations. Would you like us to schedule a formal evaluation?",
@@ -173,27 +184,37 @@ export default function AIAssistant() {
             {/* Abstract visual element */}
             <div className="absolute -right-16 -top-16 w-32 h-32 border border-secondary/20 rounded-full"></div>
             <h3 className="font-display-lg text-headline-md text-foreground mb-6">Executive Scheduling</h3>
-            <form className="space-y-5">
+            <form onSubmit={handleRequestSession} className="space-y-5">
               <div className="space-y-1">
                 <label className="font-body-sm text-body-sm text-foreground">Full Name</label>
                 <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   className="w-full bg-surface-container-lowest border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors"
                   placeholder="e.g. Abdullah Al Rushdi"
                   type="text"
+                  required
                 />
               </div>
               <div className="space-y-1">
                 <label className="font-body-sm text-body-sm text-foreground">Company Name</label>
                 <input
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
                   className="w-full bg-surface-container-lowest border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors"
                   placeholder="e.g. Muscat Sovereign Fund"
                   type="text"
+                  required
                 />
               </div>
               <div className="space-y-1">
                 <label className="font-body-sm text-body-sm text-foreground">When would you like to meet?</label>
                 <div className="relative">
-                  <select className="w-full bg-surface-container-lowest border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors appearance-none">
+                  <select
+                    value={timeframe}
+                    onChange={(e) => setTimeframe(e.target.value)}
+                    className="w-full bg-surface-container-lowest border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors appearance-none"
+                  >
                     <option>Immediate (1-3 Business Days)</option>
                     <option>Standard (1-2 Weeks)</option>
                     <option>Exploratory (Q3 2024)</option>
@@ -201,15 +222,15 @@ export default function AIAssistant() {
                 </div>
               </div>
               <div className="pt-4">
-                <Link
-                  href="/contact"
-                  className="w-full btn-gold font-label-caps text-label-caps uppercase px-6 py-4 rounded-none flex justify-center items-center gap-2"
+                <button
+                  type="submit"
+                  className="w-full btn-gold font-label-caps text-label-caps uppercase px-6 py-4 rounded-none flex justify-center items-center gap-2 cursor-pointer"
                 >
                   <span>Request Secure Session</span>
                   <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
                     lock
                   </span>
-                </Link>
+                </button>
               </div>
             </form>
           </div>

@@ -21,6 +21,17 @@ export default function ArabicAIAssistant() {
   const [inputValue, setInputValue] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  const [name, setName] = useState("");
+  const [company, setCompany] = useState("");
+  const [timeframe, setTimeframe] = useState("عاجل (1-3 أيام عمل)");
+
+  const handleRequestSession = (e: React.FormEvent) => {
+    e.preventDefault();
+    const message = `مرحباً مركز القرار، أود طلب جلسة استشارية آمنة.\nالاسم: ${name}\nالشركة: ${company}\nالموعد المفضل: ${timeframe}`;
+    const waUrl = `https://wa.me/96896680001?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, "_blank");
+  };
+
   const responses: Record<string, string> = {
     "تحقق من قيمة المشروع":
       "لتقييم القيمة المالية لمشروعك، نقوم بإجراء نمذجة كاملة للتدفقات النقدية المخصومة (DCF)، وتحليل معدل العائد الداخلي (IRR)، وتقديرات المتوسط المرجح لتكلفة رأس المال (WACC). هل ترغب في جدولة تقييم رسمي؟",
@@ -180,27 +191,37 @@ export default function ArabicAIAssistant() {
             {/* Abstract visual element */}
             <div className="absolute -left-16 -top-16 w-32 h-32 border border-secondary/20 rounded-full"></div>
             <h3 className="font-display-lg text-headline-md text-foreground mb-6">جدولة تنفيذية</h3>
-            <form className="space-y-5">
+            <form onSubmit={handleRequestSession} className="space-y-5">
               <div className="space-y-1">
                 <label className="font-body-sm text-body-sm text-foreground">الاسم الكامل</label>
                 <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   className="w-full bg-surface-container-lowest border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors"
                   placeholder="مثال: عبدالله الروشدي"
                   type="text"
+                  required
                 />
               </div>
               <div className="space-y-1">
                 <label className="font-body-sm text-body-sm text-foreground">اسم الشركة</label>
                 <input
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
                   className="w-full bg-surface-container-lowest border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors"
                   placeholder="مثال: صندوق مسقط السيادي"
                   type="text"
+                  required
                 />
               </div>
               <div className="space-y-1">
                 <label className="font-body-sm text-body-sm text-foreground">متى تود الاجتماع؟</label>
                 <div className="relative">
-                  <select className="w-full bg-surface-container-lowest border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors appearance-none">
+                  <select
+                    value={timeframe}
+                    onChange={(e) => setTimeframe(e.target.value)}
+                    className="w-full bg-surface-container-lowest border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors appearance-none"
+                  >
                     <option>عاجل (1-3 أيام عمل)</option>
                     <option>اعتيادي (1-2 أسبوع)</option>
                     <option>استكشافي (الربع الثالث 2024)</option>
@@ -208,15 +229,15 @@ export default function ArabicAIAssistant() {
                 </div>
               </div>
               <div className="pt-4">
-                <Link
-                  href="/ar/contact"
-                  className="w-full btn-gold font-label-caps text-label-caps uppercase px-6 py-4 rounded-none flex justify-center items-center gap-2"
+                <button
+                  type="submit"
+                  className="w-full btn-gold font-label-caps text-label-caps uppercase px-6 py-4 rounded-none flex justify-center items-center gap-2 cursor-pointer"
                 >
                   <span>طلب جلسة آمنة</span>
                   <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
                     lock
                   </span>
-                </Link>
+                </button>
               </div>
             </form>
           </div>

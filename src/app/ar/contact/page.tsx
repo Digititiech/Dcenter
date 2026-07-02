@@ -39,6 +39,9 @@ export default function ArabicContact() {
   ];
 
   const handleConfirmConsultation = () => {
+    const message = `مرحباً مركز القرار، أود حجز جلسة استشارية استراتيجية.\nالموعد المفضل: أكتوبر ${selectedDay} في الساعة ${selectedSlot}`;
+    const waUrl = `https://wa.me/96896680001?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, "_blank");
     setShowConfirmation(true);
     setTimeout(() => {
       setShowConfirmation(false);

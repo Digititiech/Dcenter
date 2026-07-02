@@ -39,6 +39,9 @@ export default function Contact() {
   ];
 
   const handleConfirmConsultation = () => {
+    const message = `Hello Decision Center, I would like to book a strategic consultation.\nSelected Date: October ${selectedDay}, 2026\nTime Slot: ${selectedSlot}`;
+    const waUrl = `https://wa.me/96896680001?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, "_blank");
     setShowConfirmation(true);
     setTimeout(() => {
       setShowConfirmation(false);
