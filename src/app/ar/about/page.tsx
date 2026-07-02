@@ -156,97 +156,85 @@ export default function ArabicAbout() {
         </section>
 
         {/* Section 3: Founder Profile */}
-        <section className="py-section-gap bg-background">
+        <section className="py-section-gap bg-surface-container-lowest">
           <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-              {/* Founder Image Side */}
-              <div className="lg:col-span-5 relative">
-                <div className="relative z-10 institutional-border p-4 bg-surface-container-low shadow-2xl">
-                  <div className="aspect-[4/5] bg-surface-container overflow-hidden">
-                    <img
-                      alt="Abdullah Al Rushdi"
-                      className="w-full h-full object-cover"
-                      src="/founder-image.jpeg"
-                    />
-                  </div>
-                  <div className="mt-8">
-                    <h3 className="font-display-lg text-3xl mb-1 text-foreground">عبدالله الروشدي</h3>
-                    <p className="font-label-caps text-secondary tracking-[0.2em]">المؤسس والرئيس التنفيذي</p>
-                  </div>
-                </div>
-                <div className="absolute -top-10 -right-10 w-full h-full border border-secondary/10 z-0"></div>
+            <div className="mb-16">
+              <h2 className="font-display-lg text-headline-lg text-foreground mb-4 max-w-2xl">
+                عقود من الخبرة في قلب النظام المالي
+              </h2>
+            </div>
+            <div className="grid grid-cols-12 gap-gutter institutional-border p-0 overflow-hidden bg-background">
+              <div className="col-span-12 lg:col-span-5 h-[400px] lg:h-auto overflow-hidden relative">
+                <img
+                  className="w-full h-full object-cover transition-all duration-700"
+                  alt="Abdullah Al Rushdi"
+                  src="/founder-image.jpeg"
+                />
                 {/* MOVED METRICS BADGE */}
-                <div className="absolute -bottom-10 -left-10 z-20 w-64 bg-surface-container-highest border border-secondary/20 p-8 hidden md:block">
+                <div className="absolute bottom-6 left-6 z-20 w-64 bg-surface-container-highest border border-secondary/20 p-8 hidden md:block">
                   <div className="text-secondary font-display-lg text-5xl mb-2">30+</div>
                   <p className="font-label-caps text-label-caps text-on-surface-variant">
                     عاماً من الخبرة المؤسسية المتراكمة
                   </p>
                 </div>
               </div>
-              {/* Biography Side */}
-              <div className="lg:col-span-7 space-y-10">
-                <div>
-                  <span className="font-label-caps text-secondary mb-4 block">قيادة تنفيذية</span>
-                  <h2 className="font-display-lg text-4xl mb-8 text-foreground">
-                    عقود من الخبرة في قلب النظام المالي
-                  </h2>
-                  <div className="space-y-6 font-body-lg text-on-surface-variant leading-relaxed">
-                    <p>
-                      يتمتع عبدالله الروشدي بمسيرة مهنية استثنائية تمتد لأكثر من 30 عاماً في قمة القطاع المالي والمصرفي في
-                      سلطنة عُمان والمنطقة. قبل تأسيس &quot;مركز اتخاذ القرار&quot;، شغل مناصب قيادية عليا في أبرز المؤسسات
-                      المالية، بما في ذلك بنك مسقط وبنك ظفار.
-                    </p>
-                    <p>
-                      تميزت فترة عمله بقيادة استراتيجيات التحول الكبرى، وإدارة محافظ قروض ضخمة، وهيكلة تمويل المشاريع
-                      الوطنية الاستراتيجية. يُعرف عبدالله بدقته التحليلية المتناهية وقدرته الفذة على إدارة المخاطر في
-                      أكثر الظروف الاقتصادية تقلباً، مما جعله مستشاراً موثوقاً للعديد من الهيئات السيادية ومجالس
-                      الإدارات.
-                    </p>
-                  </div>
+              <div className="col-span-12 lg:col-span-7 p-12 lg:p-16 flex flex-col justify-center">
+                <div className="mb-8">
+                  <h3 className="font-display-lg text-headline-md text-secondary">عبدالله الروشدي</h3>
+                  <p className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mt-1 font-semibold">
+                    المؤسس والرئيس التنفيذي
+                  </p>
                 </div>
-                {/* Expertise List */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 pt-8 border-t border-outline-variant/20">
-                  <div>
-                    <h4 className="font-label-caps text-foreground mb-4 text-sm opacity-60">مجالات الخبرة الرئيسية</h4>
-                    <ul className="space-y-3">
-                      <li className="flex items-center gap-3 text-on-surface">
-                        <span className="w-1.5 h-1.5 bg-secondary rounded-full"></span>
-                        <span className="font-body-sm text-foreground">الإدارة المصرفية العليا</span>
-                      </li>
-                      <li className="flex items-center gap-3 text-on-surface">
-                        <span className="w-1.5 h-1.5 bg-secondary rounded-full"></span>
-                        <span className="font-body-sm text-foreground">حوكمة الشركات والامتثال</span>
-                      </li>
-                      <li className="flex items-center gap-3 text-on-surface">
-                        <span className="w-1.5 h-1.5 bg-secondary rounded-full"></span>
-                        <span className="font-body-sm text-foreground">إدارة مخاطر المؤسسات (ERM)</span>
-                      </li>
-                      <li className="flex items-center gap-3 text-on-surface">
-                        <span className="w-1.5 h-1.5 bg-secondary rounded-full"></span>
-                        <span className="font-body-sm text-foreground">هيكلة رأس المال والتمويل المعقد</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="font-label-caps text-foreground mb-4 text-sm opacity-60">التركيز الاستراتيجي</h4>
-                    <ul className="space-y-3">
-                      <li className="flex items-center gap-3 text-on-surface">
-                        <span className="w-1.5 h-1.5 bg-secondary rounded-full"></span>
-                        <span className="font-body-sm text-foreground">تطوير السياسات المالية السيادية</span>
-                      </li>
-                      <li className="flex items-center gap-3 text-on-surface">
-                        <span className="w-1.5 h-1.5 bg-secondary rounded-full"></span>
-                        <span className="font-body-sm text-foreground">استراتيجيات مواءمة الثروة</span>
-                      </li>
-                      <li className="flex items-center gap-3 text-on-surface">
-                        <span className="w-1.5 h-1.5 bg-secondary rounded-full"></span>
-                        <span className="font-body-sm text-foreground">تحسين أداء الأرباح والخسائر</span>
-                      </li>
-                      <li className="flex items-center gap-3 text-on-surface">
-                        <span className="w-1.5 h-1.5 bg-secondary rounded-full"></span>
-                        <span className="font-body-sm text-foreground">التحول الرقمي للقطاع المالي</span>
-                      </li>
-                    </ul>
+                <div className="font-body-md text-body-md text-on-surface-variant mb-10 leading-relaxed space-y-6">
+                  <p>
+                    يتمتع عبدالله الروشدي بمسيرة مهنية استثنائية تمتد لأكثر من 30 عاماً في قمة القطاع المالي والمصرفي في
+                    سلطنة عُمان والمنطقة. قبل تأسيس &quot;مركز اتخاذ القرار&quot;، شغل مناصب قيادية عليا في أبرز المؤسسات
+                    المالية، بما في ذلك بنك مسقط وبنك ظفار.
+                  </p>
+                  <p>
+                    تميزت فترة عمله بقيادة استراتيجيات التحول الكبرى، وإدارة محافظ قروض ضخمة، وهيكلة تمويل المشاريع
+                    الوطنية الاستراتيجية. يُعرف عبدالله بدقته التحليلية المتناهية وقدرته الفذة على إدارة المخاطر في
+                    أكثر الظروف الاقتصادية تقلباً، مما جعله مستشاراً موثوقاً للعديد من الهيئات السيادية ومجالس
+                    الإدارات.
+                  </p>
+                </div>
+                <div>
+                  <p className="font-label-caps text-label-caps text-secondary mb-6 uppercase">
+                    مجالات التركيز الاستراتيجي
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">الإدارة المصرفية العليا</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">حوكمة الشركات والامتثال والاستثمار</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">إدارة مخاطر المؤسسات (ERM)</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">هيكلة رأس المال والتمويل المعقد</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">تطوير السياسات المالية السيادية</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">استراتيجيات مواءمة الثروة والأداء</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">تحسين أداء الأرباح والخسائر والنمو</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">التحول الرقمي للقطاع المالي</span>
+                    </div>
                   </div>
                 </div>
               </div>
