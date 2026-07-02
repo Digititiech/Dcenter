@@ -13,6 +13,7 @@ export default function About() {
           <div className="max-w-container-max mx-auto px-margin-desktop relative z-10">
             <div className="grid grid-cols-12 gap-gutter items-center">
               <div className="col-span-12 lg:col-span-7">
+                <img src="/dc-logo.png" alt="Decision Center Logo" className="h-16 w-auto object-contain mb-6" />
                 <span className="font-label-caps text-label-caps text-secondary mb-4 block">
                   Where Vision Meets Decision
                 </span>
@@ -157,7 +158,7 @@ export default function About() {
                 <img
                   className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
                   alt="Abdullah Al Rushdi"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2jgtei4nMH-kEuWX631FVwZ46R17tB3-XDLcpFYXprQALbnxoJoGY5sHpLE59x3ocKwgxzhHtpXNcY2tfMqQBDuuj9YQaBLK7WJRrI2-Z7hCTjAYzCjDZLtm3nh5_Z0_on04UvbhKGv6dlceYa-MB9EHTtJFdd9cnp-0K2z5JmjRhGvt_7kEdXZDhVoS6AHDzl4W8h4Lty3eMRmL5MF3kA35MkdYv53DDZDKiMKJKveTVCHSZuB7VMkuqt_dw5xe8G-9YPSrNHI1v"
+                  src="/founder-image.jpeg"
                 />
               </div>
               <div className="col-span-12 lg:col-span-7 p-12 lg:p-16 flex flex-col justify-center">

@@ -178,7 +178,7 @@ export default function AIAssistant() {
                 <label className="font-body-sm text-body-sm text-foreground">Full Name</label>
                 <input
                   className="w-full bg-surface-container-lowest border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors"
-                  placeholder="e.g. Abdullah Al Busaidi"
+                  placeholder="e.g. Abdullah Al Rushdi"
                   type="text"
                 />
               </div>

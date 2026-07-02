@@ -38,15 +38,10 @@ export default function Footer({ locale }: { locale: "en" | "ar" }) {
         <div className="col-span-1 md:col-span-4 flex flex-col gap-6">
           <Link
             href={locale === "en" ? "/" : "/ar"}
-            className="font-display-lg text-headline-md font-bold text-secondary flex items-center gap-2"
+            className="flex items-center gap-3"
           >
-            <span
-              className="material-symbols-outlined text-3xl"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              account_balance
-            </span>
-            <span>{brandName}</span>
+            <img src="/dc-logo.png" alt="Decision Center Logo" className="h-10 w-auto object-contain" />
+            <span className="font-display-lg text-headline-md font-bold text-secondary">{brandName}</span>
           </Link>
           <p className="font-body-sm text-body-sm text-on-surface-variant max-w-sm">
             {desc}
@@ -79,6 +74,17 @@ export default function Footer({ locale }: { locale: "en" | "ar" }) {
               >
                 <span className="material-symbols-outlined text-[18px]">mail</span>
                 <span>dcenterfe@gmail.com</span>
+              </a>
+            </li>
+            <li>
+              <a
+                className="text-on-surface-variant hover:text-secondary transition-colors flex items-center gap-2"
+                href="https://instagram.com/center.decision"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="material-symbols-outlined text-[18px]">public</span>
+                <span>center.decision</span>
               </a>
             </li>
           </ul>

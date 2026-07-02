@@ -19,6 +19,7 @@ export default function ArabicAbout() {
           <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-center">
               <div className="lg:col-span-6 space-y-8">
+                <img src="/dc-logo.png" alt="Decision Center Logo" className="h-16 w-auto object-contain mb-2" />
                 <span className="font-label-caps text-label-caps text-secondary tracking-widest block">
                   نظرة عامة مؤسسية
                 </span>
@@ -172,11 +173,11 @@ export default function ArabicAbout() {
                     <img
                       alt="Abdullah Al Rushdi"
                       className="w-full h-full object-cover"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-bvF8dSN2MQZhRHcgeQIRktds4enzh7p0YWlgz2qayYe3o2-1VDiVDFbDpBdt3wp9I_QQvDxmt_IRV_y0_HZbbsUxN1nsC2SCUzT-IdgOTP7zluazS8wFlYZK0BWoiH_QEbzJQTVRtpmEBwsEFzm7M4KJ_gf83CpGQv3mwlEsJK8LXxbZXH_7q2NC2VsAZaf3GAPY2zMpNikueQ4LG5NLQ1y0pizNI66pHJU6D-H7XCMjt0dX9FYJHP5DTU6DAWrPVayc3VEPjxIz"
+                      src="/founder-image.jpeg"
                     />
                   </div>
                   <div className="mt-8">
-                    <h3 className="font-display-lg text-3xl mb-1 text-foreground">عبدالله الرشدي</h3>
+                    <h3 className="font-display-lg text-3xl mb-1 text-foreground">عبدالله الروشدي</h3>
                     <p className="font-label-caps text-secondary tracking-[0.2em]">المؤسس والرئيس التنفيذي</p>
                   </div>
                 </div>
@@ -191,7 +192,7 @@ export default function ArabicAbout() {
                   </h2>
                   <div className="space-y-6 font-body-lg text-on-surface-variant leading-relaxed">
                     <p>
-                      يتمتع عبدالله الرشدي بمسيرة مهنية استثنائية تمتد لأكثر من 30 عاماً في قمة القطاع المالي والمصرفي في
+                      يتمتع عبدالله الروشدي بمسيرة مهنية استثنائية تمتد لأكثر من 30 عاماً في قمة القطاع المالي والمصرفي في
                       سلطنة عُمان والمنطقة. قبل تأسيس &quot;مركز اتخاذ القرار&quot;، شغل مناصب قيادية عليا في أبرز المؤسسات
                       المالية، بما في ذلك بنك مسقط وبنك ظفار.
                     </p>

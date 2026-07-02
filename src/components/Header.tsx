@@ -64,18 +64,12 @@ export default function Header({ locale }: { locale: "en" | "ar" }) {
       }`}
     >
       <nav className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto h-full">
-        {/* Brand Logo */}
         <Link
           href={locale === "en" ? "/" : "/ar"}
-          className="font-display-lg text-headline-md font-bold text-foreground tracking-tighter flex items-center gap-2"
+          className="flex items-center gap-3"
         >
-          <span
-            className="material-symbols-outlined text-secondary text-3xl"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            account_balance
-          </span>
-          <span>{brandName}</span>
+          <img src="/dc-logo.png" alt="Decision Center Logo" className="h-10 w-auto object-contain" />
+          <span className="font-display-lg text-headline-md font-bold text-foreground tracking-tighter">{brandName}</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -126,14 +120,9 @@ export default function Header({ locale }: { locale: "en" | "ar" }) {
               side={locale === "en" ? "right" : "left"}
               className="w-[280px] bg-background border-outline-variant/20 p-6 flex flex-col gap-6"
             >
-              <div className="font-display-lg text-headline-md font-bold text-foreground tracking-tighter flex items-center gap-2 mb-4">
-                <span
-                  className="material-symbols-outlined text-secondary text-2xl"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  account_balance
-                </span>
-                <span>{brandName}</span>
+              <div className="flex items-center gap-3 mb-4">
+                <img src="/dc-logo.png" alt="Decision Center Logo" className="h-8 w-auto object-contain" />
+                <span className="font-display-lg text-headline-md font-bold text-foreground tracking-tighter">{brandName}</span>
               </div>
               <div className="flex flex-col gap-4 flex-grow">
                 {links.map((link) => {

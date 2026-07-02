@@ -170,6 +170,25 @@ export default function Contact() {
                     <p className="font-body-md text-body-md text-foreground">dcenterfe@gmail.com</p>
                   </div>
                 </div>
+                <div className="flex items-start space-x-4">
+                  <span
+                    className="material-symbols-outlined text-secondary mt-1"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
+                    public
+                  </span>
+                  <div>
+                    <p className="font-label-caps text-label-caps text-on-surface-variant mb-1">Instagram</p>
+                    <a
+                      href="https://instagram.com/center.decision"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-body-md text-body-md text-foreground hover:text-secondary transition-colors"
+                    >
+                      center.decision
+                    </a>
+                  </div>
+                </div>
               </div>
               <div className="mt-8 pt-8 border-t border-outline-variant/20 flex space-x-4 items-center animate-pulse">
                 <span className="material-symbols-outlined text-outline text-3xl">verified_user</span>
