@@ -224,7 +224,7 @@ export default function ArabicAIAssistant() {
                   >
                     <option>عاجل (1-3 أيام عمل)</option>
                     <option>اعتيادي (1-2 أسبوع)</option>
-                    <option>استكشافي (الربع الثالث 2024)</option>
+                    <option>استكشافي (الربع الثالث 2026)</option>
                   </select>
                 </div>
               </div>

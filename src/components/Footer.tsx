@@ -29,8 +29,8 @@ export default function Footer({ locale }: { locale: "en" | "ar" }) {
   const address = locale === "en" ? "Sohar, Sultanate of Oman" : "صحار، سلطنة عمان";
   const copyright =
     locale === "en"
-      ? "© 2024 Decision Center. All rights reserved. Registered in Oman."
-      : "© 2024 مركز القرار. جميع الحقوق محفوظة. مسجل في سلطنة عمان.";
+      ? "© 2026 Decision Center. All rights reserved. Registered in Oman."
+      : "© 2026 مركز القرار. جميع الحقوق محفوظة. مسجل في سلطنة عمان.";
 
   return (
     <footer className="bg-surface-container-lowest border-t border-outline-variant/30 text-secondary mt-auto">

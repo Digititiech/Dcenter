@@ -217,7 +217,7 @@ export default function AIAssistant() {
                   >
                     <option>Immediate (1-3 Business Days)</option>
                     <option>Standard (1-2 Weeks)</option>
-                    <option>Exploratory (Q3 2024)</option>
+                    <option>Exploratory (Q3 2026)</option>
                   </select>
                 </div>
               </div>
