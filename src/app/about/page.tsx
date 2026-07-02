@@ -29,7 +29,7 @@ export default function About() {
               <div className="col-span-12 lg:col-span-5 relative">
                 <div className="aspect-square bg-surface-container-high relative overflow-hidden institutional-border p-1">
                   <div
-                    className="w-full h-full bg-cover bg-center grayscale hover:grayscale-0 transition-all duration-700"
+                    className="w-full h-full bg-cover bg-center transition-all duration-700"
                     style={{
                       backgroundImage: "url('/Image_5sz10z5sz10z5sz1.png')",
                     }}
@@ -156,7 +156,7 @@ export default function About() {
             <div className="grid grid-cols-12 gap-gutter institutional-border p-0 overflow-hidden bg-background">
               <div className="col-span-12 lg:col-span-5 h-[400px] lg:h-auto overflow-hidden relative">
                 <img
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-full object-cover transition-all duration-700"
                   alt="Abdullah Al Rushdi"
                   src="/founder-image.jpeg"
                 />

@@ -41,7 +41,7 @@ export default function ArabicAbout() {
               <div className="lg:col-span-6 relative">
                 <div className="aspect-square bg-surface-container-high relative overflow-hidden institutional-border p-1">
                   <div
-                    className="w-full h-full bg-cover bg-center grayscale hover:grayscale-0 transition-all duration-700"
+                    className="w-full h-full bg-cover bg-center transition-all duration-700"
                     style={{
                       backgroundImage: "url('/Image_5sz10z5sz10z5sz1.png')",
                     }}

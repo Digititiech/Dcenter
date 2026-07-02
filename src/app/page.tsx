@@ -51,11 +51,12 @@ export default function Home() {
               </div>
             </div>
             <div className="md:col-span-4 mt-12 md:mt-0 relative">
-              <div className="aspect-[4/5] bg-surface-container-high border border-outline-variant/30 rounded-none relative overflow-hidden group flex items-center justify-center p-8">
+              <div className="aspect-[4/5] bg-surface-container-high border border-outline-variant/30 rounded-none relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10"></div>
                 <img
-                  alt="Decision Center Logo"
-                  className="w-full h-full object-contain transition-all duration-700"
-                  src="/dc-logo.png"
+                  alt="Decision Center"
+                  className="w-full h-full object-cover transition-all duration-700"
+                  src="/Image_euujiweuujiweuuj.png"
                 />
               </div>
               <div className="absolute -bottom-6 -left-6 w-32 h-32 border-b-4 border-l-4 border-secondary/30 -z-10"></div>

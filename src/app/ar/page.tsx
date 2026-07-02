@@ -50,11 +50,12 @@ export default function ArabicHome() {
               </div>
             </div>
             <div className="md:col-span-4 mt-12 md:mt-0 relative">
-              <div className="aspect-[4/5] bg-surface-container-high border border-outline-variant/30 rounded-none relative overflow-hidden group flex items-center justify-center p-8">
+              <div className="aspect-[4/5] bg-surface-container-high border border-outline-variant/30 rounded-none relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10"></div>
                 <img
-                  alt="Decision Center Logo"
-                  className="w-full h-full object-contain transition-all duration-700"
-                  src="/dc-logo.png"
+                  alt="Decision Center"
+                  className="w-full h-full object-cover transition-all duration-700"
+                  src="/Image_euujiweuujiweuuj.png"
                 />
               </div>
               <div className="absolute -bottom-6 -right-6 w-32 h-32 border-b-4 border-r-4 border-secondary/30 -z-10"></div>
@@ -327,7 +328,7 @@ export default function ArabicHome() {
                   <div className="w-full h-full rounded-full border-4 border-dashed border-secondary/20 animate-[spin_20s_linear_infinite] absolute inset-0"></div>
                   <img
                     alt="Strategic Process"
-                    className="w-full h-full object-cover rounded-full mix-blend-luminosity opacity-40"
+                    className="w-full h-full object-cover rounded-full opacity-40"
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuCx2zozE-CIVO3DgYGQY3Zl8bvhUza6CnGZdcTOqMZeRcdw8ynyXJAmlhfbbAo08hb0Q-_X8oLHlCbieZD0GGIg8bNwpWEF62w49N5eTOvVZnt6bvbJWBrn3cSyt48IcmYMGZNA2cV_tHVumF5b4irP0Jyxqzs1ha7qmzsW0cAk4zlkX6eKy6HqNbK0y2xFbIVSj0cakXgev2Kl-zi6RvJjH2dzvQFBBdgZ6hYuXN86m2HtVPUGC-1657ahvZ3dQAPC8dSUj954kIpf"
                   />
                 </div>

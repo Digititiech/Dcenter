@@ -110,7 +110,7 @@ export default function Methodology() {
               <div className="relative flex-grow min-h-[400px] overflow-hidden">
                 {/* Abstract Data Viz / Model Preview */}
                 <div
-                  className="absolute inset-0 bg-cover bg-center opacity-80 mix-blend-luminosity"
+                  className="absolute inset-0 bg-cover bg-center opacity-40"
                   style={{
                     backgroundImage:
                       "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCml0ilORVcyUeJju1CIYv8bOcpOFXuCOqPBSvvy3o5lUAqZQZzu3kdI2mA-S98o4oq_02Be54n_IOmHc8hYpGzvCu8lSNVzsyIX4tbYbbdY-KIwgk_ehytsztZ_3BPKtWvsSyy7lbl1uFntHbBEDOPcBUxjpFafhgx06l7JiOeAhrkdocrgWGOErKY8LKa2KpIrSvam0KhcapZKOJYEIrs8lE4EhTDXWcUpoazsPZ1gkTA_C5lJxMDUMkc6a70kNb69hqmkiE5wMeP')",

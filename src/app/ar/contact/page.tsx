@@ -173,12 +173,21 @@ export default function ArabicContact() {
                   </div>
                 </div>
                 <div className="flex items-start space-x-4 space-x-reverse">
-                  <span
-                    className="material-symbols-outlined text-secondary mt-1"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    stroke="#e9c176"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mt-1 flex-shrink-0"
                   >
-                    public
-                  </span>
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                  </svg>
                   <div>
                     <p className="font-label-caps text-label-caps text-on-surface-variant mb-1">الانستجرام</p>
                     <a
