@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import WhatsAppFloating from "@/components/WhatsAppFloating";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -37,6 +38,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground antialiased selection:bg-secondary selection:text-background">
         {children}
+        <WhatsAppFloating />
       </body>
     </html>
   );
