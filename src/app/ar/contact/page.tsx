@@ -17,6 +17,10 @@ export default function ArabicContact() {
   const [selectedSlot, setSelectedSlot] = useState<string>("11:30 GST");
   const [showConfirmation, setShowConfirmation] = useState(false);
 
+  const [clientName, setClientName] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
+  const [clientPhone, setClientPhone] = useState("");
+
   const faqs: FAQ[] = [
     {
       id: "faq1",
@@ -38,8 +42,9 @@ export default function ArabicContact() {
     },
   ];
 
-  const handleConfirmConsultation = () => {
-    const message = `مرحباً مركز القرار، أود حجز جلسة استشارية استراتيجية.\nالموعد المفضل: أكتوبر ${selectedDay} في الساعة ${selectedSlot}`;
+  const handleConfirmConsultation = (e: React.FormEvent) => {
+    e.preventDefault();
+    const message = `مرحباً مركز القرار، أود حجز جلسة استشارية استراتيجية.\n\nتفاصيل العميل:\n- الاسم: ${clientName}\n- البريد الإلكتروني: ${clientEmail}\n- رقم الهاتف: ${clientPhone}\n\nالموعد المفضل: أكتوبر ${selectedDay} في الساعة ${selectedSlot}`;
     const waUrl = `https://wa.me/96896680001?text=${encodeURIComponent(message)}`;
     window.open(waUrl, "_blank");
     setShowConfirmation(true);
@@ -268,15 +273,16 @@ export default function ArabicContact() {
                 </div>
 
                 {/* Time Slots & CTA */}
-                <div className="flex flex-col">
+                <form onSubmit={handleConfirmConsultation} className="flex flex-col">
                   <p className="font-label-caps text-label-caps text-on-surface-variant mb-4">
                     المواعيد المتاحة ليوم {selectedDay} أكتوبر
                   </p>
-                  <div className="grid grid-cols-2 gap-3 mb-8">
+                  <div className="grid grid-cols-2 gap-3 mb-6">
                     {timeSlots.map((slot) => {
                       const isSelected = selectedSlot === slot;
                       return (
                         <button
+                          type="button"
                           key={slot}
                           onClick={() => setSelectedSlot(slot)}
                           className={`border py-2 font-data-tabular text-data-tabular transition-colors cursor-pointer ${
@@ -291,8 +297,46 @@ export default function ArabicContact() {
                       );
                     })}
                   </div>
+
+                  {/* Contact Fields */}
+                  <div className="space-y-4 mb-6 text-right">
+                    <div>
+                      <label className="font-body-sm text-body-sm text-foreground block mb-1">الاسم الكامل</label>
+                      <input
+                        type="text"
+                        value={clientName}
+                        onChange={(e) => setClientName(e.target.value)}
+                        placeholder="مثال: عبدالله الروشدي"
+                        className="w-full bg-surface-dim border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="font-body-sm text-body-sm text-foreground block mb-1">البريد الإلكتروني</label>
+                      <input
+                        type="email"
+                        value={clientEmail}
+                        onChange={(e) => setClientEmail(e.target.value)}
+                        placeholder="مثال: client@sovereign.om"
+                        className="w-full bg-surface-dim border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="font-body-sm text-body-sm text-foreground block mb-1">رقم الهاتف</label>
+                      <input
+                        type="tel"
+                        value={clientPhone}
+                        onChange={(e) => setClientPhone(e.target.value)}
+                        placeholder="مثال: +968 96680001"
+                        className="w-full bg-surface-dim border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors"
+                        required
+                      />
+                    </div>
+                  </div>
+
                   <button
-                    onClick={handleConfirmConsultation}
+                    type="submit"
                     className="w-full bg-secondary text-primary-container py-4 font-label-caps text-label-caps font-semibold border border-secondary hover:bg-transparent hover:text-secondary transition-all duration-300 mt-auto shadow-[0_0_15px_rgba(197,160,89,0.2)] cursor-pointer"
                   >
                     تأكيد الاستشارة
@@ -302,7 +346,7 @@ export default function ArabicContact() {
                       تم تأكيد موعد الاستشارة ليوم {selectedDay} أكتوبر في تمام الساعة {selectedSlot} بنجاح!
                     </div>
                   )}
-                </div>
+                </form>
               </div>
             </div>
           </div>

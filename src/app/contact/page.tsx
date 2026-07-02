@@ -17,6 +17,10 @@ export default function Contact() {
   const [selectedSlot, setSelectedSlot] = useState<string>("11:30 GST");
   const [showConfirmation, setShowConfirmation] = useState(false);
 
+  const [clientName, setClientName] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
+  const [clientPhone, setClientPhone] = useState("");
+
   const faqs: FAQ[] = [
     {
       id: "faq1",
@@ -38,8 +42,9 @@ export default function Contact() {
     },
   ];
 
-  const handleConfirmConsultation = () => {
-    const message = `Hello Decision Center, I would like to book a strategic consultation.\nSelected Date: October ${selectedDay}, 2026\nTime Slot: ${selectedSlot}`;
+  const handleConfirmConsultation = (e: React.FormEvent) => {
+    e.preventDefault();
+    const message = `Hello Decision Center, I would like to book a strategic consultation.\n\nClient Details:\n- Name: ${clientName}\n- Email: ${clientEmail}\n- Phone: ${clientPhone}\n\nSelected Date: October ${selectedDay}, 2026\nTime Slot: ${selectedSlot}`;
     const waUrl = `https://wa.me/96896680001?text=${encodeURIComponent(message)}`;
     window.open(waUrl, "_blank");
     setShowConfirmation(true);
@@ -266,15 +271,16 @@ export default function Contact() {
                 </div>
 
                 {/* Time Slots & CTA */}
-                <div className="flex flex-col">
+                <form onSubmit={handleConfirmConsultation} className="flex flex-col">
                   <p className="font-label-caps text-label-caps text-on-surface-variant mb-4">
                     Available Slots for Oct {selectedDay}
                   </p>
-                  <div className="grid grid-cols-2 gap-3 mb-8">
+                  <div className="grid grid-cols-2 gap-3 mb-6">
                     {timeSlots.map((slot) => {
                       const isSelected = selectedSlot === slot;
                       return (
                         <button
+                          type="button"
                           key={slot}
                           onClick={() => setSelectedSlot(slot)}
                           className={`border py-2 font-data-tabular text-data-tabular transition-colors cursor-pointer ${
@@ -288,8 +294,46 @@ export default function Contact() {
                       );
                     })}
                   </div>
+
+                  {/* Contact Fields */}
+                  <div className="space-y-4 mb-6 text-left">
+                    <div>
+                      <label className="font-body-sm text-body-sm text-foreground block mb-1">Full Name</label>
+                      <input
+                        type="text"
+                        value={clientName}
+                        onChange={(e) => setClientName(e.target.value)}
+                        placeholder="e.g. Abdullah Al Rushdi"
+                        className="w-full bg-surface-dim border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="font-body-sm text-body-sm text-foreground block mb-1">Email Address</label>
+                      <input
+                        type="email"
+                        value={clientEmail}
+                        onChange={(e) => setClientEmail(e.target.value)}
+                        placeholder="e.g. client@sovereign.om"
+                        className="w-full bg-surface-dim border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="font-body-sm text-body-sm text-foreground block mb-1">Phone Number</label>
+                      <input
+                        type="tel"
+                        value={clientPhone}
+                        onChange={(e) => setClientPhone(e.target.value)}
+                        placeholder="e.g. +968 96680001"
+                        className="w-full bg-surface-dim border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors"
+                        required
+                      />
+                    </div>
+                  </div>
+
                   <button
-                    onClick={handleConfirmConsultation}
+                    type="submit"
                     className="w-full bg-secondary text-primary-container py-4 font-label-caps text-label-caps font-semibold border border-secondary hover:bg-transparent hover:text-secondary transition-all duration-300 mt-auto shadow-[0_0_15px_rgba(197,160,89,0.2)] cursor-pointer"
                   >
                     Confirm Consultation
@@ -299,7 +343,7 @@ export default function Contact() {
                       Secure Briefing Scheduled for Oct {selectedDay} at {selectedSlot}!
                     </div>
                   )}
-                </div>
+                </form>
               </div>
             </div>
           </div>
