@@ -43,16 +43,9 @@ export default function ArabicAbout() {
                   <div
                     className="w-full h-full bg-cover bg-center grayscale hover:grayscale-0 transition-all duration-700"
                     style={{
-                      backgroundImage:
-                        "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDHF-gQoWOwyIS5QPtcyQpKttCwKERJfaHll6JpQP5oadYqE_qEAxW_R9euhdt8axVnPJqN_SW-lmiHaH5ApU9bQ9YHPwMOFXU2I-AQ0fb75h4Dl0RLdIZ_XXnu5G0jZfygyRNNZYtuff5CfhWBhqEj_LkxMtEkTjRLdtyxccQ98VO66b370JzAjmpZ2tZIsnlLTO9UEGCuZKHkiuFvWcOYI14g4s0Qc4i18XBKM9aC7qCX_L9kfSeIUR0b6rn8F1toZeOuRoCuiiUz')",
+                      backgroundImage: "url('/Image_5sz10z5sz10z5sz1.png')",
                     }}
                   ></div>
-                </div>
-                <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-surface-container-highest border border-secondary/20 p-8 hidden md:block">
-                  <div className="text-secondary font-display-lg text-5xl mb-2">30+</div>
-                  <p className="font-label-caps text-label-caps text-on-surface-variant">
-                    عاماً من الخبرة المؤسسية المتراكمة
-                  </p>
                 </div>
               </div>
             </div>
@@ -182,6 +175,13 @@ export default function ArabicAbout() {
                   </div>
                 </div>
                 <div className="absolute -top-10 -right-10 w-full h-full border border-secondary/10 z-0"></div>
+                {/* MOVED METRICS BADGE */}
+                <div className="absolute -bottom-10 -left-10 z-20 w-64 bg-surface-container-highest border border-secondary/20 p-8 hidden md:block">
+                  <div className="text-secondary font-display-lg text-5xl mb-2">30+</div>
+                  <p className="font-label-caps text-label-caps text-on-surface-variant">
+                    عاماً من الخبرة المؤسسية المتراكمة
+                  </p>
+                </div>
               </div>
               {/* Biography Side */}
               <div className="lg:col-span-7 space-y-10">

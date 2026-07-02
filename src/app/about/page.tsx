@@ -26,14 +26,14 @@ export default function About() {
                   tangible results and executable solutions that serve sovereign entities and major corporations.
                 </p>
               </div>
-              <div className="col-span-12 lg:col-span-5 flex justify-end mt-12 lg:mt-0">
-                <div className="institutional-border p-12 bg-surface-container-low text-center w-full max-w-md">
-                  <div className="font-display-lg text-display-lg-mobile md:text-display-lg text-secondary mb-2">
-                    +30
-                  </div>
-                  <div className="font-label-caps text-label-caps uppercase tracking-widest text-on-surface">
-                    Years of Institutional Expertise
-                  </div>
+              <div className="col-span-12 lg:col-span-5 relative">
+                <div className="aspect-square bg-surface-container-high relative overflow-hidden institutional-border p-1">
+                  <div
+                    className="w-full h-full bg-cover bg-center grayscale hover:grayscale-0 transition-all duration-700"
+                    style={{
+                      backgroundImage: "url('/Image_5sz10z5sz10z5sz1.png')",
+                    }}
+                  ></div>
                 </div>
               </div>
             </div>
@@ -154,12 +154,19 @@ export default function About() {
               </h2>
             </div>
             <div className="grid grid-cols-12 gap-gutter institutional-border p-0 overflow-hidden bg-background">
-              <div className="col-span-12 lg:col-span-5 h-[400px] lg:h-auto overflow-hidden">
+              <div className="col-span-12 lg:col-span-5 h-[400px] lg:h-auto overflow-hidden relative">
                 <img
                   className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
                   alt="Abdullah Al Rushdi"
                   src="/founder-image.jpeg"
                 />
+                {/* MOVED METRICS BADGE */}
+                <div className="absolute bottom-6 right-6 z-20 w-64 bg-surface-container-highest border border-secondary/20 p-8 hidden md:block">
+                  <div className="text-secondary font-display-lg text-5xl mb-2">30+</div>
+                  <p className="font-label-caps text-label-caps text-on-surface-variant">
+                    Years of Institutional Expertise
+                  </p>
+                </div>
               </div>
               <div className="col-span-12 lg:col-span-7 p-12 lg:p-16 flex flex-col justify-center">
                 <div className="mb-8">
