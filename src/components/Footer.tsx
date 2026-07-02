@@ -124,13 +124,21 @@ export default function Footer({ locale }: { locale: "en" | "ar" }) {
           <p className="font-body-sm text-body-sm text-on-surface-variant">
             {copyright}
           </p>
-          <div className="flex gap-4">
-            <span className="text-on-surface-variant hover:text-secondary transition-colors cursor-pointer">
-              <span className="material-symbols-outlined">language</span>
-            </span>
-            <span className="text-on-surface-variant hover:text-secondary transition-colors cursor-pointer">
-              <span className="material-symbols-outlined">public</span>
-            </span>
+          <div className="flex gap-6 items-center">
+            <Link
+              href="/admin/login"
+              className="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary transition-colors"
+            >
+              {locale === "en" ? "Admin Login" : "دخول المسؤول"}
+            </Link>
+            <div className="flex gap-4">
+              <span className="text-on-surface-variant hover:text-secondary transition-colors cursor-pointer">
+                <span className="material-symbols-outlined">language</span>
+              </span>
+              <span className="text-on-surface-variant hover:text-secondary transition-colors cursor-pointer">
+                <span className="material-symbols-outlined">public</span>
+              </span>
+            </div>
           </div>
         </div>
       </div>

@@ -20,6 +20,7 @@ export default function Contact() {
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
   const [clientPhone, setClientPhone] = useState("");
+  const [requestedService, setRequestedService] = useState("Financial & Valuation Modeling");
 
   const faqs: FAQ[] = [
     {
@@ -44,7 +45,7 @@ export default function Contact() {
 
   const handleConfirmConsultation = (e: React.FormEvent) => {
     e.preventDefault();
-    const message = `Hello Decision Center, I would like to book a strategic consultation.\n\nClient Details:\n- Name: ${clientName}\n- Email: ${clientEmail}\n- Phone: ${clientPhone}\n\nSelected Date: October ${selectedDay}, 2026\nTime Slot: ${selectedSlot}`;
+    const message = `Hello Decision Center, I would like to book a strategic consultation.\n\nClient Details:\n- Name: ${clientName}\n- Email: ${clientEmail}\n- Phone: ${clientPhone}\n- Requested Service: ${requestedService}\n\nSelected Date: October ${selectedDay}, 2026\nTime Slot: ${selectedSlot}`;
     const waUrl = `https://wa.me/96896680001?text=${encodeURIComponent(message)}`;
     window.open(waUrl, "_blank");
     setShowConfirmation(true);
@@ -329,6 +330,22 @@ export default function Contact() {
                         className="w-full bg-surface-dim border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors"
                         required
                       />
+                    </div>
+                    <div>
+                      <label className="font-body-sm text-body-sm text-foreground block mb-1">Requested Service</label>
+                      <div className="relative">
+                        <select
+                          value={requestedService}
+                          onChange={(e) => setRequestedService(e.target.value)}
+                          className="w-full bg-surface-dim border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors appearance-none"
+                        >
+                          <option>Financial & Valuation Modeling</option>
+                          <option>Evidentiary Feasibility Studies</option>
+                          <option>Debt Restructuring & ERM</option>
+                          <option>Sovereign Policy Support</option>
+                          <option>Other Strategy Consultations</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
 

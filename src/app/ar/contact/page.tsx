@@ -20,6 +20,7 @@ export default function ArabicContact() {
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
   const [clientPhone, setClientPhone] = useState("");
+  const [requestedService, setRequestedService] = useState("النمذجة والتقييم المالي");
 
   const faqs: FAQ[] = [
     {
@@ -44,7 +45,7 @@ export default function ArabicContact() {
 
   const handleConfirmConsultation = (e: React.FormEvent) => {
     e.preventDefault();
-    const message = `مرحباً مركز القرار، أود حجز جلسة استشارية استراتيجية.\n\nتفاصيل العميل:\n- الاسم: ${clientName}\n- البريد الإلكتروني: ${clientEmail}\n- رقم الهاتف: ${clientPhone}\n\nالموعد المفضل: أكتوبر ${selectedDay} في الساعة ${selectedSlot}`;
+    const message = `مرحباً مركز القرار، أود حجز جلسة استشارية استراتيجية.\n\nتفاصيل العميل:\n- الاسم: ${clientName}\n- البريد الإلكتروني: ${clientEmail}\n- رقم الهاتف: ${clientPhone}\n- الخدمة المطلوبة: ${requestedService}\n\nالموعد المفضل: أكتوبر ${selectedDay} في الساعة ${selectedSlot}`;
     const waUrl = `https://wa.me/96896680001?text=${encodeURIComponent(message)}`;
     window.open(waUrl, "_blank");
     setShowConfirmation(true);
@@ -332,6 +333,22 @@ export default function ArabicContact() {
                         className="w-full bg-surface-dim border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors"
                         required
                       />
+                    </div>
+                    <div>
+                      <label className="font-body-sm text-body-sm text-foreground block mb-1">الخدمة المطلوبة</label>
+                      <div className="relative">
+                        <select
+                          value={requestedService}
+                          onChange={(e) => setRequestedService(e.target.value)}
+                          className="w-full bg-surface-dim border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors appearance-none"
+                        >
+                          <option>النمذجة والتقييم المالي</option>
+                          <option>دراسات الجدوى المعتمدة</option>
+                          <option>إعادة هيكلة الديون وإدارة المخاطر</option>
+                          <option>دعم السياسات السيادية</option>
+                          <option>استشارات استراتيجية أخرى</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
 

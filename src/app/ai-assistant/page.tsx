@@ -25,6 +25,9 @@ export default function AIAssistant() {
   const [company, setCompany] = useState("");
   const [timeframe, setTimeframe] = useState("Immediate (1-3 Business Days)");
 
+  const [questionCount, setQuestionCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleRequestSession = (e: React.FormEvent) => {
     e.preventDefault();
     const message = `Hello Decision Center, I would like to request a secure consulting session.\nName: ${name}\nCompany: ${company}\nPreferred Timeframe: ${timeframe}`;
@@ -41,37 +44,81 @@ export default function AIAssistant() {
       "Decision Center has decades of regional banking leadership. We advise on restructuring, capital structuring, debt negotiations, and ERM compliance. Please details your target bank or funding size.",
   };
 
-  const handleQuickAction = (actionName: string) => {
+  const askAI = async (userText: string) => {
+    if (questionCount >= 3) return;
+
+    const nextCount = questionCount + 1;
+    setQuestionCount(nextCount);
+    setIsLoading(true);
     setShowQuickActions(false);
-    setMessages((prev) => [...prev, { sender: "user", text: actionName }]);
 
-    setTimeout(() => {
-      const reply = responses[actionName] || "Thank you. Let me review that request and get back to you shortly.";
-      setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
-    }, 800);
-  };
+    const updatedMessages = [...messages, { sender: "user" as const, text: userText }];
+    setMessages(updatedMessages);
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
-    const text = inputValue.trim();
-    setInputValue("");
-    setShowQuickActions(false);
-    setMessages((prev) => [...prev, { sender: "user", text }]);
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: updatedMessages.map((m) => ({
+            role: m.sender === "ai" ? "ai" : "user",
+            text: m.text,
+          })),
+        }),
+      });
 
-    setTimeout(() => {
+      if (!response.ok) throw new Error("Failed to fetch response");
+      const data = await response.json();
+
       setMessages((prev) => [
         ...prev,
         {
           sender: "ai",
-          text: "Thank you for the detail. Your request has been queued in our Qualification Engine. Our strategic consulting team will address this. You can also request an Executive Session using the form on the right.",
+          text: data.text,
         },
       ]);
-    }, 800);
+
+      if (nextCount >= 3) {
+        setTimeout(() => {
+          setMessages((prev) => [
+            ...prev,
+            {
+              sender: "ai",
+              text: "For custom advice, please schedule an Executive Session on the right or connect with us on WhatsApp.",
+            },
+          ]);
+        }, 800);
+      }
+    } catch (error) {
+      console.error(error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          text: "I apologize, I'm experiencing technical difficulties connecting to the Qualification Engine. Please schedule an Executive Session or contact us on WhatsApp.",
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleQuickAction = (actionName: string) => {
+    askAI(actionName);
+  };
+
+  const handleSendMessage = () => {
+    if (!inputValue.trim() || isLoading || questionCount >= 3) return;
+    const text = inputValue.trim();
+    setInputValue("");
+    askAI(text);
   };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isLoading]);
 
   return (
     <>
@@ -101,6 +148,24 @@ export default function AIAssistant() {
                     </div>
                     <div className="bg-surface-container-highest border border-outline-variant/20 p-4 rounded-none max-w-[85%]">
                       <p className="font-body-md text-body-md text-foreground">{msg.text}</p>
+                      {index > 0 && (
+                        <div className="mt-4 flex flex-col sm:flex-row gap-3">
+                          <Link
+                            href="/contact"
+                            className="bg-secondary text-primary-container px-4 py-2 text-center font-label-caps text-label-caps hover:bg-transparent hover:text-secondary border border-secondary transition-all text-xs"
+                          >
+                            Schedule Consultation
+                          </Link>
+                          <a
+                            href={`https://wa.me/96896680001?text=${encodeURIComponent("Hello Decision Center, I would like to book a consultation regarding my project.")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-4 py-2 text-center font-label-caps text-label-caps transition-all text-xs flex items-center justify-center gap-1"
+                          >
+                            WhatsApp
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </>
                 ) : (
@@ -116,7 +181,18 @@ export default function AIAssistant() {
               </div>
             ))}
 
-            {showQuickActions && (
+            {isLoading && (
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-none bg-surface-container-highest flex items-center justify-center border border-outline-variant/30 flex-shrink-0">
+                  <span className="material-symbols-outlined text-secondary animate-pulse">memory</span>
+                </div>
+                <div className="bg-surface-container-highest border border-outline-variant/20 p-4 rounded-none max-w-[85%]">
+                  <p className="font-body-md text-body-md text-foreground italic opacity-70">AI is formulating response...</p>
+                </div>
+              </div>
+            )}
+
+            {showQuickActions && questionCount < 3 && (
               <div className="pl-14 space-y-3">
                 {Object.keys(responses).map((action) => (
                   <button
@@ -142,13 +218,21 @@ export default function AIAssistant() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-                className="flex-grow bg-surface-container-lowest border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:ring-0 focus:border-secondary"
-                placeholder="Detail your institutional requirement..."
+                disabled={questionCount >= 3 || isLoading}
+                className="flex-grow bg-surface-container-lowest border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:ring-0 focus:border-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+                placeholder={
+                  questionCount >= 3
+                    ? "Session limit reached. Please schedule a consultation."
+                    : isLoading
+                    ? "Thinking..."
+                    : "Detail your institutional requirement..."
+                }
                 type="text"
               />
               <button
                 onClick={handleSendMessage}
-                className="btn-gold px-4 py-3 rounded-none flex items-center justify-center cursor-pointer"
+                disabled={questionCount >= 3 || isLoading}
+                className="btn-gold px-4 py-3 rounded-none flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span className="material-symbols-outlined">send</span>
               </button>

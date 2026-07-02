@@ -25,6 +25,9 @@ export default function ArabicAIAssistant() {
   const [company, setCompany] = useState("");
   const [timeframe, setTimeframe] = useState("عاجل (1-3 أيام عمل)");
 
+  const [questionCount, setQuestionCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleRequestSession = (e: React.FormEvent) => {
     e.preventDefault();
     const message = `مرحباً مركز القرار، أود طلب جلسة استشارية آمنة.\nالاسم: ${name}\nالشركة: ${company}\nالموعد المفضل: ${timeframe}`;
@@ -41,44 +44,88 @@ export default function ArabicAIAssistant() {
       "يمتلك مركز القرار عقوداً من القيادة المصرفية الإقليمية. نقدم المشورة بشأن إعادة الهيكلة، وهيكلة رأس المال، والمفاوضات المتعلقة بالديون، والامتثال لإدارة مخاطر المؤسسات (ERM). يرجى توضيح حجم التمويل المستهدف.",
   };
 
-  const handleQuickAction = (actionName: string) => {
+  const askAI = async (userText: string) => {
+    if (questionCount >= 3) return;
+
+    const nextCount = questionCount + 1;
+    setQuestionCount(nextCount);
+    setIsLoading(true);
     setShowQuickActions(false);
-    setMessages((prev) => [...prev, { sender: "user", text: actionName }]);
 
-    setTimeout(() => {
-      const reply = responses[actionName] || "شكراً لك. دعني أراجع هذا الطلب وأعود إليك قريباً.";
-      setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
-    }, 800);
-  };
+    const updatedMessages = [...messages, { sender: "user" as const, text: userText }];
+    setMessages(updatedMessages);
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
-    const text = inputValue.trim();
-    setInputValue("");
-    setShowQuickActions(false);
-    setMessages((prev) => [...prev, { sender: "user", text }]);
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: updatedMessages.map((m) => ({
+            role: m.sender === "ai" ? "ai" : "user",
+            text: m.text,
+          })),
+        }),
+      });
 
-    setTimeout(() => {
+      if (!response.ok) throw new Error("Failed to fetch response");
+      const data = await response.json();
+
       setMessages((prev) => [
         ...prev,
         {
           sender: "ai",
-          text: "شكراً لك على التفاصيل. تم إدراج طلبك في محرك التأهيل الخاص بنا. سيقوم فريق الاستشارات الاستراتيجية لدينا بمراجعة طلبك والتواصل معك. يمكنك أيضاً طلب جلسة تنفيذية باستخدام النموذج الموجود على اليسار.",
+          text: data.text,
         },
       ]);
-    }, 800);
+
+      if (nextCount >= 3) {
+        setTimeout(() => {
+          setMessages((prev) => [
+            ...prev,
+            {
+              sender: "ai",
+              text: "للحصول على استشارة مخصصة، يرجى جدولة جلسة تنفيذية على اليسار أو التواصل معنا عبر الواتساب.",
+            },
+          ]);
+        }, 800);
+      }
+    } catch (error) {
+      console.error(error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          text: "أعتذر، أواجه مشكلات فنية في الاتصال بمحرك التأهيل حالياً. يرجى جدولة جلسة استشارية أو التواصل معنا مباشرة عبر واتساب.",
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleQuickAction = (actionName: string) => {
+    askAI(actionName);
+  };
+
+  const handleSendMessage = () => {
+    if (!inputValue.trim() || isLoading || questionCount >= 3) return;
+    const text = inputValue.trim();
+    setInputValue("");
+    askAI(text);
   };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isLoading]);
 
   return (
     <>
       <Header locale="ar" />
       <main className="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-section-gap grid grid-cols-1 lg:grid-cols-12 gap-gutter pt-36">
         {/* Left Panel: AI Consultant Chat */}
-        <div className="lg:col-span-7 flex flex-col h-[700px] border border-outline-variant/20 bg-primary-container rounded-none relative overflow-hidden">
+        <div className="lg:col-span-7 flex flex-col h-[700px] border border-outline-variant/20 bg-primary-container rounded-none relative overflow-hidden" dir="rtl">
           {/* Header */}
           <div className="p-6 border-b border-outline-variant/20 bg-surface-container-high flex justify-between items-center">
             <div>
@@ -99,8 +146,26 @@ export default function ArabicAIAssistant() {
                     <div className="w-10 h-10 rounded-none bg-surface-container-highest flex items-center justify-center border border-outline-variant/30 flex-shrink-0">
                       <span className="material-symbols-outlined text-secondary">memory</span>
                     </div>
-                    <div className="bg-surface-container-highest border border-outline-variant/20 p-4 rounded-none max-w-[85%]">
+                    <div className="bg-surface-container-highest border border-outline-variant/20 p-4 rounded-none max-w-[85%] text-right">
                       <p className="font-body-md text-body-md text-foreground">{msg.text}</p>
+                      {index > 0 && (
+                        <div className="mt-4 flex flex-col sm:flex-row gap-3">
+                          <Link
+                            href="/ar/contact"
+                            className="bg-secondary text-primary-container px-4 py-2 text-center font-label-caps text-label-caps hover:bg-transparent hover:text-secondary border border-secondary transition-all text-xs"
+                          >
+                            جدولة جلسة استشارية
+                          </Link>
+                          <a
+                            href={`https://wa.me/96896680001?text=${encodeURIComponent("مرحباً مركز القرار، أود حجز جلسة استشارية بخصوص مشروعي.")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-4 py-2 text-center font-label-caps text-label-caps transition-all text-xs flex items-center justify-center gap-1"
+                          >
+                            واتساب
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </>
                 ) : (
@@ -116,7 +181,18 @@ export default function ArabicAIAssistant() {
               </div>
             ))}
 
-            {showQuickActions && (
+            {isLoading && (
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-none bg-surface-container-highest flex items-center justify-center border border-outline-variant/30 flex-shrink-0">
+                  <span className="material-symbols-outlined text-secondary animate-pulse">memory</span>
+                </div>
+                <div className="bg-surface-container-highest border border-outline-variant/20 p-4 rounded-none max-w-[85%] text-right">
+                  <p className="font-body-md text-body-md text-foreground italic opacity-70">جاري صياغة الرد من الذكاء الاصطناعي...</p>
+                </div>
+              </div>
+            )}
+
+            {showQuickActions && questionCount < 3 && (
               <div className="pr-14 space-y-3">
                 {Object.keys(responses).map((action) => (
                   <button
@@ -142,13 +218,21 @@ export default function ArabicAIAssistant() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-                className="flex-grow bg-surface-container-lowest border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:ring-0 focus:border-secondary"
-                placeholder="فصل متطلباتك المؤسسية..."
+                disabled={questionCount >= 3 || isLoading}
+                className="flex-grow bg-surface-container-lowest border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:ring-0 focus:border-secondary disabled:opacity-50 disabled:cursor-not-allowed text-right"
+                placeholder={
+                  questionCount >= 3
+                    ? "تم الوصول إلى الحد الأقصى للجلسة. يرجى جدولة استشارة."
+                    : isLoading
+                    ? "جاري التفكير..."
+                    : "فصل متطلباتك المؤسسية..."
+                }
                 type="text"
               />
               <button
                 onClick={handleSendMessage}
-                className="btn-gold px-4 py-3 rounded-none flex items-center justify-center cursor-pointer"
+                disabled={questionCount >= 3 || isLoading}
+                className="btn-gold px-4 py-3 rounded-none flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span className="material-symbols-outlined">send</span>
               </button>
