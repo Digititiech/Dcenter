@@ -81,6 +81,10 @@ export default function AdminDashboard() {
   const [editLeadFlagged, setEditLeadFlagged] = useState(false);
   const [savingLeadDetails, setSavingLeadDetails] = useState(false);
 
+  // SMTP Test State
+  const [testEmailRecipient, setTestEmailRecipient] = useState("");
+  const [sendingTestEmail, setSendingTestEmail] = useState(false);
+
   // Preset Template Management State
   const [presets, setPresets] = useState<PresetMessage[]>([]);
   const [editingPresetId, setEditingPresetId] = useState<string | null>(null);
@@ -527,6 +531,38 @@ export default function AdminDashboard() {
       localStorage.removeItem("mock-admin-auth");
     }
     router.push("/admin/login");
+  };
+
+  const handleSendTestEmail = async () => {
+    if (!smtpHost || !smtpPort || !smtpUser || !smtpPass || !testEmailRecipient) {
+      alert("Please fill out all SMTP credentials and the recipient email field");
+      return;
+    }
+    setSendingTestEmail(true);
+    try {
+      const res = await fetch("/api/send-test-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          host: smtpHost,
+          port: smtpPort,
+          user: smtpUser,
+          pass: smtpPass,
+          to: testEmailRecipient
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert("Test email sent successfully! Please check your inbox.");
+      } else {
+        alert(`Failed to send test email: ${data.error || "Unknown error"}`);
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert(`Error: ${err.message || err}`);
+    } finally {
+      setSendingTestEmail(false);
+    }
   };
 
   const handleSaveLeadDetails = async () => {
@@ -1134,6 +1170,32 @@ export default function AdminDashboard() {
               >
                 Save Mail Credentials
               </button>
+
+              {/* Send Test Email Card */}
+              <div className="border-t border-outline-variant/10 pt-5 space-y-4">
+                <h4 className="font-body-md text-body-md text-foreground font-semibold">Send Test Email</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                  <div className="space-y-1 sm:col-span-2">
+                    <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Recipient Email Address</label>
+                    <input
+                      type="email"
+                      placeholder="e.g. test@example.com"
+                      value={testEmailRecipient}
+                      onChange={(e) => setTestEmailRecipient(e.target.value)}
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                    />
+                  </div>
+                  <div className="sm:col-span-1">
+                    <button
+                      onClick={handleSendTestEmail}
+                      disabled={sendingTestEmail}
+                      className="w-full bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer h-[34px] flex items-center justify-center"
+                    >
+                      {sendingTestEmail ? "Sending..." : "Send Test Email"}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Calendar Integration */}
