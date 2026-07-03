@@ -1,10 +1,33 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function WhatsAppFloating() {
   const pathname = usePathname();
   const isArabic = pathname ? pathname.startsWith("/ar") : false;
+  const [waNumber, setWaNumber] = useState("96896680001");
+
+  useEffect(() => {
+    const fetchWaNumber = async () => {
+      try {
+        const serverUrl = localStorage.getItem("wa-server-url") || "https://wa.powerpod.ae";
+        const res = await fetch(`${serverUrl}/api/whatsapp-status`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status === "connected" && data.connectedNumber) {
+            const cleaned = data.connectedNumber.replace(/[^0-9]/g, "");
+            if (cleaned) {
+              setWaNumber(cleaned);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to fetch dynamic WhatsApp number:", err);
+      }
+    };
+    fetchWaNumber();
+  }, []);
 
   if (pathname && pathname.startsWith("/admin")) {
     return null;
@@ -14,7 +37,7 @@ export default function WhatsAppFloating() {
     <div className={`fixed bottom-6 ${isArabic ? "left-6" : "right-6"} z-50 flex flex-col gap-3`}>
       {/* WhatsApp Premium Gold SVG Icon */}
       <a
-        href="https://wa.me/96896680001"
+        href={`https://wa.me/${waNumber}`}
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center justify-center bg-secondary text-background hover:bg-secondary/90 transition-all duration-300 shadow-[0_4px_20px_rgba(233,193,118,0.3)] hover:shadow-[0_4px_25px_rgba(233,193,118,0.5)] p-3 border border-secondary/20 hover:scale-105 group"

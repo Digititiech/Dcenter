@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 
 interface Message {
   sender: "ai" | "user";
@@ -24,15 +25,99 @@ export default function AIAssistant() {
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [timeframe, setTimeframe] = useState("Immediate (1-3 Business Days)");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [waNumber, setWaNumber] = useState("96896680001");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const [questionCount, setQuestionCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleRequestSession = (e: React.FormEvent) => {
+  useEffect(() => {
+    const fetchWaNumber = async () => {
+      try {
+        const serverUrl = localStorage.getItem("wa-server-url") || "https://wa.powerpod.ae";
+        const res = await fetch(`${serverUrl}/api/whatsapp-status`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status === "connected" && data.connectedNumber) {
+            const cleaned = data.connectedNumber.replace(/[^0-9]/g, "");
+            if (cleaned) {
+              setWaNumber(cleaned);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to fetch dynamic WhatsApp number:", err);
+      }
+    };
+    fetchWaNumber();
+  }, []);
+
+  const handleRequestSession = async (e: React.FormEvent) => {
     e.preventDefault();
-    const message = `Hello Decision Center, I would like to request a secure consulting session.\nName: ${name}\nCompany: ${company}\nPreferred Timeframe: ${timeframe}`;
-    const waUrl = `https://wa.me/96896680001?text=${encodeURIComponent(message)}`;
-    window.open(waUrl, "_blank");
+    setIsSubmitting(true);
+
+    const message = `Hello Decision Center, I would like to request a secure consulting session.\nName: ${name}\nCompany: ${company}\nEmail: ${email}\nPhone: ${phone}\nPreferred Timeframe: ${timeframe}`;
+
+    const newLead = {
+      name,
+      email,
+      phone,
+      company,
+      timeframe,
+      status: "Pending"
+    };
+
+    try {
+      if (isSupabaseConfigured()) {
+        await supabase.from("leads").insert(newLead);
+      } else {
+        const localLeads = localStorage.getItem("crm-leads");
+        const currentLeads = localLeads ? JSON.parse(localLeads) : [];
+        localStorage.setItem("crm-leads", JSON.stringify([...currentLeads, { id: Date.now().toString(), ...newLead, created_at: new Date().toISOString() }]));
+      }
+
+      // Send auto WhatsApp via connected WhatsApp server
+      const serverUrl = localStorage.getItem("wa-server-url") || "https://wa.powerpod.ae";
+
+      // 1. Send confirmation to client
+      const clientMessage = `Hello ${name}, thank you for requesting an Executive Consultation Session with Decision Center. We have received your inquiry for the company "${company}" with a timeframe of "${timeframe}". Our team will contact you shortly.`;
+      
+      await fetch(`${serverUrl}/api/send-whatsapp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          number: phone,
+          message: clientMessage
+        })
+      });
+
+      // 2. Notify the admin
+      await fetch(`${serverUrl}/api/send-whatsapp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          number: "96896680001",
+          message: message
+        })
+      });
+
+      setShowConfirmation(true);
+      setName("");
+      setCompany("");
+      setPhone("");
+      setEmail("");
+      setTimeout(() => {
+        setShowConfirmation(false);
+      }, 6000);
+    } catch (err) {
+      console.error("Lead submission failed:", err);
+      alert("Failed to submit request. Please try again or contact us directly on WhatsApp.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const responses: Record<string, string> = {
@@ -157,7 +242,7 @@ export default function AIAssistant() {
                             Schedule Consultation
                           </Link>
                           <a
-                            href={`https://wa.me/96896680001?text=${encodeURIComponent("Hello Decision Center, I would like to book a consultation regarding my project.")}`}
+                            href={`https://wa.me/${waNumber}?text=${encodeURIComponent("Hello Decision Center, I would like to book a consultation regarding my project.")}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-4 py-2 text-center font-label-caps text-label-caps transition-all text-xs flex items-center justify-center gap-1"
@@ -292,6 +377,28 @@ export default function AIAssistant() {
                 />
               </div>
               <div className="space-y-1">
+                <label className="font-body-sm text-body-sm text-foreground">Email Address</label>
+                <input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-surface-container-lowest border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors"
+                  placeholder="e.g. client@sovereign.om"
+                  type="email"
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="font-body-sm text-body-sm text-foreground">Phone Number</label>
+                <input
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full bg-surface-container-lowest border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors font-mono"
+                  placeholder="e.g. +968 96680001"
+                  type="tel"
+                  required
+                />
+              </div>
+              <div className="space-y-1">
                 <label className="font-body-sm text-body-sm text-foreground">When would you like to meet?</label>
                 <div className="relative">
                   <select
@@ -308,14 +415,20 @@ export default function AIAssistant() {
               <div className="pt-4">
                 <button
                   type="submit"
-                  className="w-full btn-gold font-label-caps text-label-caps uppercase px-6 py-4 rounded-none flex justify-center items-center gap-2 cursor-pointer"
+                  disabled={isSubmitting}
+                  className="w-full btn-gold font-label-caps text-label-caps uppercase px-6 py-4 rounded-none flex justify-center items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
-                  <span>Request Secure Session</span>
+                  <span>{isSubmitting ? "Requesting..." : "Request Secure Session"}</span>
                   <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
                     lock
                   </span>
                 </button>
               </div>
+              {showConfirmation && (
+                <div className="mt-4 text-secondary font-label-caps text-xs text-center border border-secondary/30 p-2 bg-secondary/5">
+                  Executive Consultation Request Received!
+                </div>
+              )}
             </form>
           </div>
         </div>

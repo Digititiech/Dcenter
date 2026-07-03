@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 
 interface FAQ {
   id: string;
@@ -21,6 +22,7 @@ export default function ArabicContact() {
   const [clientEmail, setClientEmail] = useState("");
   const [clientPhone, setClientPhone] = useState("");
   const [requestedService, setRequestedService] = useState("النمذجة والتقييم المالي");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const faqs: FAQ[] = [
     {
@@ -43,15 +45,68 @@ export default function ArabicContact() {
     },
   ];
 
-  const handleConfirmConsultation = (e: React.FormEvent) => {
+  const handleConfirmConsultation = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
     const message = `مرحباً مركز القرار، أود حجز جلسة استشارية استراتيجية.\n\nتفاصيل العميل:\n- الاسم: ${clientName}\n- البريد الإلكتروني: ${clientEmail}\n- رقم الهاتف: ${clientPhone}\n- الخدمة المطلوبة: ${requestedService}\n\nالموعد المفضل: أكتوبر ${selectedDay} في الساعة ${selectedSlot}`;
-    const waUrl = `https://wa.me/96896680001?text=${encodeURIComponent(message)}`;
-    window.open(waUrl, "_blank");
-    setShowConfirmation(true);
-    setTimeout(() => {
-      setShowConfirmation(false);
-    }, 5000);
+
+    const newBooking = {
+      clientName,
+      clientEmail,
+      clientPhone,
+      day: selectedDay,
+      timeSlot: selectedSlot,
+      status: "Pending"
+    };
+
+    try {
+      if (isSupabaseConfigured()) {
+        await supabase.from("bookings").insert(newBooking);
+      } else {
+        const localBookings = localStorage.getItem("bookings-slots");
+        const currentBookings = localBookings ? JSON.parse(localBookings) : [];
+        localStorage.setItem("bookings-slots", JSON.stringify([...currentBookings, { id: Date.now().toString(), ...newBooking }]));
+      }
+
+      // Send auto WhatsApp via connected WhatsApp server
+      const serverUrl = localStorage.getItem("wa-server-url") || "https://wa.powerpod.ae";
+      
+      // 1. Send confirmation to client
+      const clientMessage = `مرحباً ${clientName}، تم استلام طلب الاستشارة الاستراتيجية الخاص بك مع مركز القرار ليوم ${selectedDay} أكتوبر الساعة ${selectedSlot}. سنقوم بمراجعة طلبك وتأكيده قريباً.`;
+      
+      await fetch(`${serverUrl}/api/send-whatsapp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          number: clientPhone,
+          message: clientMessage
+        })
+      });
+
+      // 2. Notify the admin
+      await fetch(`${serverUrl}/api/send-whatsapp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          number: "96896680001",
+          message: message
+        })
+      });
+
+      setShowConfirmation(true);
+      setClientName("");
+      setClientEmail("");
+      setClientPhone("");
+      setTimeout(() => {
+        setShowConfirmation(false);
+      }, 6000);
+    } catch (err) {
+      console.error("Booking submission failed:", err);
+      alert("فشل تقديم الطلب. يرجى المحاولة مرة أخرى أو التواصل معنا مباشرة عبر واتساب.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const toggleFAQ = (id: string) => {
@@ -354,9 +409,10 @@ export default function ArabicContact() {
 
                   <button
                     type="submit"
-                    className="w-full bg-secondary text-primary-container py-4 font-label-caps text-label-caps font-semibold border border-secondary hover:bg-transparent hover:text-secondary transition-all duration-300 mt-auto shadow-[0_0_15px_rgba(197,160,89,0.2)] cursor-pointer"
+                    disabled={isSubmitting}
+                    className="w-full bg-secondary text-primary-container py-4 font-label-caps text-label-caps font-semibold border border-secondary hover:bg-transparent hover:text-secondary transition-all duration-300 mt-auto shadow-[0_0_15px_rgba(197,160,89,0.2)] cursor-pointer disabled:opacity-50"
                   >
-                    تأكيد الاستشارة
+                    {isSubmitting ? "جاري الحجز..." : "تأكيد الاستشارة"}
                   </button>
                   {showConfirmation && (
                     <div className="mt-4 text-secondary font-label-caps text-xs text-center border border-secondary/30 p-2 bg-secondary/5">
