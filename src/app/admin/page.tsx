@@ -63,34 +63,40 @@ export default function AdminDashboard() {
     const pollWhatsAppStatus = async () => {
       if (!waServerUrl) return;
       try {
-        const res = await fetch(`${waServerUrl}/api/status`);
+        const res = await fetch(`${waServerUrl}/api/whatsapp-status`);
         if (!res.ok) throw new Error("Server offline");
         const data = await res.json();
         
-        if (data.status === "INITIALIZING") {
+        if (data.status === "connecting" || data.status === "initializing") {
           setQrStatus("generating");
           setConnectionLogs(prev => {
             if (prev[prev.length - 1]?.includes("initializing")) return prev;
             return [...prev.slice(-10), "[SYSTEM] Bot is initializing instance..."];
           });
-        } else if (data.status === "SCAN_QR") {
+        } else if (data.status === "qr_ready") {
           setQrStatus("waiting");
-          const qrRes = await fetch(`${waServerUrl}/api/qr`);
-          if (qrRes.ok) {
-            const qrData = await qrRes.json();
-            setQrImage(qrData.qr);
+          if (data.qrCode) {
+            setQrImage(data.qrCode);
           }
-          setConnectionLogs(prev => {
-            if (prev[prev.length - 1]?.includes("QR Code displayed")) return prev;
-            return [...prev.slice(-10), "[SOCKET] QR Code displayed. Waiting for scanner handshake..."];
-          });
-        } else if (data.status === "CONNECTED") {
+          if (data.logs && Array.isArray(data.logs)) {
+            setConnectionLogs(data.logs);
+          } else {
+            setConnectionLogs(prev => {
+              if (prev[prev.length - 1]?.includes("QR Code displayed")) return prev;
+              return [...prev.slice(-10), "[SOCKET] QR Code displayed. Waiting for scanner handshake..."];
+            });
+          }
+        } else if (data.status === "connected") {
           setQrStatus("connected");
           setQrImage(null);
-          setConnectionLogs(prev => {
-            if (prev[prev.length - 1]?.includes("CONNECTED")) return prev;
-            return [...prev.slice(-10), "[SOCKET] Handshake succeeded! Device authenticated.", "[SYSTEM] Session status: CONNECTED"];
-          });
+          if (data.logs && Array.isArray(data.logs)) {
+            setConnectionLogs(data.logs);
+          } else {
+            setConnectionLogs(prev => {
+              if (prev[prev.length - 1]?.includes("CONNECTED")) return prev;
+              return [...prev.slice(-10), "[SOCKET] Handshake succeeded! Device authenticated.", "[SYSTEM] Session status: CONNECTED"];
+            });
+          }
         } else {
           setQrStatus("disconnected");
           setQrImage(null);
@@ -391,11 +397,11 @@ export default function AdminDashboard() {
     if (booking) {
       try {
         const msg = `Hello ${booking.clientName}, your strategic consultation slot with Decision Center is confirmed for October ${booking.day} at ${booking.timeSlot}. We look forward to our session.`;
-        await fetch(`${waServerUrl}/api/send`, {
+        await fetch(`${waServerUrl}/api/send-whatsapp`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            to: booking.clientPhone,
+            number: booking.clientPhone,
             message: msg
           })
         });
