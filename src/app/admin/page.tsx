@@ -85,6 +85,16 @@ export default function AdminDashboard() {
   const [testEmailRecipient, setTestEmailRecipient] = useState("");
   const [sendingTestEmail, setSendingTestEmail] = useState(false);
 
+  // Manual Booking Add State
+  const [showingAddBookingModal, setShowingAddBookingModal] = useState(false);
+  const [newBookingName, setNewBookingName] = useState("");
+  const [newBookingEmail, setNewBookingEmail] = useState("");
+  const [newBookingPhone, setNewBookingPhone] = useState("");
+  const [newBookingDay, setNewBookingDay] = useState(1);
+  const [newBookingSlot, setNewBookingSlot] = useState("09:00 AM");
+  const [newBookingStatus, setNewBookingStatus] = useState<"Pending" | "Confirmed" | "Rescheduled">("Confirmed");
+  const [savingNewBooking, setSavingNewBooking] = useState(false);
+
   // Preset Template Management State
   const [presets, setPresets] = useState<PresetMessage[]>([]);
   const [editingPresetId, setEditingPresetId] = useState<string | null>(null);
@@ -667,6 +677,49 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleAddBooking = async () => {
+    if (!newBookingName || !newBookingEmail || !newBookingPhone || !newBookingDay || !newBookingSlot) {
+      alert("Please fill out all fields");
+      return;
+    }
+    setSavingNewBooking(true);
+
+    const newBooking: Omit<Booking, "id"> = {
+      clientName: newBookingName,
+      clientEmail: newBookingEmail,
+      clientPhone: newBookingPhone,
+      day: Number(newBookingDay),
+      timeSlot: newBookingSlot,
+      status: newBookingStatus
+    };
+
+    try {
+      if (isUsingSupabase) {
+        const { data, error } = await supabase.from("bookings").insert(newBooking).select().single();
+        if (error) throw error;
+        if (data) {
+          setBookings([...bookings, data]);
+        }
+      } else {
+        const localBooking: Booking = {
+          id: Date.now().toString(),
+          ...newBooking
+        };
+        const updated = [...bookings, localBooking];
+        setBookings(updated);
+        localStorage.setItem("bookings-slots", JSON.stringify(updated));
+      }
+
+      alert("New booking added successfully!");
+      setShowingAddBookingModal(false);
+    } catch (err) {
+      console.error(err);
+      alert("Error adding manual booking");
+    } finally {
+      setSavingNewBooking(false);
+    }
+  };
+
   const handleSavePreset = async () => {
     if (!presetTitle || !presetText) {
       alert("Please enter title and text for the preset template");
@@ -1074,9 +1127,25 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               {/* List of Bookings */}
               <div className="lg:col-span-7 bg-[#111110] border border-outline-variant/10 p-6 space-y-6">
-                <h3 className="font-display-lg text-headline-md text-foreground pb-2 border-b border-outline-variant/10">
-                  Scheduled Bookings List
-                </h3>
+                <div className="flex justify-between items-center pb-2 border-b border-outline-variant/10">
+                  <h3 className="font-display-lg text-headline-md text-foreground">
+                    Scheduled Bookings List
+                  </h3>
+                  <button
+                    onClick={() => {
+                      setNewBookingName("");
+                      setNewBookingEmail("");
+                      setNewBookingPhone("");
+                      setNewBookingDay(1);
+                      setNewBookingSlot("09:00 AM");
+                      setNewBookingStatus("Confirmed");
+                      setShowingAddBookingModal(true);
+                    }}
+                    className="inline-flex items-center gap-1 bg-secondary text-primary-container hover:bg-transparent hover:text-secondary px-3 py-1.5 font-label-caps text-[10px] border border-secondary transition-all cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">add</span> Add Booking
+                  </button>
+                </div>
                 <div className="space-y-4">
                   {bookings.map(b => (
                     <div key={b.id} className="border border-outline-variant/15 bg-[#181817] p-5 flex flex-col sm:flex-row justify-between gap-4">
@@ -1735,6 +1804,117 @@ export default function AdminDashboard() {
                 </button>
                 <button
                   onClick={() => setActiveEditLead(null)}
+                  className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-6 py-3 font-label-caps text-label-caps transition-colors cursor-pointer text-xs"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Add Booking Modal */}
+        {showingAddBookingModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070707]/80 backdrop-blur-sm p-4">
+            <div className="bg-[#111110] border border-secondary/30 p-6 max-w-lg w-full relative space-y-5">
+              <button
+                onClick={() => setShowingAddBookingModal(false)}
+                className="absolute top-4 right-4 text-on-surface-variant hover:text-foreground cursor-pointer"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+
+              <div>
+                <h3 className="font-display-lg text-headline-md text-foreground">Add Custom Booking</h3>
+                <p className="font-body-sm text-[12px] text-on-surface-variant mt-1">Schedule a manual consultation slot.</p>
+              </div>
+
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1 text-left">
+                <div className="space-y-1">
+                  <label className="font-body-sm text-body-sm text-foreground">Client Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Salim Al Harthy"
+                    value={newBookingName}
+                    onChange={(e) => setNewBookingName(e.target.value)}
+                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="font-body-sm text-body-sm text-foreground">Email</label>
+                    <input
+                      type="email"
+                      placeholder="e.g. salim@example.com"
+                      value={newBookingEmail}
+                      onChange={(e) => setNewBookingEmail(e.target.value)}
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="font-body-sm text-body-sm text-foreground">Phone</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 96896680001"
+                      value={newBookingPhone}
+                      onChange={(e) => setNewBookingPhone(e.target.value)}
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="font-body-sm text-body-sm text-foreground">October Day (1-15)</label>
+                    <select
+                      value={newBookingDay}
+                      onChange={(e) => setNewBookingDay(Number(e.target.value))}
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-2 focus:outline-none focus:border-secondary"
+                    >
+                      {Array.from({ length: 15 }, (_, i) => i + 1).map(day => (
+                        <option key={day} value={day}>October {day}, 2026</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="font-body-sm text-body-sm text-foreground">Time Slot</label>
+                    <select
+                      value={newBookingSlot}
+                      onChange={(e) => setNewBookingSlot(e.target.value)}
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-2 focus:outline-none focus:border-secondary"
+                    >
+                      <option value="09:00 AM">09:00 AM</option>
+                      <option value="10:30 AM">10:30 AM</option>
+                      <option value="01:00 PM">01:00 PM</option>
+                      <option value="03:00 PM">03:00 PM</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-body-sm text-body-sm text-foreground">Booking Status</label>
+                  <select
+                    value={newBookingStatus}
+                    onChange={(e) => setNewBookingStatus(e.target.value as any)}
+                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-2 focus:outline-none focus:border-secondary"
+                  >
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Pending">Pending</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex gap-4 pt-2">
+                <button
+                  onClick={handleAddBooking}
+                  disabled={savingNewBooking}
+                  className="flex-grow bg-secondary text-primary-container py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer text-xs"
+                >
+                  {savingNewBooking ? "Adding..." : "Add Booking"}
+                </button>
+                <button
+                  onClick={() => setShowingAddBookingModal(false)}
                   className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-6 py-3 font-label-caps text-label-caps transition-colors cursor-pointer text-xs"
                 >
                   Cancel
