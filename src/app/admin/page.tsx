@@ -93,10 +93,7 @@ export default function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    const savedPresets = localStorage.getItem("whatsapp-presets");
-    if (savedPresets) {
-      setPresets(JSON.parse(savedPresets));
-    } else {
+    const loadPresets = async () => {
       const defaultPresets: PresetMessage[] = [
         {
           id: "1",
@@ -119,10 +116,39 @@ export default function AdminDashboard() {
           text: "Hello {name}, regarding your inquiry aligned with Oman Vision 2040, we have specialized advisory programs. Let's arrange a call."
         }
       ];
-      setPresets(defaultPresets);
-      localStorage.setItem("whatsapp-presets", JSON.stringify(defaultPresets));
-    }
-  }, []);
+
+      if (isSupabaseConfigured()) {
+        try {
+          const { data, error } = await supabase.from("whatsapp_presets").select("*").order("created_at", { ascending: true });
+          if (!error && data && data.length > 0) {
+            setPresets(data);
+            return;
+          }
+          // Seed defaults in Supabase if empty
+          if (data && data.length === 0) {
+            const formattedDefaults = defaultPresets.map(({ title, text }) => ({ title, text }));
+            const { data: inserted, error: insertErr } = await supabase.from("whatsapp_presets").insert(formattedDefaults).select();
+            if (!insertErr && inserted) {
+              setPresets(inserted);
+              return;
+            }
+          }
+        } catch (err) {
+          console.error("Failed to load presets from database, falling back to LocalStorage:", err);
+        }
+      }
+
+      const savedPresets = localStorage.getItem("whatsapp-presets");
+      if (savedPresets) {
+        setPresets(JSON.parse(savedPresets));
+      } else {
+        setPresets(defaultPresets);
+        localStorage.setItem("whatsapp-presets", JSON.stringify(defaultPresets));
+      }
+    };
+
+    loadPresets();
+  }, [isUsingSupabase]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -548,30 +574,60 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleSavePreset = () => {
+  const handleSavePreset = async () => {
     if (!presetTitle || !presetText) {
       alert("Please enter title and text for the preset template");
       return;
     }
 
-    let updated: PresetMessage[];
-    if (editingPresetId) {
-      updated = presets.map(p => p.id === editingPresetId ? { ...p, title: presetTitle, text: presetText } : p);
-      setEditingPresetId(null);
+    if (isUsingSupabase) {
+      try {
+        if (editingPresetId) {
+          const { error } = await supabase
+            .from("whatsapp_presets")
+            .update({ title: presetTitle, text: presetText })
+            .eq("id", editingPresetId);
+          if (error) throw error;
+          
+          setPresets(presets.map(p => p.id === editingPresetId ? { ...p, title: presetTitle, text: presetText } : p));
+        } else {
+          const { data, error } = await supabase
+            .from("whatsapp_presets")
+            .insert({ title: presetTitle, text: presetText })
+            .select()
+            .single();
+          if (error) throw error;
+          if (data) {
+            setPresets([...presets, data]);
+          }
+        }
+        setEditingPresetId(null);
+        setPresetTitle("");
+        setPresetText("");
+        alert("Preset template saved in Database!");
+      } catch (err) {
+        console.error(err);
+        alert("Failed to save preset to database.");
+      }
     } else {
-      const newPreset: PresetMessage = {
-        id: Date.now().toString(),
-        title: presetTitle,
-        text: presetText
-      };
-      updated = [...presets, newPreset];
+      let updated: PresetMessage[];
+      if (editingPresetId) {
+        updated = presets.map(p => p.id === editingPresetId ? { ...p, title: presetTitle, text: presetText } : p);
+        setEditingPresetId(null);
+      } else {
+        const newPreset: PresetMessage = {
+          id: Date.now().toString(),
+          title: presetTitle,
+          text: presetText
+        };
+        updated = [...presets, newPreset];
+      }
+      setPresets(updated);
+      localStorage.setItem("whatsapp-presets", JSON.stringify(updated));
+      setPresetTitle("");
+      setPresetText("");
+      alert("Preset template saved in LocalStorage!");
     }
-
-    setPresets(updated);
-    localStorage.setItem("whatsapp-presets", JSON.stringify(updated));
-    setPresetTitle("");
-    setPresetText("");
-    alert("Preset template saved!");
   };
 
   const handleCancelEditPreset = () => {
@@ -580,11 +636,23 @@ export default function AdminDashboard() {
     setPresetText("");
   };
 
-  const handleDeletePreset = (id: string) => {
+  const handleDeletePreset = async (id: string) => {
     if (!confirm("Are you sure you want to delete this preset template?")) return;
-    const updated = presets.filter(p => p.id !== id);
-    setPresets(updated);
-    localStorage.setItem("whatsapp-presets", JSON.stringify(updated));
+    
+    if (isUsingSupabase) {
+      try {
+        const { error } = await supabase.from("whatsapp_presets").delete().eq("id", id);
+        if (error) throw error;
+        setPresets(presets.filter(p => p.id !== id));
+      } catch (err) {
+        console.error(err);
+        alert("Failed to delete preset from database.");
+      }
+    } else {
+      const updated = presets.filter(p => p.id !== id);
+      setPresets(updated);
+      localStorage.setItem("whatsapp-presets", JSON.stringify(updated));
+    }
   };
 
   const handleDisconnectWhatsApp = async () => {
