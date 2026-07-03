@@ -45,7 +45,71 @@ export default function AdminDashboard() {
   const [gcalLoading, setGcalLoading] = useState(false);
 
   // WhatsApp QR State
+  const [waServerUrl, setWaServerUrl] = useState("http://localhost:3001");
   const [qrStatus, setQrStatus] = useState<"disconnected" | "generating" | "waiting" | "connected">("disconnected");
+  const [qrImage, setQrImage] = useState<string | null>(null);
+  const [connectionLogs, setConnectionLogs] = useState<string[]>([
+    "[SYSTEM] Initiating WhatsApp bot client connection checker..."
+  ]);
+
+  useEffect(() => {
+    const savedUrl = localStorage.getItem("wa-server-url");
+    if (savedUrl) setWaServerUrl(savedUrl);
+  }, []);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    const pollWhatsAppStatus = async () => {
+      if (!waServerUrl) return;
+      try {
+        const res = await fetch(`${waServerUrl}/api/status`);
+        if (!res.ok) throw new Error("Server offline");
+        const data = await res.json();
+        
+        if (data.status === "INITIALIZING") {
+          setQrStatus("generating");
+          setConnectionLogs(prev => {
+            if (prev[prev.length - 1]?.includes("initializing")) return prev;
+            return [...prev.slice(-10), "[SYSTEM] Bot is initializing instance..."];
+          });
+        } else if (data.status === "SCAN_QR") {
+          setQrStatus("waiting");
+          const qrRes = await fetch(`${waServerUrl}/api/qr`);
+          if (qrRes.ok) {
+            const qrData = await qrRes.json();
+            setQrImage(qrData.qr);
+          }
+          setConnectionLogs(prev => {
+            if (prev[prev.length - 1]?.includes("QR Code displayed")) return prev;
+            return [...prev.slice(-10), "[SOCKET] QR Code displayed. Waiting for scanner handshake..."];
+          });
+        } else if (data.status === "CONNECTED") {
+          setQrStatus("connected");
+          setQrImage(null);
+          setConnectionLogs(prev => {
+            if (prev[prev.length - 1]?.includes("CONNECTED")) return prev;
+            return [...prev.slice(-10), "[SOCKET] Handshake succeeded! Device authenticated.", "[SYSTEM] Session status: CONNECTED"];
+          });
+        } else {
+          setQrStatus("disconnected");
+          setQrImage(null);
+        }
+      } catch (err) {
+        setQrStatus("disconnected");
+        setQrImage(null);
+        setConnectionLogs(prev => {
+          if (prev[prev.length - 1]?.includes("Server offline")) return prev;
+          return [...prev.slice(-10), `[SYSTEM] Server offline. Verify ${waServerUrl} is running.`];
+        });
+      }
+    };
+
+    pollWhatsAppStatus();
+    interval = setInterval(pollWhatsAppStatus, 4000);
+
+    return () => clearInterval(interval);
+  }, [waServerUrl]);
 
   // CRM & Bookings Mock/DB State
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -286,6 +350,7 @@ export default function AdminDashboard() {
   };
 
   const handleConfirmBooking = async (bookingId: string) => {
+    const booking = bookings.find(b => b.id === bookingId);
     const updated = bookings.map(b => b.id === bookingId ? { ...b, status: "Confirmed" as const } : b);
     setBookings(updated);
 
@@ -321,6 +386,23 @@ export default function AdminDashboard() {
       localStorage.setItem("bookings-slots", JSON.stringify(updated));
       alert("Mock Booking Confirmed!");
     }
+
+    // Try to trigger automated WhatsApp confirmation message
+    if (booking) {
+      try {
+        const msg = `Hello ${booking.clientName}, your strategic consultation slot with Decision Center is confirmed for October ${booking.day} at ${booking.timeSlot}. We look forward to our session.`;
+        await fetch("http://localhost:3001/api/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            to: booking.clientPhone,
+            message: msg
+          })
+        });
+      } catch (err) {
+        console.warn("Automated WhatsApp send failed (server likely offline):", err);
+      }
+    }
   };
 
   const handleRescheduleBooking = async (bookingId: string) => {
@@ -343,16 +425,7 @@ export default function AdminDashboard() {
     router.push("/admin/login");
   };
 
-  const generateQrCode = () => {
-    setQrStatus("generating");
-    setTimeout(() => {
-      setQrStatus("waiting");
-    }, 1500);
-  };
 
-  const simulateQrScan = () => {
-    setQrStatus("connected");
-  };
 
   if (loading) {
     return (
@@ -827,47 +900,25 @@ export default function AdminDashboard() {
                 <div className="w-48 h-48 bg-white flex items-center justify-center border border-secondary p-2 relative overflow-hidden">
                   {qrStatus === "disconnected" && (
                     <div className="absolute inset-0 bg-[#070707]/90 flex items-center justify-center text-center p-4">
-                      <button
-                        onClick={generateQrCode}
-                        className="bg-secondary text-primary-container px-3 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer"
-                      >
-                        Generate QR Code
-                      </button>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant">
+                        WhatsApp Server Offline. Run the bot script to connect.
+                      </p>
                     </div>
                   )}
                   {qrStatus === "generating" && (
-                    <div className="absolute inset-0 bg-[#070707]/90 flex items-center justify-center text-secondary animate-pulse text-xs">
-                      Configuring Instance...
+                    <div className="absolute inset-0 bg-[#070707]/90 flex items-center justify-center text-secondary animate-pulse text-xs text-center p-4">
+                      Configuring session browser instance...
                     </div>
                   )}
-                  {(qrStatus === "waiting" || qrStatus === "connected") && (
+                  {qrStatus === "waiting" && qrImage && (
                     <div className="relative w-full h-full flex flex-col justify-center items-center">
-                      {/* Simulating QR code with a CSS design */}
-                      <div className="grid grid-cols-4 gap-1.5 w-32 h-32 opacity-80 bg-stone-900 p-2">
-                        <div className="bg-white border-2 border-stone-900"></div>
-                        <div className="bg-stone-500"></div>
-                        <div className="bg-stone-500"></div>
-                        <div className="bg-white border-2 border-stone-900"></div>
-                        <div className="bg-stone-500"></div>
-                        <div className="bg-white"></div>
-                        <div className="bg-white"></div>
-                        <div className="bg-stone-500"></div>
-                        <div className="bg-stone-500"></div>
-                        <div className="bg-white"></div>
-                        <div className="bg-stone-500"></div>
-                        <div className="bg-white"></div>
-                        <div className="bg-white border-2 border-stone-900"></div>
-                        <div className="bg-stone-500"></div>
-                        <div className="bg-stone-500"></div>
-                        <div className="bg-white border-2 border-stone-900"></div>
-                      </div>
-                      {qrStatus === "waiting" && (
-                        <div className="absolute inset-0 bg-secondary/10 flex flex-col justify-center items-center p-3 text-center cursor-pointer" onClick={simulateQrScan}>
-                          <span className="bg-secondary text-primary-container text-[8px] font-label-caps px-2 py-1 uppercase shadow">
-                            Click to scan QR
-                          </span>
-                        </div>
-                      )}
+                      <img src={qrImage} alt="Scan QR Code" className="w-full h-full object-contain" />
+                    </div>
+                  )}
+                  {qrStatus === "connected" && (
+                    <div className="absolute inset-0 bg-emerald-500/10 flex flex-col justify-center items-center text-center p-4">
+                      <span className="material-symbols-outlined text-4xl text-emerald-400">check_circle</span>
+                      <p className="font-label-caps text-label-caps text-emerald-400 mt-2">Active Connection</p>
                     </div>
                   )}
                 </div>
@@ -875,22 +926,33 @@ export default function AdminDashboard() {
                 <div className="flex-grow space-y-4">
                   <div className="space-y-1">
                     <p className="font-label-caps text-label-caps text-on-surface-variant">WhatsApp Server Endpoint</p>
-                    <p className="font-body-md text-body-md text-foreground font-mono bg-[#181817] p-3 border border-outline-variant/10">
-                      https://api.whatsapp.dcenter.om/v1/session
-                    </p>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={waServerUrl}
+                        onChange={(e) => setWaServerUrl(e.target.value)}
+                        placeholder="e.g. http://localhost:3001"
+                        className="flex-grow bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2 focus:outline-none focus:border-secondary font-mono"
+                      />
+                      <button
+                        onClick={() => {
+                          localStorage.setItem("wa-server-url", waServerUrl);
+                          alert("WhatsApp Server URL saved!");
+                        }}
+                        className="bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer"
+                      >
+                        Save
+                      </button>
+                    </div>
                   </div>
                   <div className="space-y-1">
                     <p className="font-label-caps text-label-caps text-on-surface-variant">Connection Logs</p>
                     <div className="bg-[#181817] border border-outline-variant/10 p-3 h-24 overflow-y-auto text-xs font-mono text-secondary space-y-1">
-                      <div>[SYSTEM] Initiating socket client connection...</div>
-                      {qrStatus === "generating" && <div>[SYSTEM] Generating new QR code sequence...</div>}
-                      {qrStatus === "waiting" && <div>[SOCKET] QR Code displayed. Waiting for scanner handshake...</div>}
-                      {qrStatus === "connected" && (
-                        <>
-                          <div className="text-emerald-400">[SOCKET] Handshake succeeded! Device authenticated.</div>
-                          <div className="text-emerald-400">[SYSTEM] Session state updated to: CONNECTED</div>
-                        </>
-                      )}
+                      {connectionLogs.map((log, index) => (
+                        <div key={index} className={log.includes("Handshake") || log.includes("CONNECTED") ? "text-emerald-400" : ""}>
+                          {log}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
