@@ -45,7 +45,7 @@ export default function AdminDashboard() {
   const [gcalLoading, setGcalLoading] = useState(false);
 
   // WhatsApp QR State
-  const [waServerUrl, setWaServerUrl] = useState("http://localhost:3001");
+  const [waServerUrl, setWaServerUrl] = useState("https://wa.powerpod.ae");
   const [qrStatus, setQrStatus] = useState<"disconnected" | "generating" | "waiting" | "connected">("disconnected");
   const [qrImage, setQrImage] = useState<string | null>(null);
   const [connectionLogs, setConnectionLogs] = useState<string[]>([
@@ -391,7 +391,7 @@ export default function AdminDashboard() {
     if (booking) {
       try {
         const msg = `Hello ${booking.clientName}, your strategic consultation slot with Decision Center is confirmed for October ${booking.day} at ${booking.timeSlot}. We look forward to our session.`;
-        await fetch("http://localhost:3001/api/send", {
+        await fetch(`${waServerUrl}/api/send`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
