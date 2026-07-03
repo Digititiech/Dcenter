@@ -14,6 +14,8 @@ interface Lead {
   timeframe: string;
   status: "Pending" | "Contacted" | "Qualified" | "Booked";
   created_at: string;
+  notes?: string;
+  flagged_for_followup?: boolean;
 }
 
 interface Booking {
@@ -67,6 +69,17 @@ export default function AdminDashboard() {
   const [activeReachOutLead, setActiveReachOutLead] = useState<Lead | null>(null);
   const [customMessageText, setCustomMessageText] = useState("");
   const [sendingCrmMessage, setSendingCrmMessage] = useState(false);
+
+  // CRM Lead Editing State
+  const [activeEditLead, setActiveEditLead] = useState<Lead | null>(null);
+  const [editLeadName, setEditLeadName] = useState("");
+  const [editLeadEmail, setEditLeadEmail] = useState("");
+  const [editLeadPhone, setEditLeadPhone] = useState("");
+  const [editLeadCompany, setEditLeadCompany] = useState("");
+  const [editLeadTimeframe, setEditLeadTimeframe] = useState("");
+  const [editLeadNotes, setEditLeadNotes] = useState("");
+  const [editLeadFlagged, setEditLeadFlagged] = useState(false);
+  const [savingLeadDetails, setSavingLeadDetails] = useState(false);
 
   // Preset Template Management State
   const [presets, setPresets] = useState<PresetMessage[]>([]);
@@ -490,6 +503,51 @@ export default function AdminDashboard() {
     router.push("/admin/login");
   };
 
+  const handleSaveLeadDetails = async () => {
+    if (!activeEditLead) return;
+    setSavingLeadDetails(true);
+
+    const updatedLead: Lead = {
+      ...activeEditLead,
+      name: editLeadName,
+      email: editLeadEmail,
+      phone: editLeadPhone,
+      company: editLeadCompany,
+      timeframe: editLeadTimeframe,
+      notes: editLeadNotes,
+      flagged_for_followup: editLeadFlagged
+    };
+
+    const updatedLeads = leads.map(l => l.id === activeEditLead.id ? updatedLead : l);
+    setLeads(updatedLeads);
+
+    try {
+      if (isUsingSupabase) {
+        await supabase
+          .from("leads")
+          .update({
+            name: editLeadName,
+            email: editLeadEmail,
+            phone: editLeadPhone,
+            company: editLeadCompany,
+            timeframe: editLeadTimeframe,
+            notes: editLeadNotes,
+            flagged_for_followup: editLeadFlagged
+          })
+          .eq("id", activeEditLead.id);
+      } else {
+        localStorage.setItem("crm-leads", JSON.stringify(updatedLeads));
+      }
+      alert("Lead details updated successfully!");
+      setActiveEditLead(null);
+    } catch (err) {
+      console.error(err);
+      alert("Error saving lead details");
+    } finally {
+      setSavingLeadDetails(false);
+    }
+  };
+
   const handleSavePreset = () => {
     if (!presetTitle || !presetText) {
       alert("Please enter title and text for the preset template");
@@ -775,7 +833,21 @@ export default function AdminDashboard() {
                 <tbody className="divide-y divide-outline-variant/10">
                   {leads.map(lead => (
                     <tr key={lead.id} className="hover:bg-surface-container-low transition-colors">
-                      <td className="p-4 font-body-md text-body-md text-foreground font-semibold">{lead.name}</td>
+                      <td className="p-4 font-body-md text-body-md text-foreground">
+                        <div className="font-semibold flex items-center gap-2">
+                          {lead.name}
+                          {lead.flagged_for_followup && (
+                            <span className="material-symbols-outlined text-secondary text-sm" style={{ fontVariationSettings: "'FILL' 1" }} title="Flagged for follow-up">
+                              flag
+                            </span>
+                          )}
+                        </div>
+                        {lead.notes && (
+                          <div className="text-[10px] text-secondary mt-0.5 max-w-xs truncate italic" title={lead.notes}>
+                            Note: {lead.notes}
+                          </div>
+                        )}
+                      </td>
                       <td className="p-4 font-body-md text-body-md text-foreground">{lead.company}</td>
                       <td className="p-4 font-body-sm text-body-sm text-on-surface-variant">
                         <div>{lead.email}</div>
@@ -795,15 +867,32 @@ export default function AdminDashboard() {
                         </select>
                       </td>
                       <td className="p-4 text-right">
-                        <button
-                          onClick={() => {
-                            setActiveReachOutLead(lead);
-                            setCustomMessageText(`Hello ${lead.name}, thank you for contacting Decision Center. We have received your inquiry.`);
-                          }}
-                          className="inline-flex items-center gap-1.5 border border-secondary/20 hover:border-secondary hover:text-secondary px-3 py-1.5 font-label-caps text-[10px] transition-colors cursor-pointer"
-                        >
-                          <span className="material-symbols-outlined text-xs">chat</span> Reach Out
-                        </button>
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => {
+                              setActiveReachOutLead(lead);
+                              setCustomMessageText(`Hello ${lead.name}, thank you for contacting Decision Center. We have received your inquiry.`);
+                            }}
+                            className="inline-flex items-center gap-1.5 border border-secondary/20 hover:border-secondary hover:text-secondary px-2.5 py-1.5 font-label-caps text-[10px] transition-colors cursor-pointer"
+                          >
+                            <span className="material-symbols-outlined text-xs">chat</span> Reach Out
+                          </button>
+                          <button
+                            onClick={() => {
+                              setActiveEditLead(lead);
+                              setEditLeadName(lead.name);
+                              setEditLeadEmail(lead.email);
+                              setEditLeadPhone(lead.phone);
+                              setEditLeadCompany(lead.company);
+                              setEditLeadTimeframe(lead.timeframe);
+                              setEditLeadNotes(lead.notes || "");
+                              setEditLeadFlagged(!!lead.flagged_for_followup);
+                            }}
+                            className="inline-flex items-center gap-1.5 border border-outline-variant/30 hover:border-secondary hover:text-secondary px-2.5 py-1.5 font-label-caps text-[10px] transition-colors cursor-pointer"
+                          >
+                            <span className="material-symbols-outlined text-xs">edit</span> Edit
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -1355,6 +1444,119 @@ export default function AdminDashboard() {
                 </button>
                 <button
                   onClick={() => setActiveReachOutLead(null)}
+                  className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-6 py-3 font-label-caps text-label-caps transition-colors cursor-pointer text-xs"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Lead Details Modal */}
+        {activeEditLead && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070707]/80 backdrop-blur-sm p-4">
+            <div className="bg-[#111110] border border-secondary/30 p-6 max-w-lg w-full relative space-y-5">
+              <button
+                onClick={() => setActiveEditLead(null)}
+                className="absolute top-4 right-4 text-on-surface-variant hover:text-foreground cursor-pointer"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+
+              <div>
+                <h3 className="font-display-lg text-headline-md text-foreground">Edit Lead Profile</h3>
+                <p className="font-body-sm text-[12px] text-on-surface-variant mt-1">Modify CRM entry information and notes.</p>
+              </div>
+
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+                <div className="space-y-1">
+                  <label className="font-body-sm text-body-sm text-foreground">Full Name</label>
+                  <input
+                    type="text"
+                    value={editLeadName}
+                    onChange={(e) => setEditLeadName(e.target.value)}
+                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-body-sm text-body-sm text-foreground">Company Name</label>
+                  <input
+                    type="text"
+                    value={editLeadCompany}
+                    onChange={(e) => setEditLeadCompany(e.target.value)}
+                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="font-body-sm text-body-sm text-foreground">Email</label>
+                    <input
+                      type="email"
+                      value={editLeadEmail}
+                      onChange={(e) => setEditLeadEmail(e.target.value)}
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="font-body-sm text-body-sm text-foreground">Phone</label>
+                    <input
+                      type="text"
+                      value={editLeadPhone}
+                      onChange={(e) => setEditLeadPhone(e.target.value)}
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-body-sm text-body-sm text-foreground">Preferred Timeframe</label>
+                  <input
+                    type="text"
+                    value={editLeadTimeframe}
+                    onChange={(e) => setEditLeadTimeframe(e.target.value)}
+                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-body-sm text-body-sm text-foreground">Internal Notes / Comments</label>
+                  <textarea
+                    value={editLeadNotes}
+                    onChange={(e) => setEditLeadNotes(e.target.value)}
+                    rows={3}
+                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs p-3 focus:outline-none focus:border-secondary"
+                    placeholder="Add notes or administrative comments regarding this lead..."
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 pt-2 text-left">
+                  <input
+                    type="checkbox"
+                    id="flagged-followup"
+                    checked={editLeadFlagged}
+                    onChange={(e) => setEditLeadFlagged(e.target.checked)}
+                    className="bg-[#181817] border border-outline-variant/30 text-secondary focus:ring-0 focus:ring-offset-0 focus:border-secondary h-4 w-4 rounded-none"
+                  />
+                  <label htmlFor="flagged-followup" className="font-body-sm text-body-sm text-foreground cursor-pointer flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>flag</span>
+                    Flag for Follow-up
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex gap-4 pt-2">
+                <button
+                  onClick={handleSaveLeadDetails}
+                  disabled={savingLeadDetails}
+                  className="flex-grow bg-secondary text-primary-container py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer text-xs"
+                >
+                  {savingLeadDetails ? "Saving..." : "Save Changes"}
+                </button>
+                <button
+                  onClick={() => setActiveEditLead(null)}
                   className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-6 py-3 font-label-caps text-label-caps transition-colors cursor-pointer text-xs"
                 >
                   Cancel
