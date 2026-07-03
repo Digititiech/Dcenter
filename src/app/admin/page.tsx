@@ -85,6 +85,11 @@ export default function AdminDashboard() {
   const [testEmailRecipient, setTestEmailRecipient] = useState("");
   const [sendingTestEmail, setSendingTestEmail] = useState(false);
 
+  // Calendar Test State
+  const [testingCalendar, setTestingCalendar] = useState(false);
+  const [calendarStatus, setCalendarStatus] = useState<"untested" | "connected" | "failed">("untested");
+  const [calendarError, setCalendarError] = useState("");
+
   // Preset Template Management State
   const [presets, setPresets] = useState<PresetMessage[]>([]);
   const [editingPresetId, setEditingPresetId] = useState<string | null>(null);
@@ -94,6 +99,9 @@ export default function AdminDashboard() {
   useEffect(() => {
     const savedUrl = localStorage.getItem("wa-server-url");
     if (savedUrl) setWaServerUrl(savedUrl);
+
+    const savedCal = localStorage.getItem("calendar-subscription-url");
+    if (savedCal) setCalendarUrl(savedCal);
   }, []);
 
   useEffect(() => {
@@ -562,6 +570,37 @@ export default function AdminDashboard() {
       alert(`Error: ${err.message || err}`);
     } finally {
       setSendingTestEmail(false);
+    }
+  };
+
+  const handleTestCalendarConnection = async () => {
+    if (!calendarUrl) {
+      alert("Please enter a Calendar subscription URL first.");
+      return;
+    }
+    setTestingCalendar(true);
+    setCalendarStatus("untested");
+    setCalendarError("");
+    try {
+      const res = await fetch("/api/test-calendar-connection", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: calendarUrl })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setCalendarStatus("connected");
+        alert(`Calendar connection verified! Syncing from: ${data.calendarName}`);
+      } else {
+        setCalendarStatus("failed");
+        setCalendarError(data.error || "Verification failed");
+      }
+    } catch (err: any) {
+      console.error(err);
+      setCalendarStatus("failed");
+      setCalendarError(err.message || "Network request error");
+    } finally {
+      setTestingCalendar(false);
     }
   };
 
@@ -1200,24 +1239,70 @@ export default function AdminDashboard() {
 
             {/* Calendar Integration */}
             <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
-              <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2">
-                Calendar Connection (iCal / GCal Link)
-              </h3>
-              <div className="space-y-1">
-                <label className="font-body-sm text-body-sm text-foreground">Calendar Subscription Sync Endpoint</label>
-                <input
-                  type="text"
-                  value={calendarUrl}
-                  onChange={(e) => setCalendarUrl(e.target.value)}
-                  className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary"
-                />
+              <div className="flex justify-between items-center border-b border-outline-variant/10 pb-2">
+                <h3 className="font-display-lg text-headline-md text-foreground">
+                  Calendar Connection (iCal / GCal Link)
+                </h3>
+                <div>
+                  {calendarStatus === "connected" && (
+                    <span className="text-[10px] text-green-500 font-label-caps bg-green-500/5 px-2 py-0.5 border border-green-500/20">
+                      Connected Feed
+                    </span>
+                  )}
+                  {calendarStatus === "failed" && (
+                    <span className="text-[10px] text-red-500 font-label-caps bg-red-500/5 px-2 py-0.5 border border-red-500/20">
+                      Connection Failed
+                    </span>
+                  )}
+                  {calendarStatus === "untested" && (
+                    <span className="text-[10px] text-on-surface-variant font-label-caps bg-outline-variant/5 px-2 py-0.5 border border-outline-variant/20">
+                      Not Tested
+                    </span>
+                  )}
+                </div>
               </div>
-              <button
-                className="bg-secondary text-primary-container px-4 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer"
-                onClick={() => alert("Calendar settings updated!")}
-              >
-                Update Calendar Sync
-              </button>
+              
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <label className="font-body-sm text-body-sm text-foreground">Calendar Subscription Sync Endpoint (webcal/iCal link)</label>
+                  <input
+                    type="text"
+                    value={calendarUrl}
+                    onChange={(e) => {
+                      setCalendarUrl(e.target.value);
+                      setCalendarStatus("untested");
+                      setCalendarError("");
+                    }}
+                    placeholder="webcal://calendar.google.com/calendar/ical/..."
+                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary font-mono"
+                  />
+                </div>
+
+                {calendarError && (
+                  <p className="text-xs text-red-400 font-body-sm bg-red-950/20 border border-red-900/30 p-2.5">
+                    {calendarError}
+                  </p>
+                )}
+
+                <div className="flex flex-wrap gap-4">
+                  <button
+                    className="bg-secondary text-primary-container px-5 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer"
+                    onClick={() => {
+                      localStorage.setItem("calendar-subscription-url", calendarUrl);
+                      alert("Calendar sync link saved!");
+                    }}
+                  >
+                    Save Sync Link
+                  </button>
+                  <button
+                    disabled={testingCalendar || !calendarUrl}
+                    onClick={handleTestCalendarConnection}
+                    className="border border-secondary/20 text-secondary hover:border-secondary hover:bg-secondary/5 px-5 py-3 font-label-caps text-label-caps transition-colors cursor-pointer disabled:opacity-40 disabled:hover:bg-transparent"
+                  >
+                    {testingCalendar ? "Verifying..." : "Test Feed Connection"}
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Google Calendar API Integration */}
