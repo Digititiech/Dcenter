@@ -8,6 +8,46 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 
+function parseDateTime(day: number, timeSlot: string) {
+  // e.g. "11:30 GST" -> hour = 11, minute = 30
+  const timePart = timeSlot.split(" ")[0] || "09:00";
+  const [hour, minute] = timePart.split(":");
+  const dayStr = String(day).padStart(2, '0');
+  const hourStr = String(hour || "09").padStart(2, '0');
+  const minuteStr = String(minute || "00").padStart(2, '0');
+  return `2026-10-${dayStr}T${hourStr}:${minuteStr}:00+04:00`;
+}
+
+function parseEndDateTime(day: number, timeSlot: string) {
+  const timePart = timeSlot.split(" ")[0] || "09:00";
+  const [hour, minute] = timePart.split(":");
+  const endHour = Number(hour || "09") + 1;
+  const dayStr = String(day).padStart(2, '0');
+  const hourStr = String(endHour).padStart(2, '0');
+  const minuteStr = String(minute || "00").padStart(2, '0');
+  return `2026-10-${dayStr}T${hourStr}:${minuteStr}:00+04:00`;
+}
+
+async function refreshGoogleAccessToken(clientId: string, clientSecret: string, refreshToken: string) {
+  const response = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken,
+      grant_type: "refresh_token",
+    }),
+  });
+  const data = await response.json();
+  if (data.error) {
+    throw new Error(`Google token refresh error: ${data.error_description || data.error}`);
+  }
+  return data.access_token;
+}
+
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
@@ -42,7 +82,6 @@ serve(async (req) => {
         "https://www.googleapis.com/auth/userinfo.email"
       ].join(" ");
 
-      // Optional state can encode user_id if calling directly or pass via callback state
       const state = url.searchParams.get("userId") || user?.id || "anonymous";
 
       const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
@@ -54,7 +93,6 @@ serve(async (req) => {
         `&prompt=consent` +
         `&state=${encodeURIComponent(state)}`;
 
-      // Return a redirect response
       return new Response(null, {
         status: 302,
         headers: {
@@ -73,7 +111,6 @@ serve(async (req) => {
         throw new Error("Missing auth code from Google redirect.");
       }
 
-      // Exchange authorization code for access and refresh tokens
       const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
         method: "POST",
         headers: {
@@ -96,7 +133,6 @@ serve(async (req) => {
       const { access_token, refresh_token, expires_in } = tokenData;
       const expiry_date = new Date(Date.now() + expires_in * 1000).toISOString();
 
-      // Retrieve user email from Google Userinfo API
       const userinfoResponse = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
         headers: {
           Authorization: `Bearer ${access_token}`,
@@ -105,7 +141,6 @@ serve(async (req) => {
       const userinfo = await userinfoResponse.json();
       const email = userinfo.email || null;
 
-      // Upsert tokens in supabase db
       const userId = state !== "anonymous" ? state : null;
       
       const { error: dbErr } = await supabaseClient
@@ -114,7 +149,7 @@ serve(async (req) => {
           {
             user_id: userId,
             access_token,
-            refresh_token: refresh_token || "", // refresh_token is only returned on first consent prompt
+            refresh_token: refresh_token || "",
             expiry_date,
             email,
           },
@@ -123,7 +158,6 @@ serve(async (req) => {
 
       if (dbErr) throw dbErr;
 
-      // Redirect back to Admin UI
       const clientAdminUrl = Deno.env.get("CLIENT_ADMIN_URL") || "http://localhost:3000/admin";
       return new Response(null, {
         status: 302,
@@ -180,6 +214,85 @@ serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "create-event") {
+      // 5. Synchronize appointment details to Google Calendar
+      if (!user) {
+        return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const body = await req.json().catch(() => ({}));
+      const { bookingId } = body;
+
+      if (!bookingId) {
+        throw new Error("Missing bookingId parameter.");
+      }
+
+      // Fetch user's refresh token
+      const { data: tokenRecord, error: tokenErr } = await supabaseClient
+        .from("google_calendar_tokens")
+        .select("refresh_token, email")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (tokenErr) throw tokenErr;
+      if (!tokenRecord || !tokenRecord.refresh_token) {
+        throw new Error("Google Calendar integration not authorized. Refresh token missing.");
+      }
+
+      // Fetch booking details
+      const { data: booking, error: bookingErr } = await supabaseClient
+        .from("bookings")
+        .select("*")
+        .eq("id", bookingId)
+        .single();
+
+      if (bookingErr) throw bookingErr;
+      if (!booking) {
+        throw new Error(`Booking with ID ${bookingId} not found.`);
+      }
+
+      // Refresh Access Token
+      const accessToken = await refreshGoogleAccessToken(clientId, clientSecret, tokenRecord.refresh_token);
+
+      // Parse start and end times (GST timezone UTC+4)
+      const startIso = parseDateTime(booking.day, booking.timeSlot);
+      const endIso = parseEndDateTime(booking.day, booking.timeSlot);
+
+      const gcalEvent = {
+        summary: `Strategic Consultation: ${booking.clientName}`,
+        description: `Strategic Advisory Session booked via Decision Center Portal.\n\nClient Details:\n- Name: ${booking.clientName}\n- Email: ${booking.clientEmail}\n- Phone: ${booking.clientPhone}`,
+        start: {
+          dateTime: startIso,
+          timeZone: "Asia/Muscat",
+        },
+        end: {
+          dateTime: endIso,
+          timeZone: "Asia/Muscat",
+        },
+      };
+
+      const gcalResponse = await fetch("https://www.googleapis.com/calendar/v3/calendars/primary/events", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(gcalEvent),
+      });
+
+      const gcalResult = await gcalResponse.json();
+      if (gcalResult.error) {
+        throw new Error(`Google Calendar API Error: ${gcalResult.error.message}`);
+      }
+
+      return new Response(JSON.stringify({ success: true, eventId: gcalResult.id }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

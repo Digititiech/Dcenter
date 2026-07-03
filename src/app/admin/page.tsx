@@ -290,9 +290,36 @@ export default function AdminDashboard() {
     setBookings(updated);
 
     if (isUsingSupabase) {
-      await supabase.from("bookings").update({ status: "Confirmed" }).eq("id", bookingId);
+      try {
+        await supabase.from("bookings").update({ status: "Confirmed" }).eq("id", bookingId);
+        
+        // Sync to Google Calendar if configured
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          const syncResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=create-event`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${session.access_token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ bookingId }),
+            }
+          );
+          const syncData = await syncResponse.json();
+          if (syncResponse.ok && syncData.success) {
+            alert("Booking confirmed and synchronized to Google Calendar!");
+          } else {
+            console.warn("Booking confirmed but failed to sync with Google Calendar:", syncData.error);
+          }
+        }
+      } catch (e) {
+        console.error("Error confirming booking:", e);
+      }
     } else {
       localStorage.setItem("bookings-slots", JSON.stringify(updated));
+      alert("Mock Booking Confirmed!");
     }
   };
 
