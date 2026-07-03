@@ -39,6 +39,11 @@ export default function AdminDashboard() {
   const [smtpPass, setSmtpPass] = useState("••••••••••••");
   const [calendarUrl, setCalendarUrl] = useState("https://calendar.google.com/calendar/ical/dcenter...");
   
+  // Google Calendar Auth State
+  const [gcalConnected, setGcalConnected] = useState(false);
+  const [gcalEmail, setGcalEmail] = useState<string | null>(null);
+  const [gcalLoading, setGcalLoading] = useState(false);
+
   // WhatsApp QR State
   const [qrStatus, setQrStatus] = useState<"disconnected" | "generating" | "waiting" | "connected">("disconnected");
 
@@ -126,6 +131,110 @@ export default function AdminDashboard() {
 
     checkSession();
   }, []);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("gcal") === "success") {
+      alert("Google Calendar connected successfully!");
+      // Clean up the URL query params
+      const newUrl = window.location.pathname + (activeTab !== "overview" ? `?tab=${activeTab}` : "");
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  }, [activeTab]);
+
+  const checkGoogleCalendarStatus = async () => {
+    if (!isSupabaseConfigured()) {
+      // Check local storage mock status
+      const mockConnected = localStorage.getItem("gcal-connected") === "true";
+      const mockEmail = localStorage.getItem("gcal-email") || null;
+      setGcalConnected(mockConnected);
+      setGcalEmail(mockEmail);
+      return;
+    }
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=status`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setGcalConnected(data.connected);
+        setGcalEmail(data.email);
+      }
+    } catch (e) {
+      console.error("Error checking Google Calendar status:", e);
+    }
+  };
+
+  useEffect(() => {
+    checkGoogleCalendarStatus();
+  }, [isUsingSupabase]);
+
+  const handleConnectGoogleCalendar = async () => {
+    setGcalLoading(true);
+    try {
+      if (isSupabaseConfigured()) {
+        const { data: { session } } = await supabase.auth.getSession();
+        const userId = session?.user?.id || "";
+        // Redirect to Edge Function login action
+        window.location.href = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=login&userId=${userId}`;
+      } else {
+        // Mock connection
+        setTimeout(() => {
+          setGcalConnected(true);
+          setGcalEmail("admin@dcenter.om");
+          localStorage.setItem("gcal-connected", "true");
+          localStorage.setItem("gcal-email", "admin@dcenter.om");
+          setGcalLoading(false);
+          alert("Mock Google Calendar Connected!");
+        }, 1000);
+      }
+    } catch (e) {
+      console.error(e);
+      setGcalLoading(false);
+    }
+  };
+
+  const handleDisconnectGoogleCalendar = async () => {
+    setGcalLoading(true);
+    try {
+      if (isSupabaseConfigured()) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=disconnect`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+          }
+        );
+        if (response.ok) {
+          setGcalConnected(false);
+          setGcalEmail(null);
+          alert("Google Calendar disconnected.");
+        }
+      } else {
+        setGcalConnected(false);
+        setGcalEmail(null);
+        localStorage.removeItem("gcal-connected");
+        localStorage.removeItem("gcal-email");
+        alert("Mock Google Calendar Disconnected.");
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setGcalLoading(false);
+    }
+  };
 
   const fetchData = async (useDb: boolean) => {
     if (useDb) {
@@ -634,6 +743,51 @@ export default function AdminDashboard() {
               >
                 Update Calendar Sync
               </button>
+            </div>
+
+            {/* Google Calendar API Integration */}
+            <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
+              <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2 flex items-center gap-2">
+                <span className="material-symbols-outlined text-secondary">calendar_today</span>
+                Google Calendar OAuth Integration
+              </h3>
+              <p className="font-body-sm text-body-sm text-on-surface-variant">
+                Authorize Decision Center to synchronize consultation bookings directly to your Google Calendar.
+              </p>
+              <div className="flex items-center gap-4 bg-[#181817] p-4 border border-outline-variant/10">
+                <div className="w-10 h-10 rounded-none bg-surface-container flex items-center justify-center border border-outline-variant/30 flex-shrink-0">
+                  <span className={`material-symbols-outlined ${gcalConnected ? 'text-emerald-400' : 'text-on-surface-variant'}`}>
+                    {gcalConnected ? 'sync' : 'sync_disabled'}
+                  </span>
+                </div>
+                <div>
+                  <p className="font-body-md text-body-md text-foreground font-semibold">
+                    {gcalConnected ? `Connected to Google Calendar` : 'Not Connected'}
+                  </p>
+                  <p className="font-body-sm text-[12px] text-on-surface-variant">
+                    {gcalConnected ? `Account: ${gcalEmail}` : 'Synchronize your events via OAuth 2.0 flow'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                {!gcalConnected ? (
+                  <button
+                    disabled={gcalLoading}
+                    onClick={handleConnectGoogleCalendar}
+                    className="bg-secondary text-primary-container px-6 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-50 transition-colors cursor-pointer flex items-center gap-2"
+                  >
+                    <span>{gcalLoading ? 'Connecting...' : 'Connect Google Calendar'}</span>
+                  </button>
+                ) : (
+                  <button
+                    disabled={gcalLoading}
+                    onClick={handleDisconnectGoogleCalendar}
+                    className="border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 text-red-400 px-6 py-3 font-label-caps text-label-caps disabled:opacity-50 transition-all cursor-pointer flex items-center gap-2"
+                  >
+                    <span>Disconnect Calendar</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* WhatsApp Connection */}
