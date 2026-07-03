@@ -51,6 +51,11 @@ export default function AdminDashboard() {
   const [connectionLogs, setConnectionLogs] = useState<string[]>([
     "[SYSTEM] Initiating WhatsApp bot client connection checker..."
   ]);
+  const [connectedNumber, setConnectedNumber] = useState<string | null>(null);
+  const [testNumber, setTestNumber] = useState("");
+  const [testMessage, setTestMessage] = useState("Test message from Decision Center");
+  const [sendingTest, setSendingTest] = useState(false);
+  const [disconnecting, setDisconnecting] = useState(false);
 
   useEffect(() => {
     const savedUrl = localStorage.getItem("wa-server-url");
@@ -69,12 +74,14 @@ export default function AdminDashboard() {
         
         if (data.status === "connecting" || data.status === "initializing") {
           setQrStatus("generating");
+          setConnectedNumber(null);
           setConnectionLogs(prev => {
             if (prev[prev.length - 1]?.includes("initializing")) return prev;
             return [...prev.slice(-10), "[SYSTEM] Bot is initializing instance..."];
           });
         } else if (data.status === "qr_ready") {
           setQrStatus("waiting");
+          setConnectedNumber(null);
           if (data.qrCode) {
             setQrImage(data.qrCode);
           }
@@ -89,6 +96,7 @@ export default function AdminDashboard() {
         } else if (data.status === "connected") {
           setQrStatus("connected");
           setQrImage(null);
+          setConnectedNumber(data.connectedNumber || "Connected Device");
           if (data.logs && Array.isArray(data.logs)) {
             setConnectionLogs(data.logs);
           } else {
@@ -100,10 +108,12 @@ export default function AdminDashboard() {
         } else {
           setQrStatus("disconnected");
           setQrImage(null);
+          setConnectedNumber(null);
         }
       } catch (err) {
         setQrStatus("disconnected");
         setQrImage(null);
+        setConnectedNumber(null);
         setConnectionLogs(prev => {
           if (prev[prev.length - 1]?.includes("Server offline")) return prev;
           return [...prev.slice(-10), `[SYSTEM] Server offline. Verify ${waServerUrl} is running.`];
@@ -429,6 +439,57 @@ export default function AdminDashboard() {
       localStorage.removeItem("mock-admin-auth");
     }
     router.push("/admin/login");
+  };
+
+  const handleDisconnectWhatsApp = async () => {
+    if (!confirm("Are you sure you want to disconnect WhatsApp? This will log out the session.")) return;
+    setDisconnecting(true);
+    try {
+      const res = await fetch(`${waServerUrl}/api/disconnect-whatsapp`, {
+        method: "POST"
+      });
+      if (res.ok) {
+        alert("WhatsApp session disconnected successfully.");
+        setQrStatus("disconnected");
+        setConnectedNumber(null);
+      } else {
+        alert("Failed to disconnect WhatsApp.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error disconnecting WhatsApp.");
+    } finally {
+      setDisconnecting(false);
+    }
+  };
+
+  const handleSendTestMessage = async () => {
+    if (!testNumber) {
+      alert("Please enter a valid phone number");
+      return;
+    }
+    setSendingTest(true);
+    try {
+      const res = await fetch(`${waServerUrl}/api/send-whatsapp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          number: testNumber,
+          message: testMessage
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert("Test message sent successfully!");
+      } else {
+        alert(`Failed to send test message: ${data.error || "Unknown error"}`);
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert(`Error sending test message: ${err.message || err}`);
+    } finally {
+      setSendingTest(false);
+    }
   };
 
 
@@ -922,14 +983,24 @@ export default function AdminDashboard() {
                     </div>
                   )}
                   {qrStatus === "connected" && (
-                    <div className="absolute inset-0 bg-emerald-500/10 flex flex-col justify-center items-center text-center p-4">
-                      <span className="material-symbols-outlined text-4xl text-emerald-400">check_circle</span>
-                      <p className="font-label-caps text-label-caps text-emerald-400 mt-2">Active Connection</p>
+                    <div className="absolute inset-0 bg-emerald-500/10 flex flex-col justify-center items-center text-center p-3">
+                      <span className="material-symbols-outlined text-3xl text-emerald-400">check_circle</span>
+                      <p className="font-label-caps text-label-caps text-[11px] text-emerald-400 mt-1">Active Connection</p>
+                      {connectedNumber && (
+                        <p className="font-mono text-[9px] text-secondary mt-0.5 break-all max-w-full px-1">{connectedNumber}</p>
+                      )}
+                      <button
+                        onClick={handleDisconnectWhatsApp}
+                        disabled={disconnecting}
+                        className="mt-2.5 border border-red-500/30 bg-red-500/5 hover:bg-red-500/15 text-red-400 px-3 py-1 font-label-caps text-[8px] transition-all cursor-pointer disabled:opacity-50"
+                      >
+                        {disconnecting ? "Disconnecting..." : "Disconnect"}
+                      </button>
                     </div>
                   )}
                 </div>
 
-                <div className="flex-grow space-y-4">
+                <div className="flex-grow space-y-4 w-full">
                   <div className="space-y-1">
                     <p className="font-label-caps text-label-caps text-on-surface-variant">WhatsApp Server Endpoint</p>
                     <div className="flex gap-2">
@@ -955,11 +1026,54 @@ export default function AdminDashboard() {
                     <p className="font-label-caps text-label-caps text-on-surface-variant">Connection Logs</p>
                     <div className="bg-[#181817] border border-outline-variant/10 p-3 h-24 overflow-y-auto text-xs font-mono text-secondary space-y-1">
                       {connectionLogs.map((log, index) => (
-                        <div key={index} className={log.includes("Handshake") || log.includes("CONNECTED") ? "text-emerald-400" : ""}>
+                        <div key={index} className={log.includes("Handshake") || log.includes("CONNECTED") || log.includes("connected") ? "text-emerald-400" : ""}>
                           {log}
                         </div>
                       ))}
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Send Test WhatsApp Message Section */}
+              <div className="border-t border-outline-variant/10 pt-5 space-y-4">
+                <div className="flex justify-between items-center">
+                  <h4 className="font-body-md text-body-md text-foreground font-semibold">Send Test WhatsApp Message</h4>
+                  {qrStatus !== "connected" && (
+                    <span className="text-[10px] text-amber-500 font-label-caps bg-amber-500/5 px-2 py-0.5 border border-amber-500/20">
+                      Requires Active Connection
+                    </span>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                  <div className="space-y-1 sm:col-span-1">
+                    <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Recipient Phone Number</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 96896680001"
+                      value={testNumber}
+                      onChange={(e) => setTestNumber(e.target.value)}
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary font-mono"
+                    />
+                  </div>
+                  <div className="space-y-1 sm:col-span-1">
+                    <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Message Text</label>
+                    <input
+                      type="text"
+                      placeholder="Test message from Decision Center"
+                      value={testMessage}
+                      onChange={(e) => setTestMessage(e.target.value)}
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                    />
+                  </div>
+                  <div className="sm:col-span-1">
+                    <button
+                      onClick={handleSendTestMessage}
+                      disabled={sendingTest || qrStatus !== "connected"}
+                      className="w-full bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer h-[34px] flex items-center justify-center"
+                    >
+                      {sendingTest ? "Sending..." : "Send Test Message"}
+                    </button>
                   </div>
                 </div>
               </div>
