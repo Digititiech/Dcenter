@@ -26,6 +26,12 @@ interface Booking {
   status: "Pending" | "Confirmed" | "Rescheduled";
 }
 
+interface PresetMessage {
+  id: string;
+  title: string;
+  text: string;
+}
+
 export default function AdminDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"overview" | "crm" | "bookings" | "settings">("overview");
@@ -62,9 +68,47 @@ export default function AdminDashboard() {
   const [customMessageText, setCustomMessageText] = useState("");
   const [sendingCrmMessage, setSendingCrmMessage] = useState(false);
 
+  // Preset Template Management State
+  const [presets, setPresets] = useState<PresetMessage[]>([]);
+  const [editingPresetId, setEditingPresetId] = useState<string | null>(null);
+  const [presetTitle, setPresetTitle] = useState("");
+  const [presetText, setPresetText] = useState("");
+
   useEffect(() => {
     const savedUrl = localStorage.getItem("wa-server-url");
     if (savedUrl) setWaServerUrl(savedUrl);
+  }, []);
+
+  useEffect(() => {
+    const savedPresets = localStorage.getItem("whatsapp-presets");
+    if (savedPresets) {
+      setPresets(JSON.parse(savedPresets));
+    } else {
+      const defaultPresets: PresetMessage[] = [
+        {
+          id: "1",
+          title: "Greeting & Inquiry Acknowledged",
+          text: "Hello {name}, thank you for contacting Decision Center. We have received your inquiry for {company}. How can we assist you today?"
+        },
+        {
+          id: "2",
+          title: "Schedule Strategic Consultation",
+          text: "Hello {name}, we would like to schedule a secure executive session to review your project. Please let us know your availability."
+        },
+        {
+          id: "3",
+          title: "Information & Documents Request",
+          text: "Hello {name}, to proceed with your project analysis, could you please provide any business plans or feasibility drafts you currently have?"
+        },
+        {
+          id: "4",
+          title: "Oman Vision 2040 Advisory",
+          text: "Hello {name}, regarding your inquiry aligned with Oman Vision 2040, we have specialized advisory programs. Let's arrange a call."
+        }
+      ];
+      setPresets(defaultPresets);
+      localStorage.setItem("whatsapp-presets", JSON.stringify(defaultPresets));
+    }
   }, []);
 
   useEffect(() => {
@@ -444,6 +488,45 @@ export default function AdminDashboard() {
       localStorage.removeItem("mock-admin-auth");
     }
     router.push("/admin/login");
+  };
+
+  const handleSavePreset = () => {
+    if (!presetTitle || !presetText) {
+      alert("Please enter title and text for the preset template");
+      return;
+    }
+
+    let updated: PresetMessage[];
+    if (editingPresetId) {
+      updated = presets.map(p => p.id === editingPresetId ? { ...p, title: presetTitle, text: presetText } : p);
+      setEditingPresetId(null);
+    } else {
+      const newPreset: PresetMessage = {
+        id: Date.now().toString(),
+        title: presetTitle,
+        text: presetText
+      };
+      updated = [...presets, newPreset];
+    }
+
+    setPresets(updated);
+    localStorage.setItem("whatsapp-presets", JSON.stringify(updated));
+    setPresetTitle("");
+    setPresetText("");
+    alert("Preset template saved!");
+  };
+
+  const handleCancelEditPreset = () => {
+    setEditingPresetId(null);
+    setPresetTitle("");
+    setPresetText("");
+  };
+
+  const handleDeletePreset = (id: string) => {
+    if (!confirm("Are you sure you want to delete this preset template?")) return;
+    const updated = presets.filter(p => p.id !== id);
+    setPresets(updated);
+    localStorage.setItem("whatsapp-presets", JSON.stringify(updated));
   };
 
   const handleDisconnectWhatsApp = async () => {
@@ -1084,6 +1167,94 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </div>
+
+            {/* WhatsApp Preset Messages Manager */}
+            <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
+              <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2">
+                WhatsApp Preset Messages
+              </h3>
+              <p className="font-body-sm text-body-sm text-on-surface-variant">
+                Manage templates for reaching out to leads. You can use placeholders like <code className="text-secondary font-mono">{`{name}`}</code> and <code className="text-secondary font-mono">{`{company}`}</code>.
+              </p>
+
+              {/* Add/Edit Form */}
+              <div className="bg-[#181817] p-4 border border-outline-variant/10 space-y-4">
+                <h4 className="font-body-md text-body-md text-foreground font-semibold">
+                  {editingPresetId ? "Edit Template" : "Create New Template"}
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Template Title</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Follow Up Greeting"
+                      value={presetTitle}
+                      onChange={(e) => setPresetTitle(e.target.value)}
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Template Text (with placeholders)</label>
+                    <input
+                      type="text"
+                      placeholder="Hello {name}, regarding {company}..."
+                      value={presetText}
+                      onChange={(e) => setPresetText(e.target.value)}
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleSavePreset}
+                    className="bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer"
+                  >
+                    {editingPresetId ? "Update Template" : "Add Template"}
+                  </button>
+                  {editingPresetId && (
+                    <button
+                      onClick={handleCancelEditPreset}
+                      className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-4 py-2 font-label-caps text-[10px] transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Presets List */}
+              <div className="space-y-3">
+                {presets.map((preset) => (
+                  <div key={preset.id} className="border border-outline-variant/15 p-4 bg-[#181817] flex justify-between items-center gap-4">
+                    <div className="space-y-1 text-left">
+                      <p className="font-body-md text-foreground font-semibold">{preset.title}</p>
+                      <p className="font-mono text-xs text-secondary break-all">{preset.text}</p>
+                    </div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      <button
+                        onClick={() => {
+                          setEditingPresetId(preset.id);
+                          setPresetTitle(preset.title);
+                          setPresetText(preset.text);
+                        }}
+                        className="border border-secondary/20 hover:border-secondary text-secondary hover:text-secondary px-2.5 py-1.5 font-label-caps text-[9px] transition-all cursor-pointer"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeletePreset(preset.id)}
+                        className="border border-red-500/20 hover:border-red-500 text-red-400 px-2.5 py-1.5 font-label-caps text-[9px] transition-all cursor-pointer"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {presets.length === 0 && (
+                  <p className="font-body-sm text-body-sm text-on-surface-variant text-center py-4">No custom templates defined.</p>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
@@ -1109,34 +1280,26 @@ export default function AdminDashboard() {
               <div className="space-y-2">
                 <p className="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-widest">Select Preset Message</p>
                 <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto pr-1">
-                  {[
-                    {
-                      title: "Greeting & Inquiry Acknowledged",
-                      text: `Hello ${activeReachOutLead.name}, thank you for contacting Decision Center. We have received your inquiry for ${activeReachOutLead.company}. How can we assist you today?`
-                    },
-                    {
-                      title: "Schedule Strategic Consultation",
-                      text: `Hello ${activeReachOutLead.name}, we would like to schedule a secure executive session to review your project. Please let us know your availability.`
-                    },
-                    {
-                      title: "Information & Documents Request",
-                      text: `Hello ${activeReachOutLead.name}, to proceed with your project analysis, could you please provide any business plans or feasibility drafts you currently have?`
-                    },
-                    {
-                      title: "Oman Vision 2040 Advisory",
-                      text: `Hello ${activeReachOutLead.name}, regarding your inquiry aligned with Oman Vision 2040, we have specialized advisory programs. Let's arrange a call.`
-                    }
-                  ].map((preset, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setCustomMessageText(preset.text)}
-                      className="w-full text-left p-2.5 border border-outline-variant/20 bg-surface-dim hover:border-secondary hover:text-secondary transition-colors text-xs cursor-pointer font-body-sm"
-                    >
-                      <p className="font-semibold text-secondary text-[11px] mb-0.5">{preset.title}</p>
-                      <p className="opacity-80 line-clamp-1">{preset.text}</p>
-                    </button>
-                  ))}
+                  {presets.map((preset) => {
+                    const formattedText = preset.text
+                      .replace(/{name}/g, activeReachOutLead.name)
+                      .replace(/{company}/g, activeReachOutLead.company);
+
+                    return (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => setCustomMessageText(formattedText)}
+                        className="w-full text-left p-2.5 border border-outline-variant/20 bg-surface-dim hover:border-secondary hover:text-secondary transition-colors text-xs cursor-pointer font-body-sm"
+                      >
+                        <p className="font-semibold text-secondary text-[11px] mb-0.5">{preset.title}</p>
+                        <p className="opacity-80 line-clamp-1">{formattedText}</p>
+                      </button>
+                    );
+                  })}
+                  {presets.length === 0 && (
+                    <p className="font-body-sm text-[11px] text-on-surface-variant text-center py-2">No templates available. Create them in Settings.</p>
+                  )}
                 </div>
               </div>
 
