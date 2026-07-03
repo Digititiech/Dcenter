@@ -57,6 +57,11 @@ export default function AdminDashboard() {
   const [sendingTest, setSendingTest] = useState(false);
   const [disconnecting, setDisconnecting] = useState(false);
 
+  // CRM Chat Dialog State
+  const [activeReachOutLead, setActiveReachOutLead] = useState<Lead | null>(null);
+  const [customMessageText, setCustomMessageText] = useState("");
+  const [sendingCrmMessage, setSendingCrmMessage] = useState(false);
+
   useEffect(() => {
     const savedUrl = localStorage.getItem("wa-server-url");
     if (savedUrl) setWaServerUrl(savedUrl);
@@ -707,14 +712,15 @@ export default function AdminDashboard() {
                         </select>
                       </td>
                       <td className="p-4 text-right">
-                        <a
-                          href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, "")}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 border border-secondary/20 hover:border-secondary hover:text-secondary px-3 py-1.5 font-label-caps text-[10px] transition-colors"
+                        <button
+                          onClick={() => {
+                            setActiveReachOutLead(lead);
+                            setCustomMessageText(`Hello ${lead.name}, thank you for contacting Decision Center. We have received your inquiry.`);
+                          }}
+                          className="inline-flex items-center gap-1.5 border border-secondary/20 hover:border-secondary hover:text-secondary px-3 py-1.5 font-label-caps text-[10px] transition-colors cursor-pointer"
                         >
                           <span className="material-symbols-outlined text-xs">chat</span> Reach Out
-                        </a>
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -1076,6 +1082,120 @@ export default function AdminDashboard() {
                     </button>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Reach Out Chat Dialog Modal */}
+        {activeReachOutLead && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070707]/85 backdrop-blur-sm p-4">
+            <div className="bg-[#111110] border border-secondary/30 p-6 max-w-lg w-full relative space-y-6">
+              <button
+                onClick={() => setActiveReachOutLead(null)}
+                className="absolute top-4 right-4 text-on-surface-variant hover:text-foreground cursor-pointer"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+
+              <div>
+                <h3 className="font-display-lg text-headline-md text-foreground">Reach Out to Lead</h3>
+                <p className="font-body-sm text-[12px] text-secondary mt-1 font-semibold">
+                  Name: {activeReachOutLead.name} | Company: {activeReachOutLead.company} | Phone: {activeReachOutLead.phone}
+                </p>
+              </div>
+
+              {/* Preset Messages */}
+              <div className="space-y-2">
+                <p className="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-widest">Select Preset Message</p>
+                <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto pr-1">
+                  {[
+                    {
+                      title: "Greeting & Inquiry Acknowledged",
+                      text: `Hello ${activeReachOutLead.name}, thank you for contacting Decision Center. We have received your inquiry for ${activeReachOutLead.company}. How can we assist you today?`
+                    },
+                    {
+                      title: "Schedule Strategic Consultation",
+                      text: `Hello ${activeReachOutLead.name}, we would like to schedule a secure executive session to review your project. Please let us know your availability.`
+                    },
+                    {
+                      title: "Information & Documents Request",
+                      text: `Hello ${activeReachOutLead.name}, to proceed with your project analysis, could you please provide any business plans or feasibility drafts you currently have?`
+                    },
+                    {
+                      title: "Oman Vision 2040 Advisory",
+                      text: `Hello ${activeReachOutLead.name}, regarding your inquiry aligned with Oman Vision 2040, we have specialized advisory programs. Let's arrange a call.`
+                    }
+                  ].map((preset, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setCustomMessageText(preset.text)}
+                      className="w-full text-left p-2.5 border border-outline-variant/20 bg-surface-dim hover:border-secondary hover:text-secondary transition-colors text-xs cursor-pointer font-body-sm"
+                    >
+                      <p className="font-semibold text-secondary text-[11px] mb-0.5">{preset.title}</p>
+                      <p className="opacity-80 line-clamp-1">{preset.text}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Message Editing box */}
+              <div className="space-y-1">
+                <label className="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-widest block">Message Text</label>
+                <textarea
+                  value={customMessageText}
+                  onChange={(e) => setCustomMessageText(e.target.value)}
+                  rows={4}
+                  className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs p-3 focus:outline-none focus:border-secondary"
+                  placeholder="Type your custom message..."
+                />
+              </div>
+
+              {/* Send / Cancel */}
+              <div className="flex gap-4">
+                <button
+                  onClick={async () => {
+                    if (!customMessageText) {
+                      alert("Please select or write a message");
+                      return;
+                    }
+                    setSendingCrmMessage(true);
+                    try {
+                      const res = await fetch(`${waServerUrl}/api/send-whatsapp`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          number: activeReachOutLead.phone,
+                          message: customMessageText
+                        })
+                      });
+                      const data = await res.json();
+                      if (res.ok && data.success) {
+                        alert("Message sent successfully!");
+                        handleUpdateLeadStatus(activeReachOutLead.id, "Contacted");
+                        setActiveReachOutLead(null);
+                      } else {
+                        alert(`Failed to send message: ${data.error || "Unknown error"}`);
+                      }
+                    } catch (err: any) {
+                      console.error(err);
+                      alert(`Error sending message: ${err.message || err}`);
+                    } finally {
+                      setSendingCrmMessage(false);
+                    }
+                  }}
+                  disabled={sendingCrmMessage || qrStatus !== "connected"}
+                  className="flex-grow bg-secondary text-primary-container py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer text-xs"
+                >
+                  {sendingCrmMessage ? "Sending..." : qrStatus !== "connected" ? "Requires WhatsApp Link" : "Send via WhatsApp"}
+                </button>
+                <button
+                  onClick={() => setActiveReachOutLead(null)}
+                  className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-6 py-3 font-label-caps text-label-caps transition-colors cursor-pointer text-xs"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
