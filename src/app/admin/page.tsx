@@ -38,6 +38,7 @@ interface PresetMessage {
 export default function AdminDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"overview" | "crm" | "bookings" | "settings">("overview");
+  const [activeSettingsTab, setActiveSettingsTab] = useState<"email" | "calendar" | "whatsapp">("email");
   const [isUsingSupabase, setIsUsingSupabase] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -1752,495 +1753,542 @@ export default function AdminDashboard() {
               <p className="font-body-md text-body-md text-on-surface-variant">Configure SMTP emails, calendar syncing, and WhatsApp endpoints.</p>
             </div>
 
-            {/* SMTP Settings */}
-            <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
-              <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2">
-                Email SMTP Configuration
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="font-body-sm text-body-sm text-foreground">SMTP Server</label>
-                  <input
-                    type="text"
-                    value={smtpHost}
-                    onChange={(e) => setSmtpHost(e.target.value)}
-                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-body-sm text-body-sm text-foreground">SMTP Port</label>
-                  <input
-                    type="text"
-                    value={smtpPort}
-                    onChange={(e) => setSmtpPort(e.target.value)}
-                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-body-sm text-body-sm text-foreground">Username</label>
-                  <input
-                    type="text"
-                    value={smtpUser}
-                    onChange={(e) => setSmtpUser(e.target.value)}
-                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-body-sm text-body-sm text-foreground">Password</label>
-                  <input
-                    type="password"
-                    value={smtpPass}
-                    onChange={(e) => setSmtpPass(e.target.value)}
-                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary"
-                  />
-                </div>
-              </div>
+            {/* Settings Sub-Tab Navigation */}
+            <div className="flex border-b border-outline-variant/10 gap-6">
               <button
-                className="bg-secondary text-primary-container px-4 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer"
-                onClick={handleSaveSmtpSettings}
+                onClick={() => setActiveSettingsTab("email")}
+                className={`pb-3 font-label-caps text-[11px] uppercase tracking-wider transition-all cursor-pointer border-b-2 ${
+                  activeSettingsTab === "email"
+                    ? "border-secondary text-secondary font-bold"
+                    : "border-transparent text-on-surface-variant hover:text-foreground"
+                }`}
               >
-                Save Mail Credentials
+                Email Settings
               </button>
-
-              {/* Send Test Email Card */}
-              <div className="border-t border-outline-variant/10 pt-5 space-y-4">
-                <h4 className="font-body-md text-body-md text-foreground font-semibold">Send Test Email</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
-                  <div className="space-y-1 sm:col-span-2">
-                    <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Recipient Email Address</label>
-                    <input
-                      type="email"
-                      placeholder="e.g. test@example.com"
-                      value={testEmailRecipient}
-                      onChange={(e) => setTestEmailRecipient(e.target.value)}
-                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
-                    />
-                  </div>
-                  <div className="sm:col-span-1">
-                    <button
-                      onClick={handleSendTestEmail}
-                      disabled={sendingTestEmail}
-                      className="w-full bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer h-[34px] flex items-center justify-center"
-                    >
-                      {sendingTestEmail ? "Sending..." : "Send Test Email"}
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <button
+                onClick={() => setActiveSettingsTab("calendar")}
+                className={`pb-3 font-label-caps text-[11px] uppercase tracking-wider transition-all cursor-pointer border-b-2 ${
+                  activeSettingsTab === "calendar"
+                    ? "border-secondary text-secondary font-bold"
+                    : "border-transparent text-on-surface-variant hover:text-foreground"
+                }`}
+              >
+                Calendar Settings
+              </button>
+              <button
+                onClick={() => setActiveSettingsTab("whatsapp")}
+                className={`pb-3 font-label-caps text-[11px] uppercase tracking-wider transition-all cursor-pointer border-b-2 ${
+                  activeSettingsTab === "whatsapp"
+                    ? "border-secondary text-secondary font-bold"
+                    : "border-transparent text-on-surface-variant hover:text-foreground"
+                }`}
+              >
+                WhatsApp Settings
+              </button>
             </div>
 
-
-
-            {/* Google Calendar API Integration */}
-            <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
-              <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2 flex items-center gap-2">
-                <span className="material-symbols-outlined text-secondary">calendar_today</span>
-                Google Calendar OAuth Integration
-              </h3>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">
-                Authorize Decision Center to synchronize consultation bookings directly to your Google Calendar.
-              </p>
-              <div className="flex items-center gap-4 bg-[#181817] p-4 border border-outline-variant/10">
-                <div className="w-10 h-10 rounded-none bg-surface-container flex items-center justify-center border border-outline-variant/30 flex-shrink-0">
-                  <span className={`material-symbols-outlined ${gcalConnected ? 'text-emerald-400' : 'text-on-surface-variant'}`}>
-                    {gcalConnected ? 'sync' : 'sync_disabled'}
-                  </span>
-                </div>
-                <div>
-                  <p className="font-body-md text-body-md text-foreground font-semibold">
-                    {gcalConnected ? `Connected to Google Calendar` : 'Not Connected'}
-                  </p>
-                  <p className="font-body-sm text-[12px] text-on-surface-variant">
-                    {gcalConnected ? `Account: ${gcalEmail}` : 'Synchronize your events via OAuth 2.0 flow'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-2 border-t border-outline-variant/10 pt-4">
-                <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Calendar Timezone</label>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <select
-                    value={calendarTimezone}
-                    onChange={(e) => setCalendarTimezone(e.target.value)}
-                    className="flex-grow bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2.5 focus:outline-none focus:border-secondary"
-                  >
-                    <option value="Asia/Muscat">Oman (GST / UTC+4) - Default</option>
-                    <option value="Asia/Dubai">Dubai (GST / UTC+4)</option>
-                    <option value="Asia/Riyadh">Saudi Arabia (AST / UTC+3)</option>
-                    <option value="Europe/London">London (GMT/BST / UTC+0/+1)</option>
-                    <option value="UTC">UTC / GMT</option>
-                  </select>
+            {/* Sub-Tab 1: Email Configuration */}
+            {activeSettingsTab === "email" && (
+              <div className="space-y-6 animate-fade-in">
+                {/* SMTP Settings */}
+                <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
+                  <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2">
+                    Email SMTP Configuration
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="font-body-sm text-body-sm text-foreground">SMTP Server</label>
+                      <input
+                        type="text"
+                        value={smtpHost}
+                        onChange={(e) => setSmtpHost(e.target.value)}
+                        className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="font-body-sm text-body-sm text-foreground">SMTP Port</label>
+                      <input
+                        type="text"
+                        value={smtpPort}
+                        onChange={(e) => setSmtpPort(e.target.value)}
+                        className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="font-body-sm text-body-sm text-foreground">Username</label>
+                      <input
+                        type="text"
+                        value={smtpUser}
+                        onChange={(e) => setSmtpUser(e.target.value)}
+                        className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="font-body-sm text-body-sm text-foreground">Password</label>
+                      <input
+                        type="password"
+                        value={smtpPass}
+                        onChange={(e) => setSmtpPass(e.target.value)}
+                        className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary"
+                      />
+                    </div>
+                  </div>
                   <button
-                    onClick={async () => {
-                      if (isSupabaseConfigured()) {
-                        try {
-                          const { error } = await supabase
-                            .from("settings")
-                            .upsert({ key: "calendar_timezone", value: calendarTimezone }, { onConflict: "key" });
-                          if (error) throw error;
-                          alert("Calendar timezone saved successfully!");
-                        } catch (err) {
-                          console.error(err);
-                          alert("Failed to save calendar timezone.");
-                        }
-                      } else {
-                        localStorage.setItem("calendar-timezone", calendarTimezone);
-                        alert("Calendar timezone saved locally!");
-                      }
-                    }}
-                    className="bg-[#181817] text-secondary border border-outline-variant/30 hover:border-secondary hover:text-primary-container hover:bg-secondary px-4 py-2.5 font-label-caps text-[10px] transition-colors cursor-pointer flex items-center justify-center whitespace-nowrap"
+                    className="bg-secondary text-primary-container px-4 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer"
+                    onClick={handleSaveSmtpSettings}
                   >
-                    Save Timezone
+                    Save Mail Credentials
                   </button>
+
+                  {/* Send Test Email Card */}
+                  <div className="border-t border-outline-variant/10 pt-5 space-y-4">
+                    <h4 className="font-body-md text-body-md text-foreground font-semibold">Send Test Email</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                      <div className="space-y-1 sm:col-span-2">
+                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Recipient Email Address</label>
+                        <input
+                          type="email"
+                          placeholder="e.g. test@example.com"
+                          value={testEmailRecipient}
+                          onChange={(e) => setTestEmailRecipient(e.target.value)}
+                          className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                        />
+                      </div>
+                      <div className="sm:col-span-1">
+                        <button
+                          onClick={handleSaveSmtpSettings}
+                          disabled={sendingTestEmail}
+                          className="w-full bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer h-[34px] flex items-center justify-center"
+                        >
+                          {sendingTestEmail ? "Sending..." : "Send Test Email"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
+            )}
 
-              <div className="flex gap-4">
-                {!gcalConnected ? (
+            {/* Sub-Tab 2: Calendar Synchronization & Availability */}
+            {activeSettingsTab === "calendar" && (
+              <div className="space-y-6 animate-fade-in">
+                {/* Google Calendar API Integration */}
+                <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
+                  <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-secondary">calendar_today</span>
+                    Google Calendar OAuth Integration
+                  </h3>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    Authorize Decision Center to synchronize consultation bookings directly to your Google Calendar.
+                  </p>
+                  <div className="flex items-center gap-4 bg-[#181817] p-4 border border-outline-variant/10">
+                    <div className="w-10 h-10 rounded-none bg-surface-container flex items-center justify-center border border-outline-variant/30 flex-shrink-0">
+                      <span className={`material-symbols-outlined ${gcalConnected ? 'text-emerald-400' : 'text-on-surface-variant'}`}>
+                        {gcalConnected ? 'sync' : 'sync_disabled'}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="font-body-md text-body-md text-foreground font-semibold">
+                        {gcalConnected ? `Connected to Google Calendar` : 'Not Connected'}
+                      </p>
+                      <p className="font-body-sm text-[12px] text-on-surface-variant">
+                        {gcalConnected ? `Account: ${gcalEmail}` : 'Synchronize your events via OAuth 2.0 flow'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 border-t border-outline-variant/10 pt-4">
+                    <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Calendar Timezone</label>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <select
+                        value={calendarTimezone}
+                        onChange={(e) => setCalendarTimezone(e.target.value)}
+                        className="flex-grow bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2.5 focus:outline-none focus:border-secondary"
+                      >
+                        <option value="Asia/Muscat">Oman (GST / UTC+4) - Default</option>
+                        <option value="Asia/Dubai">Dubai (GST / UTC+4)</option>
+                        <option value="Asia/Riyadh">Saudi Arabia (AST / UTC+3)</option>
+                        <option value="Europe/London">London (GMT/BST / UTC+0/+1)</option>
+                        <option value="UTC">UTC / GMT</option>
+                      </select>
+                      <button
+                        onClick={async () => {
+                          if (isSupabaseConfigured()) {
+                            try {
+                              const { error } = await supabase
+                                .from("settings")
+                                .upsert({ key: "calendar_timezone", value: calendarTimezone }, { onConflict: "key" });
+                              if (error) throw error;
+                              alert("Calendar timezone saved successfully!");
+                            } catch (err) {
+                              console.error(err);
+                              alert("Failed to save calendar timezone.");
+                            }
+                          } else {
+                            localStorage.setItem("calendar-timezone", calendarTimezone);
+                            alert("Calendar timezone saved locally!");
+                          }
+                        }}
+                        className="bg-[#181817] text-secondary border border-outline-variant/30 hover:border-secondary hover:text-primary-container hover:bg-secondary px-4 py-2.5 font-label-caps text-[10px] transition-colors cursor-pointer flex items-center justify-center whitespace-nowrap"
+                      >
+                        Save Timezone
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    {!gcalConnected ? (
+                      <button
+                        disabled={gcalLoading}
+                        onClick={handleConnectGoogleCalendar}
+                        className="bg-secondary text-primary-container px-6 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-50 transition-colors cursor-pointer flex items-center gap-2"
+                      >
+                        <span>{gcalLoading ? 'Connecting...' : 'Connect Google Calendar'}</span>
+                      </button>
+                    ) : (
+                      <button
+                        disabled={gcalLoading}
+                        onClick={handleDisconnectGoogleCalendar}
+                        className="border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 text-red-400 px-6 py-3 font-label-caps text-label-caps disabled:opacity-50 transition-all cursor-pointer flex items-center gap-2"
+                      >
+                        <span>Disconnect Calendar</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Consultation Availability Settings */}
+                <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
+                  <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-secondary">schedule</span>
+                    Consultation Weekly Availability
+                  </h3>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    Define the days and active operational hours when clients can book strategic sessions.
+                  </p>
+
+                  <div className="space-y-4">
+                    {availabilities.map((avail) => {
+                      const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                      return (
+                        <div
+                          key={avail.day_of_week}
+                          className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-[#181817] border border-outline-variant/10 gap-4"
+                        >
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="checkbox"
+                              id={`avail-check-${avail.day_of_week}`}
+                              checked={avail.is_available}
+                              onChange={(e) =>
+                                handleUpdateDayAvailability(avail.day_of_week, { is_available: e.target.checked })
+                              }
+                              className="accent-secondary h-4 w-4 rounded-none cursor-pointer"
+                            />
+                            <label
+                              htmlFor={`avail-check-${avail.day_of_week}`}
+                              className={`font-body-md text-body-md font-bold cursor-pointer ${
+                                avail.is_available ? "text-foreground" : "text-on-surface-variant line-through"
+                              }`}
+                            >
+                              {dayNames[avail.day_of_week]}
+                            </label>
+                          </div>
+
+                          {avail.is_available ? (
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="time"
+                                value={avail.time_from}
+                                onChange={(e) =>
+                                  handleUpdateDayAvailability(avail.day_of_week, { time_from: e.target.value })
+                                }
+                                className="bg-[#111110] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2 py-1.5 focus:outline-none focus:border-secondary font-mono"
+                              />
+                              <span className="text-on-surface-variant text-xs">to</span>
+                              <input
+                                type="time"
+                                value={avail.time_to}
+                                onChange={(e) =>
+                                  handleUpdateDayAvailability(avail.day_of_week, { time_to: e.target.value })
+                                }
+                                className="bg-[#111110] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2 py-1.5 focus:outline-none focus:border-secondary font-mono"
+                              />
+                            </div>
+                          ) : (
+                            <span className="text-[10px] font-label-caps text-red-400 bg-red-400/5 px-2 py-0.5 border border-red-500/20 uppercase">
+                              Closed / Unavailable
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
                   <button
-                    disabled={gcalLoading}
-                    onClick={handleConnectGoogleCalendar}
+                    onClick={handleSaveAvailability}
+                    disabled={savingAvailability}
                     className="bg-secondary text-primary-container px-6 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-50 transition-colors cursor-pointer flex items-center gap-2"
                   >
-                    <span>{gcalLoading ? 'Connecting...' : 'Connect Google Calendar'}</span>
+                    <span>{savingAvailability ? "Saving..." : "Save Availability Settings"}</span>
                   </button>
-                ) : (
-                  <button
-                    disabled={gcalLoading}
-                    onClick={handleDisconnectGoogleCalendar}
-                    className="border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 text-red-400 px-6 py-3 font-label-caps text-label-caps disabled:opacity-50 transition-all cursor-pointer flex items-center gap-2"
-                  >
-                    <span>Disconnect Calendar</span>
-                  </button>
-                )}
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Consultation Availability Settings */}
-            <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
-              <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2 flex items-center gap-2">
-                <span className="material-symbols-outlined text-secondary">schedule</span>
-                Consultation Weekly Availability
-              </h3>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">
-                Define the days and active operational hours when clients can book strategic sessions.
-              </p>
-
-              <div className="space-y-4">
-                {availabilities.map((avail) => {
-                  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-                  return (
-                    <div
-                      key={avail.day_of_week}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-[#181817] border border-outline-variant/10 gap-4"
-                    >
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          id={`avail-check-${avail.day_of_week}`}
-                          checked={avail.is_available}
-                          onChange={(e) =>
-                            handleUpdateDayAvailability(avail.day_of_week, { is_available: e.target.checked })
-                          }
-                          className="accent-secondary h-4 w-4 rounded-none cursor-pointer"
-                        />
-                        <label
-                          htmlFor={`avail-check-${avail.day_of_week}`}
-                          className={`font-body-md text-body-md font-bold cursor-pointer ${
-                            avail.is_available ? "text-foreground" : "text-on-surface-variant line-through"
-                          }`}
-                        >
-                          {dayNames[avail.day_of_week]}
-                        </label>
-                      </div>
-
-                      {avail.is_available ? (
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="time"
-                            value={avail.time_from}
-                            onChange={(e) =>
-                              handleUpdateDayAvailability(avail.day_of_week, { time_from: e.target.value })
-                            }
-                            className="bg-[#111110] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2 py-1.5 focus:outline-none focus:border-secondary font-mono"
-                          />
-                          <span className="text-on-surface-variant text-xs">to</span>
-                          <input
-                            type="time"
-                            value={avail.time_to}
-                            onChange={(e) =>
-                              handleUpdateDayAvailability(avail.day_of_week, { time_to: e.target.value })
-                            }
-                            className="bg-[#111110] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2 py-1.5 focus:outline-none focus:border-secondary font-mono"
-                          />
+            {/* Sub-Tab 3: WhatsApp Bot Control */}
+            {activeSettingsTab === "whatsapp" && (
+              <div className="space-y-6 animate-fade-in">
+                {/* WhatsApp Connection */}
+                <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
+                  <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2">
+                    WhatsApp API Connection (QR Code)
+                  </h3>
+                  
+                  <div className="flex flex-col md:flex-row items-center gap-8">
+                    <div className="w-48 h-48 bg-white flex items-center justify-center border border-secondary p-2 relative overflow-hidden flex-shrink-0">
+                      {!serverOnline && (
+                        <div className="absolute inset-0 bg-[#070707]/95 flex flex-col justify-center items-center text-center p-4 gap-2 z-10">
+                          <span className="material-symbols-outlined text-amber-500 text-3xl animate-pulse">cloud_off</span>
+                          <p className="font-body-sm text-[11px] text-on-surface-variant">
+                            WhatsApp Server Offline. Verify the endpoint or start the bot script.
+                          </p>
+                          <button
+                            onClick={handleRefreshStatus}
+                            className="mt-1 border border-secondary/20 hover:border-secondary hover:text-secondary px-2.5 py-1 font-label-caps text-[9px] transition-colors cursor-pointer text-foreground bg-transparent"
+                          >
+                            Retry Connection
+                          </button>
                         </div>
-                      ) : (
-                        <span className="text-[10px] font-label-caps text-red-400 bg-red-400/5 px-2 py-0.5 border border-red-500/20 uppercase">
-                          Closed / Unavailable
+                      )}
+                      {serverOnline && qrStatus === "disconnected" && (
+                        <div className="absolute inset-0 bg-[#070707]/95 flex flex-col justify-center items-center text-center p-4 gap-2 z-10">
+                          <span className="material-symbols-outlined text-secondary/60 text-3xl">link_off</span>
+                          <p className="font-body-sm text-[11px] text-on-surface-variant">
+                            WhatsApp Disconnected. Click below to initialize session.
+                          </p>
+                          <button
+                            disabled={initializingWa}
+                            onClick={handleConnectWhatsApp}
+                            className="mt-1 bg-secondary text-primary-container hover:bg-transparent hover:text-secondary px-3 py-1.5 font-label-caps text-[9px] uppercase border border-secondary transition-colors cursor-pointer"
+                          >
+                            {initializingWa ? "Initializing..." : "Connect WhatsApp"}
+                          </button>
+                        </div>
+                      )}
+                      {qrStatus === "generating" && (
+                        <div className="absolute inset-0 bg-[#070707]/90 flex items-center justify-center text-secondary animate-pulse text-xs text-center p-4">
+                          Configuring session browser instance...
+                        </div>
+                      )}
+                      {qrStatus === "waiting" && qrImage && (
+                        <div className="relative w-full h-full flex flex-col justify-center items-center">
+                          <img src={qrImage} alt="Scan QR Code" className="w-full h-full object-contain" />
+                        </div>
+                      )}
+                      {qrStatus === "connected" && (
+                        <div className="absolute inset-0 bg-emerald-500/10 flex flex-col justify-center items-center text-center p-3">
+                          <span className="material-symbols-outlined text-3xl text-emerald-400">check_circle</span>
+                          <p className="font-label-caps text-label-caps text-[11px] text-emerald-400 mt-1">Active Connection</p>
+                          {connectedNumber && (
+                            <p className="font-mono text-[9px] text-secondary mt-0.5 break-all max-w-full px-1">{connectedNumber}</p>
+                          )}
+                          <button
+                            onClick={handleDisconnectWhatsApp}
+                            disabled={disconnecting}
+                            className="mt-2.5 border border-red-500/30 bg-red-500/5 hover:bg-red-500/15 text-red-400 px-3 py-1 font-label-caps text-[8px] transition-all cursor-pointer disabled:opacity-50"
+                          >
+                            {disconnecting ? "Disconnecting..." : "Disconnect"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-grow space-y-4 w-full">
+                      <div className="space-y-1">
+                        <p className="font-label-caps text-label-caps text-on-surface-variant">WhatsApp Server Endpoint</p>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={waServerUrl}
+                            onChange={(e) => setWaServerUrl(e.target.value)}
+                            placeholder="e.g. http://localhost:3001"
+                            className="flex-grow bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2 focus:outline-none focus:border-secondary font-mono"
+                          />
+                          <button
+                            onClick={handleRefreshStatus}
+                            className="border border-outline-variant/30 hover:border-secondary hover:text-secondary text-foreground px-3 py-2 font-label-caps text-[10px] transition-colors cursor-pointer"
+                          >
+                            Refresh Status
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (isUsingSupabase) {
+                                try {
+                                  const { error } = await supabase.from("settings").upsert({ key: "wa_server_url", value: waServerUrl });
+                                  if (error) throw error;
+                                  alert("WhatsApp URL saved in Database!");
+                                } catch (err) {
+                                  console.error(err);
+                                  alert("Failed to save WhatsApp URL in Database.");
+                                }
+                              } else {
+                                localStorage.setItem("wa-server-url", waServerUrl);
+                                alert("WhatsApp URL saved in LocalStorage!");
+                              }
+                            }}
+                            className="bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer"
+                          >
+                            Save
+                          </button>
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="font-label-caps text-label-caps text-on-surface-variant">Connection Logs</p>
+                        <div className="bg-[#181817] border border-outline-variant/10 p-3 h-24 overflow-y-auto text-xs font-mono text-secondary space-y-1">
+                          {connectionLogs.map((log, index) => (
+                            <div key={index} className={log.includes("Handshake") || log.includes("CONNECTED") || log.includes("connected") ? "text-emerald-400" : ""}>
+                              {log}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Send Test WhatsApp Message Section */}
+                  <div className="border-t border-outline-variant/10 pt-5 space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h4 className="font-body-md text-body-md text-foreground font-semibold">Send Test WhatsApp Message</h4>
+                      {qrStatus !== "connected" && (
+                        <span className="text-[10px] text-amber-500 font-label-caps bg-amber-500/5 px-2 py-0.5 border border-amber-500/20">
+                          Requires Active Connection
                         </span>
                       )}
                     </div>
-                  );
-                })}
-              </div>
-
-              <button
-                onClick={handleSaveAvailability}
-                disabled={savingAvailability}
-                className="bg-secondary text-primary-container px-6 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-50 transition-colors cursor-pointer flex items-center gap-2"
-              >
-                <span>{savingAvailability ? "Saving..." : "Save Availability Settings"}</span>
-              </button>
-            </div>
-
-            {/* WhatsApp Connection */}
-            <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
-              <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2">
-                WhatsApp API Connection (QR Code)
-              </h3>
-              
-              <div className="flex flex-col md:flex-row items-center gap-8">
-                <div className="w-48 h-48 bg-white flex items-center justify-center border border-secondary p-2 relative overflow-hidden">
-                  {!serverOnline && (
-                    <div className="absolute inset-0 bg-[#070707]/95 flex flex-col justify-center items-center text-center p-4 gap-2 z-10">
-                      <span className="material-symbols-outlined text-amber-500 text-3xl animate-pulse">cloud_off</span>
-                      <p className="font-body-sm text-[11px] text-on-surface-variant">
-                        WhatsApp Server Offline. Verify the endpoint or start the bot script.
-                      </p>
-                      <button
-                        onClick={handleRefreshStatus}
-                        className="mt-1 border border-secondary/20 hover:border-secondary hover:text-secondary px-2.5 py-1 font-label-caps text-[9px] transition-colors cursor-pointer text-foreground bg-transparent"
-                      >
-                        Retry Connection
-                      </button>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                      <div className="space-y-1 sm:col-span-1">
+                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Recipient Phone Number</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. 96896680001"
+                          value={testNumber}
+                          onChange={(e) => setTestNumber(e.target.value)}
+                          className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary font-mono"
+                        />
+                      </div>
+                      <div className="space-y-1 sm:col-span-1">
+                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Message Text</label>
+                        <input
+                          type="text"
+                          placeholder="Test message from Decision Center"
+                          value={testMessage}
+                          onChange={(e) => setTestMessage(e.target.value)}
+                          className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                        />
+                      </div>
+                      <div className="sm:col-span-1">
+                        <button
+                          onClick={handleSendTestMessage}
+                          disabled={sendingTest || qrStatus !== "connected"}
+                          className="w-full bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer h-[34px] flex items-center justify-center"
+                        >
+                          {sendingTest ? "Sending..." : "Send Test Message"}
+                        </button>
+                      </div>
                     </div>
-                  )}
-                  {serverOnline && qrStatus === "disconnected" && (
-                    <div className="absolute inset-0 bg-[#070707]/95 flex flex-col justify-center items-center text-center p-4 gap-2 z-10">
-                      <span className="material-symbols-outlined text-secondary/60 text-3xl">link_off</span>
-                      <p className="font-body-sm text-[11px] text-on-surface-variant">
-                        WhatsApp Disconnected. Click below to initialize session.
-                      </p>
-                      <button
-                        disabled={initializingWa}
-                        onClick={handleConnectWhatsApp}
-                        className="mt-1 bg-secondary text-primary-container hover:bg-transparent hover:text-secondary px-3 py-1.5 font-label-caps text-[9px] uppercase border border-secondary transition-colors cursor-pointer"
-                      >
-                        {initializingWa ? "Initializing..." : "Connect WhatsApp"}
-                      </button>
-                    </div>
-                  )}
-                  {qrStatus === "generating" && (
-                    <div className="absolute inset-0 bg-[#070707]/90 flex items-center justify-center text-secondary animate-pulse text-xs text-center p-4">
-                      Configuring session browser instance...
-                    </div>
-                  )}
-                  {qrStatus === "waiting" && qrImage && (
-                    <div className="relative w-full h-full flex flex-col justify-center items-center">
-                      <img src={qrImage} alt="Scan QR Code" className="w-full h-full object-contain" />
-                    </div>
-                  )}
-                  {qrStatus === "connected" && (
-                    <div className="absolute inset-0 bg-emerald-500/10 flex flex-col justify-center items-center text-center p-3">
-                      <span className="material-symbols-outlined text-3xl text-emerald-400">check_circle</span>
-                      <p className="font-label-caps text-label-caps text-[11px] text-emerald-400 mt-1">Active Connection</p>
-                      {connectedNumber && (
-                        <p className="font-mono text-[9px] text-secondary mt-0.5 break-all max-w-full px-1">{connectedNumber}</p>
-                      )}
-                      <button
-                        onClick={handleDisconnectWhatsApp}
-                        disabled={disconnecting}
-                        className="mt-2.5 border border-red-500/30 bg-red-500/5 hover:bg-red-500/15 text-red-400 px-3 py-1 font-label-caps text-[8px] transition-all cursor-pointer disabled:opacity-50"
-                      >
-                        {disconnecting ? "Disconnecting..." : "Disconnect"}
-                      </button>
-                    </div>
-                  )}
+                  </div>
                 </div>
 
-                <div className="flex-grow space-y-4 w-full">
-                  <div className="space-y-1">
-                    <p className="font-label-caps text-label-caps text-on-surface-variant">WhatsApp Server Endpoint</p>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={waServerUrl}
-                        onChange={(e) => setWaServerUrl(e.target.value)}
-                        placeholder="e.g. http://localhost:3001"
-                        className="flex-grow bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2 focus:outline-none focus:border-secondary font-mono"
-                      />
+                {/* WhatsApp Preset Messages Manager */}
+                <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
+                  <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2">
+                    WhatsApp Preset Messages
+                  </h3>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    Manage templates for reaching out to leads. You can use placeholders like <code className="text-secondary font-mono">{`{name}`}</code> and <code className="text-secondary font-mono">{`{company}`}</code>.
+                  </p>
+
+                  {/* Add/Edit Form */}
+                  <div className="bg-[#181817] p-4 border border-outline-variant/10 space-y-4">
+                    <h4 className="font-body-md text-body-md text-foreground font-semibold">
+                      {editingPresetId ? "Edit Template" : "Create New Template"}
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Template Title</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Follow Up Greeting"
+                          value={presetTitle}
+                          onChange={(e) => setPresetTitle(e.target.value)}
+                          className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Template Text (with placeholders)</label>
+                        <input
+                          type="text"
+                          placeholder="Hello {name}, regarding {company}..."
+                          value={presetText}
+                          onChange={(e) => setPresetText(e.target.value)}
+                          className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
                       <button
-                        onClick={handleRefreshStatus}
-                        className="border border-outline-variant/30 hover:border-secondary hover:text-secondary text-foreground px-3 py-2 font-label-caps text-[10px] transition-colors cursor-pointer"
-                      >
-                        Refresh Status
-                      </button>
-                      <button
-                        onClick={async () => {
-                          if (isUsingSupabase) {
-                            try {
-                              const { error } = await supabase.from("settings").upsert({ key: "wa_server_url", value: waServerUrl });
-                              if (error) throw error;
-                              alert("WhatsApp URL saved in Database!");
-                            } catch (err) {
-                              console.error(err);
-                              alert("Failed to save WhatsApp URL in Database.");
-                            }
-                          } else {
-                            localStorage.setItem("wa-server-url", waServerUrl);
-                            alert("WhatsApp URL saved in LocalStorage!");
-                          }
-                        }}
+                        onClick={handleSavePreset}
                         className="bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer"
                       >
-                        Save
+                        {editingPresetId ? "Update Template" : "Add Template"}
                       </button>
+                      {editingPresetId && (
+                        <button
+                          onClick={handleCancelEditPreset}
+                          className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-4 py-2 font-label-caps text-[10px] transition-colors cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      )}
                     </div>
                   </div>
-                  <div className="space-y-1">
-                    <p className="font-label-caps text-label-caps text-on-surface-variant">Connection Logs</p>
-                    <div className="bg-[#181817] border border-outline-variant/10 p-3 h-24 overflow-y-auto text-xs font-mono text-secondary space-y-1">
-                      {connectionLogs.map((log, index) => (
-                        <div key={index} className={log.includes("Handshake") || log.includes("CONNECTED") || log.includes("connected") ? "text-emerald-400" : ""}>
-                          {log}
+
+                  {/* Presets List */}
+                  <div className="space-y-3">
+                    {presets.map((preset) => (
+                      <div key={preset.id} className="border border-outline-variant/15 p-4 bg-[#181817] flex justify-between items-center gap-4">
+                        <div className="space-y-1 text-left">
+                          <p className="font-body-md text-foreground font-semibold">{preset.title}</p>
+                          <p className="font-mono text-xs text-secondary break-all">{preset.text}</p>
                         </div>
-                      ))}
-                    </div>
+                        <div className="flex gap-2 flex-shrink-0">
+                          <button
+                            onClick={() => {
+                              setEditingPresetId(preset.id);
+                              setPresetTitle(preset.title);
+                              setPresetText(preset.text);
+                            }}
+                            className="border border-secondary/20 hover:border-secondary text-secondary hover:text-secondary px-2.5 py-1.5 font-label-caps text-[9px] transition-all cursor-pointer"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeletePreset(preset.id)}
+                            className="border border-red-500/20 hover:border-red-500 text-red-400 px-2.5 py-1.5 font-label-caps text-[9px] transition-all cursor-pointer"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {presets.length === 0 && (
+                      <p className="font-body-sm text-body-sm text-on-surface-variant text-center py-4">No custom templates defined.</p>
+                    )}
                   </div>
                 </div>
               </div>
-
-              {/* Send Test WhatsApp Message Section */}
-              <div className="border-t border-outline-variant/10 pt-5 space-y-4">
-                <div className="flex justify-between items-center">
-                  <h4 className="font-body-md text-body-md text-foreground font-semibold">Send Test WhatsApp Message</h4>
-                  {qrStatus !== "connected" && (
-                    <span className="text-[10px] text-amber-500 font-label-caps bg-amber-500/5 px-2 py-0.5 border border-amber-500/20">
-                      Requires Active Connection
-                    </span>
-                  )}
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
-                  <div className="space-y-1 sm:col-span-1">
-                    <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Recipient Phone Number</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 96896680001"
-                      value={testNumber}
-                      onChange={(e) => setTestNumber(e.target.value)}
-                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary font-mono"
-                    />
-                  </div>
-                  <div className="space-y-1 sm:col-span-1">
-                    <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Message Text</label>
-                    <input
-                      type="text"
-                      placeholder="Test message from Decision Center"
-                      value={testMessage}
-                      onChange={(e) => setTestMessage(e.target.value)}
-                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
-                    />
-                  </div>
-                  <div className="sm:col-span-1">
-                    <button
-                      onClick={handleSendTestMessage}
-                      disabled={sendingTest || qrStatus !== "connected"}
-                      className="w-full bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer h-[34px] flex items-center justify-center"
-                    >
-                      {sendingTest ? "Sending..." : "Send Test Message"}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* WhatsApp Preset Messages Manager */}
-            <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
-              <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2">
-                WhatsApp Preset Messages
-              </h3>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">
-                Manage templates for reaching out to leads. You can use placeholders like <code className="text-secondary font-mono">{`{name}`}</code> and <code className="text-secondary font-mono">{`{company}`}</code>.
-              </p>
-
-              {/* Add/Edit Form */}
-              <div className="bg-[#181817] p-4 border border-outline-variant/10 space-y-4">
-                <h4 className="font-body-md text-body-md text-foreground font-semibold">
-                  {editingPresetId ? "Edit Template" : "Create New Template"}
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Template Title</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Follow Up Greeting"
-                      value={presetTitle}
-                      onChange={(e) => setPresetTitle(e.target.value)}
-                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Template Text (with placeholders)</label>
-                    <input
-                      type="text"
-                      placeholder="Hello {name}, regarding {company}..."
-                      value={presetText}
-                      onChange={(e) => setPresetText(e.target.value)}
-                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    onClick={handleSavePreset}
-                    className="bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer"
-                  >
-                    {editingPresetId ? "Update Template" : "Add Template"}
-                  </button>
-                  {editingPresetId && (
-                    <button
-                      onClick={handleCancelEditPreset}
-                      className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-4 py-2 font-label-caps text-[10px] transition-colors cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Presets List */}
-              <div className="space-y-3">
-                {presets.map((preset) => (
-                  <div key={preset.id} className="border border-outline-variant/15 p-4 bg-[#181817] flex justify-between items-center gap-4">
-                    <div className="space-y-1 text-left">
-                      <p className="font-body-md text-foreground font-semibold">{preset.title}</p>
-                      <p className="font-mono text-xs text-secondary break-all">{preset.text}</p>
-                    </div>
-                    <div className="flex gap-2 flex-shrink-0">
-                      <button
-                        onClick={() => {
-                          setEditingPresetId(preset.id);
-                          setPresetTitle(preset.title);
-                          setPresetText(preset.text);
-                        }}
-                        className="border border-secondary/20 hover:border-secondary text-secondary hover:text-secondary px-2.5 py-1.5 font-label-caps text-[9px] transition-all cursor-pointer"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeletePreset(preset.id)}
-                        className="border border-red-500/20 hover:border-red-500 text-red-400 px-2.5 py-1.5 font-label-caps text-[9px] transition-all cursor-pointer"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                {presets.length === 0 && (
-                  <p className="font-body-sm text-body-sm text-on-surface-variant text-center py-4">No custom templates defined.</p>
-                )}
-              </div>
-            </div>
+            )}
           </div>
         )}
 
