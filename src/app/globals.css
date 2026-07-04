@@ -187,3 +187,126 @@
   width: max-content;
   animation: marquee 30s linear infinite;
 }
+
+/* Light Theme overrides for Admin Console */
+.light-admin {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+}
+.light-admin aside {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+}
+.light-admin main {
+  background-color: #f3f4f6 !important;
+}
+.light-admin h1, .light-admin h2, .light-admin h3, .light-admin h4, .light-admin h5 {
+  color: #111827 !important;
+}
+.light-admin p {
+  color: #4b5563 !important;
+}
+.light-admin label {
+  color: #374151 !important;
+}
+.light-admin table, .light-admin tr, .light-admin th, .light-admin td {
+  border-color: #e5e7eb !important;
+  color: #111827 !important;
+}
+.light-admin .bg-\[\#111110\] {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+}
+.light-admin .bg-\[\#181817\] {
+  background-color: #f9fafb !important;
+  border-color: #e5e7eb !important;
+}
+.light-admin input, .light-admin select, .light-admin textarea {
+  background-color: #ffffff !important;
+  border-color: #d1d5db !important;
+  color: #111827 !important;
+}
+.light-admin .text-foreground {
+  color: #111827 !important;
+}
+.light-admin .text-on-surface-variant {
+  color: #4b5563 !important;
+}
+.light-admin .border-outline-variant\/10 {
+  border-color: #e5e7eb !important;
+}
+.light-admin .border-outline-variant\/15 {
+  border-color: #e5e7eb !important;
+}
+.light-admin .border-outline-variant\/30 {
+  border-color: #d1d5db !important;
+}
+.light-admin .border-secondary\/30 {
+  border-color: #dab36a !important;
+}
+.light-admin .text-secondary {
+  color: #c5a059 !important;
+}
+.light-admin .text-emerald-400 {
+  color: #059669 !important;
+}
+.light-admin .bg-secondary\/10 {
+  background-color: rgba(197, 160, 89, 0.15) !important;
+}
+.light-admin .border-r {
+  border-color: #e5e7eb !important;
+}
+.light-admin .border-t {
+  border-color: #e5e7eb !important;
+}
+.light-admin .border-b {
+  border-color: #e5e7eb !important;
+}
+.light-admin .bg-surface-container {
+  background-color: #ffffff !important;
+}
+.light-admin .bg-surface-dim {
+  background-color: #f3f4f6 !important;
+}
+.light-admin .text-on-surface {
+  color: #111827 !important;
+}
+.light-admin span.text-foreground {
+  color: #111827 !important;
+}
+.light-admin div.text-foreground {
+  color: #111827 !important;
+}
+.light-admin p.text-foreground {
+  color: #111827 !important;
+}
+.light-admin button.text-foreground {
+  color: #111827 !important;
+}
+.light-admin .border-b-2.border-secondary {
+  border-color: #dab36a !important;
+}
+.light-admin .border-l-2.border-secondary {
+  border-color: #dab36a !important;
+}
+.light-admin .text-secondary\/10 {
+  color: rgba(197, 160, 89, 0.2) !important;
+}
+.light-admin .text-emerald-500 {
+  color: #10b981 !important;
+}
+.light-admin .bg-emerald-500\/10 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+.light-admin .bg-surface-container-high {
+  background-color: #ffffff !important;
+}
+.light-admin .bg-\[\#181817\] {
+  background-color: #f9fafb !important;
+}
+.light-admin .bg-\[\#111110\] {
+  background-color: #ffffff !important;
+}
+.light-admin .bg-\[\#070707\] {
+  background-color: #f3f4f6 !important;
+}

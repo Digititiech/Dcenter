@@ -39,6 +39,7 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"overview" | "crm" | "bookings" | "settings">("overview");
   const [activeSettingsTab, setActiveSettingsTab] = useState<"email" | "calendar" | "whatsapp">("email");
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [isUsingSupabase, setIsUsingSupabase] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -205,6 +206,13 @@ export default function AdminDashboard() {
 
     loadSettings();
   }, [isUsingSupabase]);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("admin-theme");
+    if (savedTheme === "light") {
+      setTheme("light");
+    }
+  }, []);
 
   const timeSlots = ["09:00 GST", "11:30 GST", "14:00 GST", "16:00 GST"];
 
@@ -1327,7 +1335,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#070707]">
+    <div className={`flex h-screen overflow-hidden bg-[#070707] ${theme === "light" ? "light-admin" : ""}`}>
       {/* Sidebar Navigation */}
       <aside className="w-64 bg-[#111110] border-r border-outline-variant/10 flex flex-col justify-between">
         <div>
@@ -1378,10 +1386,23 @@ export default function AdminDashboard() {
             </button>
           </nav>
         </div>
-        <div className="p-4 border-t border-outline-variant/10">
+        <div className="p-4 border-t border-outline-variant/10 space-y-3">
+          <button
+            onClick={() => {
+              const next = theme === "dark" ? "light" : "dark";
+              setTheme(next);
+              localStorage.setItem("admin-theme", next);
+            }}
+            className="w-full flex items-center justify-center gap-2 border border-outline-variant/30 hover:border-secondary hover:text-secondary text-foreground py-2.5 font-label-caps text-label-caps transition-all cursor-pointer text-xs"
+          >
+            <span className="material-symbols-outlined text-sm">
+              {theme === "light" ? "dark_mode" : "light_mode"}
+            </span>
+            {theme === "light" ? "Dark Theme" : "Light Theme"}
+          </button>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 text-red-400 py-3 font-label-caps text-label-caps transition-all cursor-pointer text-xs"
+            className="w-full flex items-center justify-center gap-2 border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 text-red-400 py-2.5 font-label-caps text-label-caps transition-all cursor-pointer text-xs"
           >
             <span className="material-symbols-outlined text-sm">logout</span>
             Exit Console
