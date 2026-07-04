@@ -144,6 +144,7 @@ export default function AdminDashboard() {
     { day_of_week: 6, is_available: false, time_from: "09:00", time_to: "18:00" },
   ]);
   const [savingAvailability, setSavingAvailability] = useState(false);
+  const [calendarTimezone, setCalendarTimezone] = useState("Asia/Muscat");
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -165,6 +166,7 @@ export default function AdminDashboard() {
               if (row.key === "smtp_port") setSmtpPort(row.value);
               if (row.key === "smtp_user") setSmtpUser(row.value);
               if (row.key === "smtp_pass") setSmtpPass(row.value);
+              if (row.key === "calendar_timezone") setCalendarTimezone(row.value);
               if (row.key === "wa_server_url") {
                 setWaServerUrl(row.value);
                 resolvedUrl = row.value;
@@ -190,6 +192,10 @@ export default function AdminDashboard() {
         const savedAvail = localStorage.getItem("calendar-availability");
         if (savedAvail) {
           setAvailabilities(JSON.parse(savedAvail));
+        }
+        const savedTz = localStorage.getItem("calendar-timezone");
+        if (savedTz) {
+          setCalendarTimezone(savedTz);
         }
       }
 
@@ -1849,6 +1855,46 @@ export default function AdminDashboard() {
                   </p>
                 </div>
               </div>
+
+              <div className="space-y-2 border-t border-outline-variant/10 pt-4">
+                <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Calendar Timezone</label>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <select
+                    value={calendarTimezone}
+                    onChange={(e) => setCalendarTimezone(e.target.value)}
+                    className="flex-grow bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2.5 focus:outline-none focus:border-secondary"
+                  >
+                    <option value="Asia/Muscat">Oman (GST / UTC+4) - Default</option>
+                    <option value="Asia/Dubai">Dubai (GST / UTC+4)</option>
+                    <option value="Asia/Riyadh">Saudi Arabia (AST / UTC+3)</option>
+                    <option value="Europe/London">London (GMT/BST / UTC+0/+1)</option>
+                    <option value="UTC">UTC / GMT</option>
+                  </select>
+                  <button
+                    onClick={async () => {
+                      if (isSupabaseConfigured()) {
+                        try {
+                          const { error } = await supabase
+                            .from("settings")
+                            .upsert({ key: "calendar_timezone", value: calendarTimezone }, { onConflict: "key" });
+                          if (error) throw error;
+                          alert("Calendar timezone saved successfully!");
+                        } catch (err) {
+                          console.error(err);
+                          alert("Failed to save calendar timezone.");
+                        }
+                      } else {
+                        localStorage.setItem("calendar-timezone", calendarTimezone);
+                        alert("Calendar timezone saved locally!");
+                      }
+                    }}
+                    className="bg-[#181817] text-secondary border border-outline-variant/30 hover:border-secondary hover:text-primary-container hover:bg-secondary px-4 py-2.5 font-label-caps text-[10px] transition-colors cursor-pointer flex items-center justify-center whitespace-nowrap"
+                  >
+                    Save Timezone
+                  </button>
+                </div>
+              </div>
+
               <div className="flex gap-4">
                 {!gcalConnected ? (
                   <button

@@ -8,7 +8,14 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 
-function parseDateTime(dateStr: string | undefined, day: number, timeSlot: string) {
+function getTimezoneOffset(timeZone: string) {
+  if (timeZone === "Asia/Riyadh") return "+03:00";
+  if (timeZone === "Europe/London") return "+00:00"; // simplified
+  if (timeZone === "UTC") return "+00:00";
+  return "+04:00"; // default for Asia/Muscat or Asia/Dubai
+}
+
+function parseDateTime(dateStr: string | undefined, day: number, timeSlot: string, offset: string = "+04:00") {
   let datePart = "2026-10-01";
   if (dateStr) {
     datePart = dateStr;
@@ -20,10 +27,10 @@ function parseDateTime(dateStr: string | undefined, day: number, timeSlot: strin
   const [hour, minute] = timePart.split(":");
   const hourStr = String(hour || "09").padStart(2, '0');
   const minuteStr = String(minute || "00").padStart(2, '0');
-  return `${datePart}T${hourStr}:${minuteStr}:00+04:00`;
+  return `${datePart}T${hourStr}:${minuteStr}:00${offset}`;
 }
 
-function parseEndDateTime(dateStr: string | undefined, day: number, timeSlot: string) {
+function parseEndDateTime(dateStr: string | undefined, day: number, timeSlot: string, offset: string = "+04:00") {
   let datePart = "2026-10-01";
   if (dateStr) {
     datePart = dateStr;
@@ -36,7 +43,7 @@ function parseEndDateTime(dateStr: string | undefined, day: number, timeSlot: st
   const endHour = Number(hour || "09") + 1;
   const hourStr = String(endHour).padStart(2, '0');
   const minuteStr = String(minute || "00").padStart(2, '0');
-  return `${datePart}T${hourStr}:${minuteStr}:00+04:00`;
+  return `${datePart}T${hourStr}:${minuteStr}:00${offset}`;
 }
 
 async function refreshGoogleAccessToken(clientId: string, clientSecret: string, refreshToken: string) {
@@ -269,23 +276,33 @@ serve(async (req) => {
         throw new Error(`Booking with ID ${bookingId} not found.`);
       }
 
+      // Fetch timezone setting
+      const { data: tzSetting } = await supabaseClient
+        .from("settings")
+        .select("value")
+        .eq("key", "calendar_timezone")
+        .maybeSingle();
+
+      const timeZone = tzSetting?.value || "Asia/Muscat";
+      const offset = getTimezoneOffset(timeZone);
+
       // Refresh Access Token
       const accessToken = await refreshGoogleAccessToken(clientId, clientSecret, tokenRecord.refresh_token);
 
-      // Parse start and end times (GST timezone UTC+4)
-      const startIso = parseDateTime(booking.booking_date, booking.day, booking.timeSlot);
-      const endIso = parseEndDateTime(booking.booking_date, booking.day, booking.timeSlot);
+      // Parse start and end times
+      const startIso = parseDateTime(booking.booking_date, booking.day, booking.timeSlot, offset);
+      const endIso = parseEndDateTime(booking.booking_date, booking.day, booking.timeSlot, offset);
 
       const gcalEvent = {
         summary: `Strategic Consultation: ${booking.clientName}`,
         description: `Strategic Advisory Session booked via Decision Center Portal.\n\nClient Details:\n- Name: ${booking.clientName}\n- Email: ${booking.clientEmail}\n- Phone: ${booking.clientPhone}`,
         start: {
           dateTime: startIso,
-          timeZone: "Asia/Muscat",
+          timeZone: timeZone,
         },
         end: {
           dateTime: endIso,
-          timeZone: "Asia/Muscat",
+          timeZone: timeZone,
         },
       };
 
@@ -329,12 +346,22 @@ serve(async (req) => {
         });
       }
 
+      // Fetch timezone setting
+      const { data: tzSetting } = await supabaseClient
+        .from("settings")
+        .select("value")
+        .eq("key", "calendar_timezone")
+        .maybeSingle();
+
+      const timeZone = tzSetting?.value || "Asia/Muscat";
+      const offset = getTimezoneOffset(timeZone);
+
       // Refresh Access Token
       const accessToken = await refreshGoogleAccessToken(clientId, clientSecret, tokenRecord.refresh_token);
 
-      // Define Muscat/Oman timezone day bounds
-      const timeMin = `${dateParam}T00:00:00+04:00`;
-      const timeMax = `${dateParam}T23:59:59+04:00`;
+      // Define bounds using correct offset
+      const timeMin = `${dateParam}T00:00:00${offset}`;
+      const timeMax = `${dateParam}T23:59:59${offset}`;
 
       const gcalResponse = await fetch(
         `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${encodeURIComponent(timeMin)}&timeMax=${encodeURIComponent(timeMax)}&singleEvents=true`,
