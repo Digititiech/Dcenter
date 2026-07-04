@@ -1543,26 +1543,30 @@ export default function AdminDashboard() {
           </nav>
         </div>
         <div className="p-4 border-t border-outline-variant/10 space-y-3">
-          <button
-            onClick={toggleLocale}
-            className="w-full flex items-center justify-center gap-2 border border-outline-variant/30 hover:border-secondary hover:text-secondary text-foreground py-2.5 font-label-caps text-label-caps transition-all cursor-pointer text-xs"
-          >
-            <span className="material-symbols-outlined text-sm">language</span>
-            {locale === "en" ? "العربية (Arabic)" : "English (الإنجليزية)"}
-          </button>
-          <button
-            onClick={() => {
-              const next = theme === "dark" ? "light" : "dark";
-              setTheme(next);
-              localStorage.setItem("admin-theme", next);
-            }}
-            className="w-full flex items-center justify-center gap-2 border border-outline-variant/30 hover:border-secondary hover:text-secondary text-foreground py-2.5 font-label-caps text-label-caps transition-all cursor-pointer text-xs"
-          >
-            <span className="material-symbols-outlined text-sm">
-              {theme === "light" ? "dark_mode" : "light_mode"}
-            </span>
-            {theme === "light" ? t.sidebar.themeDark : t.sidebar.themeLight}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={toggleLocale}
+              title={locale === "en" ? "العربية" : "English"}
+              className="flex-1 flex items-center justify-center gap-1.5 border border-outline-variant/30 hover:border-secondary hover:text-secondary text-foreground py-2.5 font-label-caps text-[10px] transition-all cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-sm">language</span>
+              {locale === "en" ? "العربية" : "English"}
+            </button>
+            <button
+              onClick={() => {
+                const next = theme === "dark" ? "light" : "dark";
+                setTheme(next);
+                localStorage.setItem("admin-theme", next);
+              }}
+              title={theme === "light" ? t.sidebar.themeDark : t.sidebar.themeLight}
+              className="flex-1 flex items-center justify-center gap-1.5 border border-outline-variant/30 hover:border-secondary hover:text-secondary text-foreground py-2.5 font-label-caps text-[10px] transition-all cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-sm">
+                {theme === "light" ? "dark_mode" : "light_mode"}
+              </span>
+              {theme === "light" ? (locale === "ar" ? "داكن" : "Dark") : (locale === "ar" ? "مضيء" : "Light")}
+            </button>
+          </div>
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 text-red-400 py-2.5 font-label-caps text-label-caps transition-all cursor-pointer text-xs"
