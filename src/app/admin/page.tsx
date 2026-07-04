@@ -26,6 +26,7 @@ interface Booking {
   day: number;
   timeSlot: string;
   status: "Pending" | "Confirmed" | "Rescheduled";
+  booking_date?: string;
 }
 
 interface PresetMessage {
@@ -85,15 +86,27 @@ export default function AdminDashboard() {
   const [testEmailRecipient, setTestEmailRecipient] = useState("");
   const [sendingTestEmail, setSendingTestEmail] = useState(false);
 
+  // Full Calendar State
+  const today = new Date();
+  const [currentCalendarYear, setCurrentCalendarYear] = useState(today.getFullYear());
+  const [currentCalendarMonth, setCurrentCalendarMonth] = useState(today.getMonth());
+  const [selectedCalendarFilterDate, setSelectedCalendarFilterDate] = useState<string | null>(null);
+
   // Manual Booking Add State
   const [showingAddBookingModal, setShowingAddBookingModal] = useState(false);
   const [newBookingName, setNewBookingName] = useState("");
   const [newBookingEmail, setNewBookingEmail] = useState("");
   const [newBookingPhone, setNewBookingPhone] = useState("");
-  const [newBookingDay, setNewBookingDay] = useState(1);
+  const [newBookingDate, setNewBookingDate] = useState(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`);
   const [newBookingSlot, setNewBookingSlot] = useState("09:00 AM");
   const [newBookingStatus, setNewBookingStatus] = useState<"Pending" | "Confirmed" | "Rescheduled">("Confirmed");
   const [savingNewBooking, setSavingNewBooking] = useState(false);
+
+  // Reschedule Booking Modal State
+  const [activeRescheduleBooking, setActiveRescheduleBooking] = useState<Booking | null>(null);
+  const [rescheduleDate, setRescheduleDate] = useState(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`);
+  const [rescheduleSlot, setRescheduleSlot] = useState("09:00 AM");
+  const [savingReschedule, setSavingReschedule] = useState(false);
 
   // Preset Template Management State
   const [presets, setPresets] = useState<PresetMessage[]>([]);
@@ -555,14 +568,55 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleRescheduleBooking = async (bookingId: string) => {
-    const updated = bookings.map(b => b.id === bookingId ? { ...b, status: "Rescheduled" as const } : b);
+  const handleRescheduleBooking = (bookingId: string) => {
+    const booking = bookings.find(b => b.id === bookingId);
+    if (booking) {
+      setActiveRescheduleBooking(booking);
+      setRescheduleDate(booking.booking_date || `2026-10-${String(booking.day).padStart(2, "0")}`);
+      setRescheduleSlot(booking.timeSlot);
+    }
+  };
+
+  const handleSaveReschedule = async () => {
+    if (!activeRescheduleBooking) return;
+    setSavingReschedule(true);
+
+    const parsedDay = new Date(rescheduleDate).getDate();
+
+    const updated = bookings.map(b =>
+      b.id === activeRescheduleBooking.id
+        ? {
+            ...b,
+            booking_date: rescheduleDate,
+            day: parsedDay,
+            timeSlot: rescheduleSlot,
+            status: "Rescheduled" as const
+          }
+        : b
+    );
     setBookings(updated);
 
-    if (isUsingSupabase) {
-      await supabase.from("bookings").update({ status: "Rescheduled" }).eq("id", bookingId);
-    } else {
-      localStorage.setItem("bookings-slots", JSON.stringify(updated));
+    try {
+      if (isUsingSupabase) {
+        await supabase
+          .from("bookings")
+          .update({
+            booking_date: rescheduleDate,
+            day: parsedDay,
+            timeSlot: rescheduleSlot,
+            status: "Rescheduled"
+          })
+          .eq("id", activeRescheduleBooking.id);
+      } else {
+        localStorage.setItem("bookings-slots", JSON.stringify(updated));
+      }
+      alert("Booking rescheduled successfully!");
+      setActiveRescheduleBooking(null);
+    } catch (err) {
+      console.error(err);
+      alert("Error rescheduling booking");
+    } finally {
+      setSavingReschedule(false);
     }
   };
 
@@ -678,19 +732,22 @@ export default function AdminDashboard() {
   };
 
   const handleAddBooking = async () => {
-    if (!newBookingName || !newBookingEmail || !newBookingPhone || !newBookingDay || !newBookingSlot) {
+    if (!newBookingName || !newBookingEmail || !newBookingPhone || !newBookingDate || !newBookingSlot) {
       alert("Please fill out all fields");
       return;
     }
     setSavingNewBooking(true);
 
+    const parsedDay = new Date(newBookingDate).getDate();
+
     const newBooking: Omit<Booking, "id"> = {
       clientName: newBookingName,
       clientEmail: newBookingEmail,
       clientPhone: newBookingPhone,
-      day: Number(newBookingDay),
+      day: parsedDay,
       timeSlot: newBookingSlot,
-      status: newBookingStatus
+      status: newBookingStatus,
+      booking_date: newBookingDate
     };
 
     try {
@@ -852,7 +909,53 @@ export default function AdminDashboard() {
     }
   };
 
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
+  const getDaysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
+  const getFirstDayOffset = (year: number, month: number) => new Date(year, month, 1).getDay();
+
+  const daysInMonth = getDaysInMonth(currentCalendarYear, currentCalendarMonth);
+  const firstDayOffset = getFirstDayOffset(currentCalendarYear, currentCalendarMonth);
+
+  const getBookingDateString = (b: Booking) => {
+    if (b.booking_date) return b.booking_date;
+    return `2026-10-${String(b.day).padStart(2, "0")}`;
+  };
+
+  const formatFriendlyDate = (dateStr: string) => {
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    } catch (e) {
+      return dateStr;
+    }
+  };
+
+  const handlePrevMonth = () => {
+    if (currentCalendarMonth === 0) {
+      setCurrentCalendarMonth(11);
+      setCurrentCalendarYear(currentCalendarYear - 1);
+    } else {
+      setCurrentCalendarMonth(currentCalendarMonth - 1);
+    }
+    setSelectedCalendarFilterDate(null);
+  };
+
+  const handleNextMonth = () => {
+    if (currentCalendarMonth === 11) {
+      setCurrentCalendarMonth(0);
+      setCurrentCalendarYear(currentCalendarYear + 1);
+    } else {
+      setCurrentCalendarMonth(currentCalendarMonth + 1);
+    }
+    setSelectedCalendarFilterDate(null);
+  };
+
+  // Filter bookings
+  const filteredBookings = bookings.filter(b => {
+    if (!selectedCalendarFilterDate) return true;
+    return getBookingDateString(b) === selectedCalendarFilterDate;
+  });
 
   if (loading) {
     return (
@@ -1118,125 +1221,167 @@ export default function AdminDashboard() {
 
         {/* TAB 3: BOOKINGS */}
         {activeTab === "bookings" && (
-          <div className="space-y-8 animate-fade-in">
-            <div>
-              <h1 className="font-display-lg text-display-md text-foreground">Consultation Calendar</h1>
-              <p className="font-body-md text-body-md text-on-surface-variant">Manage scheduled institutional sessions and confirmation queue.</p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-              {/* List of Bookings */}
-              <div className="lg:col-span-7 bg-[#111110] border border-outline-variant/10 p-6 space-y-6">
-                <div className="flex justify-between items-center pb-2 border-b border-outline-variant/10">
-                  <h3 className="font-display-lg text-headline-md text-foreground">
-                    Scheduled Bookings List
-                  </h3>
-                  <button
-                    onClick={() => {
-                      setNewBookingName("");
-                      setNewBookingEmail("");
-                      setNewBookingPhone("");
-                      setNewBookingDay(1);
-                      setNewBookingSlot("09:00 AM");
-                      setNewBookingStatus("Confirmed");
-                      setShowingAddBookingModal(true);
-                    }}
-                    className="inline-flex items-center gap-1 bg-secondary text-primary-container hover:bg-transparent hover:text-secondary px-3 py-1.5 font-label-caps text-[10px] border border-secondary transition-all cursor-pointer"
-                  >
-                    <span className="material-symbols-outlined text-[14px]">add</span> Add Booking
-                  </button>
-                </div>
-                <div className="space-y-4">
-                  {bookings.map(b => (
-                    <div key={b.id} className="border border-outline-variant/15 bg-[#181817] p-5 flex flex-col sm:flex-row justify-between gap-4">
-                      <div>
-                        <div className="flex items-center gap-3">
-                          <h4 className="font-body-md text-body-md text-foreground font-bold">{b.clientName}</h4>
-                          <span className={`px-2 py-0.5 text-[8px] font-label-caps uppercase ${
-                            b.status === "Confirmed" ? "border border-emerald-400/30 text-emerald-400" : "border border-amber-400/30 text-amber-400"
-                          }`}>
-                            {b.status}
-                          </span>
-                        </div>
-                        <p className="font-body-sm text-[12px] text-on-surface-variant mt-1">
-                          Email: {b.clientEmail} | Phone: {b.clientPhone}
-                        </p>
-                        <p className="font-body-md text-body-sm text-secondary mt-2 flex items-center gap-1.5">
-                          <span className="material-symbols-outlined text-[16px]">schedule</span>
-                          October {b.day}, 2026 at {b.timeSlot}
-                        </p>
-                      </div>
-
-                      <div className="flex sm:flex-col justify-end gap-2">
-                        {b.status !== "Confirmed" && (
-                          <button
-                            onClick={() => handleConfirmBooking(b.id)}
-                            className="bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] uppercase border border-secondary hover:bg-transparent hover:text-secondary transition-all cursor-pointer"
-                          >
-                            Confirm
-                          </button>
-                        )}
-                        <button
-                          onClick={() => handleRescheduleBooking(b.id)}
-                          className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-4 py-2 font-label-caps text-[10px] uppercase transition-colors cursor-pointer"
-                        >
-                          Reschedule
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+          <div className="space-y-8 animate-fade-in text-left">
+              <div>
+                <h1 className="font-display-lg text-display-md text-foreground">Consultation Calendar</h1>
+                <p className="font-body-md text-body-md text-on-surface-variant">Manage scheduled institutional sessions and confirmation queue.</p>
               </div>
 
-              {/* October 2026 Calendar view */}
-              <div className="lg:col-span-5 bg-[#111110] border border-outline-variant/10 p-6">
-                <h3 className="font-display-lg text-headline-md text-foreground pb-2 border-b border-outline-variant/10 mb-6">
-                  Calendar Grid View
-                </h3>
-                <div className="border border-outline-variant/20 bg-surface-dim p-4">
-                  <div className="text-center mb-4">
-                    <span className="font-data-tabular text-data-tabular text-foreground font-bold">
-                      October 2026
-                    </span>
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* List of Bookings */}
+                <div className="lg:col-span-7 bg-[#111110] border border-outline-variant/10 p-6 space-y-6">
+                  <div className="flex justify-between items-center pb-2 border-b border-outline-variant/10">
+                    <div>
+                      <h3 className="font-display-lg text-headline-md text-foreground">
+                        Scheduled Bookings List
+                      </h3>
+                      {selectedCalendarFilterDate && (
+                        <div className="flex items-center gap-2 mt-1">
+                          <p className="text-xs text-secondary font-semibold">
+                            Date: {formatFriendlyDate(selectedCalendarFilterDate)}
+                          </p>
+                          <button
+                            onClick={() => setSelectedCalendarFilterDate(null)}
+                            className="text-[10px] text-red-400 hover:text-red-300 font-label-caps border border-red-500/20 px-1.5 py-0.5 rounded cursor-pointer"
+                          >
+                            Clear Filter
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => {
+                        setNewBookingName("");
+                        setNewBookingEmail("");
+                        setNewBookingPhone("");
+                        setNewBookingDate(`${currentCalendarYear}-${String(currentCalendarMonth + 1).padStart(2, "0")}-01`);
+                        setNewBookingSlot("09:00 AM");
+                        setNewBookingStatus("Confirmed");
+                        setShowingAddBookingModal(true);
+                      }}
+                      className="inline-flex items-center gap-1 bg-secondary text-primary-container hover:bg-transparent hover:text-secondary px-3 py-1.5 font-label-caps text-[10px] border border-secondary transition-all cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-[14px]">add</span> Add Booking
+                    </button>
                   </div>
-                  <div className="grid grid-cols-7 gap-1 text-center mb-2">
-                    {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
-                      <div key={i} className="font-label-caps text-label-caps text-on-surface-variant text-[10px]">
-                        {d}
+                  <div className="space-y-4">
+                    {filteredBookings.map(b => (
+                      <div key={b.id} className="border border-outline-variant/15 bg-[#181817] p-5 flex flex-col sm:flex-row justify-between gap-4">
+                        <div>
+                          <div className="flex items-center gap-3">
+                            <h4 className="font-body-md text-body-md text-foreground font-bold">{b.clientName}</h4>
+                            <span className={`px-2 py-0.5 text-[8px] font-label-caps uppercase ${
+                              b.status === "Confirmed" ? "border border-emerald-400/30 text-emerald-400" : "border border-amber-400/30 text-amber-400"
+                            }`}>
+                              {b.status}
+                            </span>
+                          </div>
+                          <p className="font-body-sm text-[12px] text-on-surface-variant mt-1">
+                            Email: {b.clientEmail} | Phone: {b.clientPhone}
+                          </p>
+                          <p className="font-body-md text-body-sm text-secondary mt-2 flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-[16px]">schedule</span>
+                            {formatFriendlyDate(getBookingDateString(b))} at {b.timeSlot}
+                          </p>
+                        </div>
+
+                        <div className="flex sm:flex-col justify-end gap-2">
+                          {b.status !== "Confirmed" && (
+                            <button
+                              onClick={() => handleConfirmBooking(b.id)}
+                              className="bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] uppercase border border-secondary hover:bg-transparent hover:text-secondary transition-all cursor-pointer"
+                            >
+                              Confirm
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleRescheduleBooking(b.id)}
+                            className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-4 py-2 font-label-caps text-[10px] uppercase transition-colors cursor-pointer"
+                          >
+                            Reschedule
+                          </button>
+                        </div>
                       </div>
                     ))}
+                    {filteredBookings.length === 0 && (
+                      <p className="font-body-sm text-body-sm text-on-surface-variant text-center py-8">No scheduled sessions for this selection.</p>
+                    )}
                   </div>
-                  <div className="grid grid-cols-7 gap-1 text-center">
-                    {/* Offset */}
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    {Array.from({ length: 15 }, (_, i) => i + 1).map(day => {
-                      const dayBookings = bookings.filter(b => b.day === day);
-                      const hasConfirmed = dayBookings.some(b => b.status === "Confirmed");
-                      const hasPending = dayBookings.some(b => b.status === "Pending");
-                      
-                      let bgClass = "";
-                      if (hasConfirmed) bgClass = "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400";
-                      else if (hasPending) bgClass = "bg-amber-500/10 border border-amber-500/30 text-amber-400";
+                </div>
 
-                      return (
-                        <div
-                          key={day}
-                          className={`p-2 font-data-tabular text-data-tabular text-foreground text-xs h-10 flex flex-col justify-between items-center relative ${bgClass}`}
-                        >
-                          <span>{day}</span>
-                          {dayBookings.length > 0 && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                          )}
+                {/* Dynamic Full Calendar View */}
+                <div className="lg:col-span-5 bg-[#111110] border border-outline-variant/10 p-6 flex flex-col">
+                  <div className="flex justify-between items-center border-b border-outline-variant/10 pb-2 mb-6">
+                    <h3 className="font-display-lg text-headline-md text-foreground">
+                      Calendar View
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handlePrevMonth}
+                        className="p-1 hover:text-secondary cursor-pointer text-foreground"
+                      >
+                        <span className="material-symbols-outlined text-sm">chevron_left</span>
+                      </button>
+                      <span className="font-data-tabular text-[12px] text-foreground font-bold tracking-wider uppercase min-w-[120px] text-center">
+                        {monthNames[currentCalendarMonth]} {currentCalendarYear}
+                      </span>
+                      <button
+                        onClick={handleNextMonth}
+                        className="p-1 hover:text-secondary cursor-pointer text-foreground"
+                      >
+                        <span className="material-symbols-outlined text-sm">chevron_right</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div className="border border-outline-variant/20 bg-surface-dim p-4 flex-grow">
+                    <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                      {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
+                        <div key={i} className="font-label-caps text-label-caps text-on-surface-variant text-[10px] font-bold">
+                          {d}
                         </div>
-                      );
-                    })}
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-7 gap-1 text-center">
+                      {/* Offset empty boxes */}
+                      {Array.from({ length: firstDayOffset }).map((_, i) => (
+                        <div key={`offset-${i}`} className="p-2 opacity-20"></div>
+                      ))}
+                      {/* Real days */}
+                      {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
+                        const dateStr = `${currentCalendarYear}-${String(currentCalendarMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                        const dayBookings = bookings.filter(b => getBookingDateString(b) === dateStr);
+                        const hasConfirmed = dayBookings.some(b => b.status === "Confirmed");
+                        const hasPending = dayBookings.some(b => b.status === "Pending");
+
+                        let bgClass = "hover:bg-surface-container-high cursor-pointer transition-colors";
+                        if (selectedCalendarFilterDate === dateStr) {
+                          bgClass = "bg-secondary text-primary-container font-bold border border-secondary";
+                        } else if (hasConfirmed) {
+                          bgClass = "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 cursor-pointer";
+                        } else if (hasPending) {
+                          bgClass = "bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 cursor-pointer";
+                        }
+
+                        return (
+                          <button
+                            key={day}
+                            onClick={() => setSelectedCalendarFilterDate(selectedCalendarFilterDate === dateStr ? null : dateStr)}
+                            className={`p-2 font-data-tabular text-data-tabular text-foreground text-xs h-10 flex flex-col justify-between items-center relative rounded-none border border-transparent ${bgClass}`}
+                          >
+                            <span className={selectedCalendarFilterDate === dateStr ? "text-primary-container font-bold" : "text-foreground"}>
+                              {day}
+                            </span>
+                            {dayBookings.length > 0 && (
+                              <span className={`w-1.5 h-1.5 rounded-full ${selectedCalendarFilterDate === dateStr ? "bg-primary-container" : "bg-secondary"}`}></span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
         )}
 
         {/* TAB 4: SETTINGS */}
@@ -1866,16 +2011,13 @@ export default function AdminDashboard() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="font-body-sm text-body-sm text-foreground">October Day (1-15)</label>
-                    <select
-                      value={newBookingDay}
-                      onChange={(e) => setNewBookingDay(Number(e.target.value))}
-                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-2 focus:outline-none focus:border-secondary"
-                    >
-                      {Array.from({ length: 15 }, (_, i) => i + 1).map(day => (
-                        <option key={day} value={day}>October {day}, 2026</option>
-                      ))}
-                    </select>
+                    <label className="font-body-sm text-body-sm text-foreground">Booking Date</label>
+                    <input
+                      type="date"
+                      value={newBookingDate}
+                      onChange={(e) => setNewBookingDate(e.target.value)}
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                    />
                   </div>
                   <div className="space-y-1">
                     <label className="font-body-sm text-body-sm text-foreground">Time Slot</label>
@@ -1915,6 +2057,67 @@ export default function AdminDashboard() {
                 </button>
                 <button
                   onClick={() => setShowingAddBookingModal(false)}
+                  className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-6 py-3 font-label-caps text-label-caps transition-colors cursor-pointer text-xs"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Reschedule Booking Modal */}
+        {activeRescheduleBooking && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070707]/80 backdrop-blur-sm p-4">
+            <div className="bg-[#111110] border border-secondary/30 p-6 max-w-lg w-full relative space-y-5">
+              <button
+                onClick={() => setActiveRescheduleBooking(null)}
+                className="absolute top-4 right-4 text-on-surface-variant hover:text-foreground cursor-pointer"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+
+              <div>
+                <h3 className="font-display-lg text-headline-md text-foreground">Reschedule Booking</h3>
+                <p className="font-body-sm text-[12px] text-on-surface-variant mt-1">Select a new date and time slot for {activeRescheduleBooking.clientName}.</p>
+              </div>
+
+              <div className="space-y-4 text-left">
+                <div className="space-y-1">
+                  <label className="font-body-sm text-body-sm text-foreground">New Date</label>
+                  <input
+                    type="date"
+                    value={rescheduleDate}
+                    onChange={(e) => setRescheduleDate(e.target.value)}
+                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-body-sm text-body-sm text-foreground">New Time Slot</label>
+                  <select
+                    value={rescheduleSlot}
+                    onChange={(e) => setRescheduleSlot(e.target.value)}
+                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-2 focus:outline-none focus:border-secondary"
+                  >
+                    <option value="09:00 AM">09:00 AM</option>
+                    <option value="10:30 AM">10:30 AM</option>
+                    <option value="01:00 PM">01:00 PM</option>
+                    <option value="03:00 PM">03:00 PM</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex gap-4 pt-2">
+                <button
+                  onClick={handleSaveReschedule}
+                  disabled={savingReschedule}
+                  className="flex-grow bg-secondary text-primary-container py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer text-xs"
+                >
+                  {savingReschedule ? "Rescheduling..." : "Reschedule Booking"}
+                </button>
+                <button
+                  onClick={() => setActiveRescheduleBooking(null)}
                   className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-6 py-3 font-label-caps text-label-caps transition-colors cursor-pointer text-xs"
                 >
                   Cancel

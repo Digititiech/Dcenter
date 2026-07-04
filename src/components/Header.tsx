@@ -80,11 +80,11 @@ export default function Header({ locale }: { locale: "en" | "ar" }) {
               <li key={link.href} className="h-full flex items-center">
                 <Link
                   href={link.href}
-                  className={`font-label-caps text-label-caps h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300 ${
-                    active
-                      ? "text-secondary border-b-2 border-secondary pb-1"
-                      : "text-on-surface-variant hover:text-foreground"
-                  }`}
+                  className={`font-sans text-lg h-full flex items-center hover:bg-secondary/10 px-4 transition-all duration-300 ${
+                     active
+                       ? "text-secondary font-bold border-b-2 border-secondary pb-1"
+                       : "text-on-surface-variant hover:text-foreground"
+                   }`}
                 >
                   {link.label}
                 </Link>
@@ -131,9 +131,9 @@ export default function Header({ locale }: { locale: "en" | "ar" }) {
                     <Link
                       key={link.href}
                       href={link.href}
-                      className={`font-label-caps text-label-caps ${
-                        active ? "text-secondary font-bold" : "text-on-surface-variant hover:text-foreground"
-                      }`}
+                      className={`font-sans text-lg ${
+                         active ? "text-secondary font-bold" : "text-on-surface-variant hover:text-foreground"
+                       }`}
                     >
                       {link.label}
                     </Link>

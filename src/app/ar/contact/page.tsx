@@ -14,7 +14,10 @@ interface FAQ {
 
 export default function ArabicContact() {
   const [activeFAQ, setActiveFAQ] = useState<string | null>(null);
-  const [selectedDay, setSelectedDay] = useState<number>(8);
+  const today = new Date();
+  const [currentYear, setCurrentYear] = useState(today.getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+  const [selectedDate, setSelectedDate] = useState<string>(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`);
   const [selectedSlot, setSelectedSlot] = useState<string>("11:30 GST");
   const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -45,19 +48,54 @@ export default function ArabicContact() {
     },
   ];
 
+  const monthNames = [
+    "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+    "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
+  ];
+
+  const getDaysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
+  const getFirstDayOffset = (year: number, month: number) => new Date(year, month, 1).getDay();
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("ar-EG", { month: "long", day: "numeric", year: "numeric" });
+  };
+
+  const handlePrevMonth = () => {
+    if (currentMonth === 0) {
+      setCurrentMonth(11);
+      setCurrentYear(currentYear - 1);
+    } else {
+      setCurrentMonth(currentMonth - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (currentMonth === 11) {
+      setCurrentMonth(0);
+      setCurrentYear(currentYear + 1);
+    } else {
+      setCurrentMonth(currentMonth + 1);
+    }
+  };
+
   const handleConfirmConsultation = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const message = `مرحباً مركز القرار، أود حجز جلسة استشارية استراتيجية.\n\nتفاصيل العميل:\n- الاسم: ${clientName}\n- البريد الإلكتروني: ${clientEmail}\n- رقم الهاتف: ${clientPhone}\n- الخدمة المطلوبة: ${requestedService}\n\nالموعد المفضل: أكتوبر ${selectedDay} في الساعة ${selectedSlot}`;
+    const dateObj = new Date(selectedDate);
+    const day = dateObj.getDate();
+
+    const message = `مرحباً مركز القرار، أود حجز جلسة استشارية استراتيجية.\n\nتفاصيل العميل:\n- الاسم: ${clientName}\n- البريد الإلكتروني: ${clientEmail}\n- رقم الهاتف: ${clientPhone}\n- الخدمة المطلوبة: ${requestedService}\n\nالموعد المفضل: ${formatDate(selectedDate)} في الساعة ${selectedSlot}`;
 
     const newBooking = {
       clientName,
       clientEmail,
       clientPhone,
-      day: selectedDay,
+      day,
       timeSlot: selectedSlot,
-      status: "Pending"
+      status: "Pending",
+      booking_date: selectedDate
     };
 
     try {
@@ -73,7 +111,7 @@ export default function ArabicContact() {
       const serverUrl = localStorage.getItem("wa-server-url") || "https://wa.powerpod.ae";
       
       // 1. Send confirmation to client
-      const clientMessage = `مرحباً ${clientName}، تم استلام طلب الاستشارة الاستراتيجية الخاص بك مع مركز القرار ليوم ${selectedDay} أكتوبر الساعة ${selectedSlot}. سنقوم بمراجعة طلبك وتأكيده قريباً.`;
+      const clientMessage = `مرحباً ${clientName}، تم استلام طلب الاستشارة الاستراتيجية الخاص بك مع مركز القرار ليوم ${formatDate(selectedDate)} الساعة ${selectedSlot}. سنقوم بمراجعة طلبك وتأكيده قريباً.`;
       
       await fetch(`${serverUrl}/api/send-whatsapp`, {
         method: "POST",
@@ -112,24 +150,6 @@ export default function ArabicContact() {
   const toggleFAQ = (id: string) => {
     setActiveFAQ(activeFAQ === id ? null : id);
   };
-
-  const days = [
-    { num: 1, current: false },
-    { num: 2, current: false },
-    { num: 3, current: false },
-    { num: 4, current: false },
-    { num: 5, current: true },
-    { num: 6, current: true },
-    { num: 7, current: true },
-    { num: 8, current: true },
-    { num: 9, current: true },
-    { num: 10, current: true },
-    { num: 11, current: false },
-    { num: 12, current: false },
-    { num: 13, current: true },
-    { num: 14, current: true },
-    { num: 15, current: true },
-  ];
 
   const timeSlots = ["09:00 GST", "11:30 GST", "14:00 GST", "16:00 GST"];
 
@@ -282,15 +302,21 @@ export default function ArabicContact() {
                 {/* Calendar Widget */}
                 <div className="border border-outline-variant/20 bg-surface-dim p-4">
                   <div className="flex justify-between items-center mb-4" dir="ltr">
-                    <span className="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-secondary">
+                    <button 
+                      onClick={handlePrevMonth}
+                      className="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-secondary"
+                    >
                       chevron_left
-                    </span>
+                    </button>
                     <span id="current-month" className="font-data-tabular text-data-tabular text-foreground font-bold">
-                      أكتوبر ٢٠٢٦
+                      {monthNames[currentMonth]} {currentYear}
                     </span>
-                    <span className="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-secondary">
+                    <button 
+                      onClick={handleNextMonth}
+                      className="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-secondary"
+                    >
                       chevron_right
-                    </span>
+                    </button>
                   </div>
                   <div className="grid grid-cols-7 gap-1 text-center mb-2">
                     {["ح", "ن", "ث", "ر", "خ", "ج", "س"].map((d, index) => (
@@ -301,28 +327,25 @@ export default function ArabicContact() {
                   </div>
                   <div className="grid grid-cols-7 gap-1 text-center" dir="ltr">
                     {/* offset slots */}
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    {days.map((d, index) => {
-                      if (!d.current) {
-                        return (
-                          <div key={index} className="p-2 font-data-tabular text-data-tabular text-outline-variant">
-                            {d.num}
-                          </div>
-                        );
-                      }
-                      const isSelected = selectedDay === d.num;
+                    {Array.from({ length: getFirstDayOffset(currentYear, currentMonth) }).map((_, i) => (
+                      <div key={`offset-${i}`} className="p-2"></div>
+                    ))}
+                    {/* real days */}
+                    {Array.from({ length: getDaysInMonth(currentYear, currentMonth) }, (_, i) => {
+                      const dayNum = i + 1;
+                      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(dayNum).padStart(2, "0")}`;
+                      const isSelected = selectedDate === dateStr;
                       return (
-                        <div
-                          key={index}
-                          onClick={() => setSelectedDay(d.num)}
+                        <button
+                          key={dayNum}
+                          type="button"
+                          onClick={() => setSelectedDate(dateStr)}
                           className={`p-2 font-data-tabular text-data-tabular text-foreground cursor-pointer hover:border hover:border-secondary ${
                             isSelected ? "border border-secondary text-secondary bg-secondary/10" : ""
                           }`}
                         >
-                          {d.num}
-                        </div>
+                          {dayNum}
+                        </button>
                       );
                     })}
                   </div>
@@ -331,7 +354,7 @@ export default function ArabicContact() {
                 {/* Time Slots & CTA */}
                 <form onSubmit={handleConfirmConsultation} className="flex flex-col">
                   <p className="font-label-caps text-label-caps text-on-surface-variant mb-4">
-                    المواعيد المتاحة ليوم {selectedDay} أكتوبر
+                    المواعيد المتاحة ليوم {formatDate(selectedDate)}
                   </p>
                   <div className="grid grid-cols-2 gap-3 mb-6">
                     {timeSlots.map((slot) => {
@@ -416,7 +439,7 @@ export default function ArabicContact() {
                   </button>
                   {showConfirmation && (
                     <div className="mt-4 text-secondary font-label-caps text-xs text-center border border-secondary/30 p-2 bg-secondary/5">
-                      تم تأكيد موعد الاستشارة ليوم {selectedDay} أكتوبر في تمام الساعة {selectedSlot} بنجاح!
+                      تم تأكيد موعد الاستشارة ليوم {formatDate(selectedDate)} في تمام الساعة {selectedSlot} بنجاح!
                     </div>
                   )}
                 </form>
