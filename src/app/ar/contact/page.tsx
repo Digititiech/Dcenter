@@ -31,13 +31,30 @@ export default function ArabicContact() {
   const [busyTimeSlots, setBusyTimeSlots] = useState<{ start: string; end: string }[]>([]);
   const [dbBookings, setDbBookings] = useState<{ timeSlot: string }[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
+  const [timezoneValue, setTimezoneValue] = useState("Asia/Muscat");
+  const [timezoneLabel, setTimezoneLabel] = useState("GST");
 
-  const timeSlots = ["09:00 GST", "11:30 GST", "14:00 GST", "16:00 GST"];
+  const getTimezoneLabel = (tz: string) => {
+    if (tz === "Asia/Riyadh") return "AST";
+    if (tz === "Europe/London") return "GMT";
+    if (tz === "UTC") return "UTC";
+    return "GST";
+  };
+
+  const getTimezoneOffset = (tz: string) => {
+    if (tz === "Asia/Riyadh") return "+03:00";
+    if (tz === "Europe/London") return "+00:00";
+    if (tz === "UTC") return "+00:00";
+    return "+04:00";
+  };
+
+  const baseSlots = ["09:00", "11:30", "14:00", "16:00"];
 
   const getFilteredTimeSlots = () => {
     if (!dayAvailability || !dayAvailability.is_available) return [];
     
-    return timeSlots.filter(slot => {
+    const slots = baseSlots.map(time => `${time} ${timezoneLabel}`);
+    return slots.filter(slot => {
       // 1. Check if within working hours
       const slotTime = slot.split(" ")[0]; // "09:00"
       if (slotTime < dayAvailability.time_from || slotTime > dayAvailability.time_to) {
@@ -49,7 +66,8 @@ export default function ArabicContact() {
       if (inDb) return false;
 
       // 3. Check if overlaps with Google Calendar events
-      const slotStart = new Date(`${selectedDate}T${slotTime}:00+04:00`).getTime();
+      const offset = getTimezoneOffset(timezoneValue);
+      const slotStart = new Date(`${selectedDate}T${slotTime}:00${offset}`).getTime();
       const slotEnd = slotStart + 2.5 * 60 * 60 * 1000; // assume 2.5 hour slots
       
       const isBusy = busyTimeSlots.some(busy => {
@@ -68,8 +86,24 @@ export default function ArabicContact() {
       const dateObj = new Date(selectedDate);
       const dayOfWeek = dateObj.getDay();
 
-      // 1. Fetch Availability from Supabase
+      // 1. Fetch Timezone and Availability from Supabase
+      let selectedTz = "Asia/Muscat";
       if (isSupabaseConfigured()) {
+        try {
+          const { data: tzData } = await supabase
+            .from("settings")
+            .select("value")
+            .eq("key", "calendar_timezone")
+            .maybeSingle();
+          if (tzData?.value) {
+            selectedTz = tzData.value;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+        setTimezoneValue(selectedTz);
+        setTimezoneLabel(getTimezoneLabel(selectedTz));
+
         try {
           const { data, error } = await supabase
             .from("calendar_availability")
@@ -89,6 +123,13 @@ export default function ArabicContact() {
           console.error(e);
         }
       } else {
+        const savedTz = localStorage.getItem("calendar-timezone");
+        if (savedTz) {
+          selectedTz = savedTz;
+        }
+        setTimezoneValue(selectedTz);
+        setTimezoneLabel(getTimezoneLabel(selectedTz));
+
         const localAvail = localStorage.getItem("calendar-availability");
         if (localAvail) {
           const list = JSON.parse(localAvail);
