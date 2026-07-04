@@ -310,3 +310,73 @@
 .light-admin .bg-\[\#070707\] {
   background-color: #f3f4f6 !important;
 }
+
+/* Modals & Overlays */
+.light-admin .bg-\[\#070707\]\/80 {
+  background-color: rgba(243, 244, 246, 0.8) !important;
+}
+.light-admin .bg-\[\#070707\]\/85 {
+  background-color: rgba(243, 244, 246, 0.85) !important;
+}
+.light-admin .bg-\[\#070707\]\/90 {
+  background-color: rgba(243, 244, 246, 0.9) !important;
+}
+.light-admin .bg-\[\#070707\]\/95 {
+  background-color: rgba(243, 244, 246, 0.95) !important;
+}
+
+/* Alert Badges & Logs */
+.light-admin .text-amber-500 {
+  color: #d97706 !important;
+}
+.light-admin .text-red-400 {
+  color: #dc2626 !important;
+}
+.light-admin .text-red-500 {
+  color: #dc2626 !important;
+}
+.light-admin .bg-red-500\/5 {
+  background-color: rgba(220, 38, 38, 0.05) !important;
+}
+.light-admin .border-red-500\/30 {
+  border-color: rgba(220, 38, 38, 0.3) !important;
+}
+
+/* Calendar Cells */
+.light-admin .bg-emerald-500\/10 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+.light-admin .border-emerald-500\/30 {
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+.light-admin .text-emerald-400 {
+  color: #059669 !important;
+}
+.light-admin .bg-amber-500\/10 {
+  background-color: rgba(217, 119, 6, 0.1) !important;
+}
+.light-admin .border-amber-500\/30 {
+  border-color: rgba(217, 119, 6, 0.3) !important;
+}
+.light-admin .text-amber-400 {
+  color: #d97706 !important;
+}
+.light-admin .hover\:bg-surface-container-high:hover {
+  background-color: #f3f4f6 !important;
+}
+.light-admin .hover\:bg-red-500\/10:hover {
+  background-color: rgba(220, 38, 38, 0.1) !important;
+}
+.light-admin .hover\:bg-red-500\/15:hover {
+  background-color: rgba(220, 38, 38, 0.15) !important;
+}
+.light-admin .hover\:bg-secondary:hover {
+  background-color: #dab36a !important;
+  color: #ffffff !important;
+}
+.light-admin .bg-surface-container-low {
+  background-color: #ffffff !important;
+}
+.light-admin .bg-surface-dim {
+  background-color: #f9fafb !important;
+}
