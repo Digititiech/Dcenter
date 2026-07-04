@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
+import { adminTranslations } from "@/lib/adminTranslations";
 
 interface Lead {
   id: string;
@@ -37,6 +38,13 @@ interface PresetMessage {
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const [locale, setLocale] = useState<"en" | "ar">("en");
+  const t = adminTranslations[locale].dashboard;
+  const toggleLocale = () => {
+    const next = locale === "en" ? "ar" : "en";
+    setLocale(next);
+    localStorage.setItem("admin-locale", next);
+  };
   const [activeTab, setActiveTab] = useState<"overview" | "crm" | "bookings" | "settings">("overview");
   const [activeSettingsTab, setActiveSettingsTab] = useState<"email" | "calendar" | "whatsapp" | "rbac">("email");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
@@ -697,6 +705,10 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
+    const savedLocale = localStorage.getItem("admin-locale") as "en" | "ar" | null;
+    if (savedLocale === "ar" || savedLocale === "en") {
+      setLocale(savedLocale);
+    }
     // Authenticate Admin Session
     const supabaseConfigured = isSupabaseConfigured();
     setIsUsingSupabase(supabaseConfigured);
@@ -1417,6 +1429,8 @@ export default function AdminDashboard() {
   };
 
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const monthNamesAr = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+  const currentMonthNames = locale === "ar" ? monthNamesAr : monthNames;
 
   const getDaysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
   const getFirstDayOffset = (year: number, month: number) => new Date(year, month, 1).getDay();
@@ -1473,58 +1487,69 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className={`flex h-screen overflow-hidden bg-[#070707] ${theme === "light" ? "light-admin" : ""}`}>
+    <div
+      dir={locale === "ar" ? "rtl" : "ltr"}
+      style={locale === "ar" ? { fontFamily: "var(--font-arabic), var(--font-sans)" } : {}}
+      className={`flex h-screen overflow-hidden bg-[#070707] ${theme === "light" ? "light-admin" : ""}`}
+    >
       {/* Sidebar Navigation */}
-      <aside className="w-64 bg-[#111110] border-r border-outline-variant/10 flex flex-col justify-between">
+      <aside className="w-64 bg-[#111110] border-r rtl:border-r-0 rtl:border-l border-outline-variant/10 flex flex-col justify-between">
         <div>
           <div className="p-6 border-b border-outline-variant/10">
             <h2 className="font-display-lg text-headline-sm text-foreground tracking-wider">
-              DC Portal
+              {t.sidebar.portalTitle}
             </h2>
             <p className="font-body-sm text-[10px] text-secondary uppercase tracking-widest mt-1">
-              {isUsingSupabase ? "Supabase Connected" : "Local Mock Sandbox"}
+              {isUsingSupabase ? t.sidebar.connected : t.sidebar.mockSandbox}
             </p>
           </div>
           <nav className="p-4 space-y-2">
             <button
               onClick={() => setActiveTab("overview")}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-left font-label-caps text-label-caps transition-colors cursor-pointer ${
-                activeTab === "overview" ? "bg-secondary/10 text-secondary border-l-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
+              className={`w-full flex items-center gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
+                activeTab === "overview" ? "bg-secondary/10 text-secondary border-l-2 rtl:border-l-0 rtl:border-r-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
               }`}
             >
               <span className="material-symbols-outlined text-[18px]">dashboard</span>
-              Overview
+              {t.sidebar.tabOverview}
             </button>
             <button
               onClick={() => setActiveTab("crm")}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-left font-label-caps text-label-caps transition-colors cursor-pointer ${
-                activeTab === "crm" ? "bg-secondary/10 text-secondary border-l-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
+              className={`w-full flex items-center gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
+                activeTab === "crm" ? "bg-secondary/10 text-secondary border-l-2 rtl:border-l-0 rtl:border-r-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
               }`}
             >
               <span className="material-symbols-outlined text-[18px]">people</span>
-              CRM Leads
+              {t.sidebar.tabCrm}
             </button>
             <button
               onClick={() => setActiveTab("bookings")}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-left font-label-caps text-label-caps transition-colors cursor-pointer ${
-                activeTab === "bookings" ? "bg-secondary/10 text-secondary border-l-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
+              className={`w-full flex items-center gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
+                activeTab === "bookings" ? "bg-secondary/10 text-secondary border-l-2 rtl:border-l-0 rtl:border-r-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
               }`}
             >
               <span className="material-symbols-outlined text-[18px]">calendar_month</span>
-              Bookings
+              {t.sidebar.tabBookings}
             </button>
             <button
               onClick={() => setActiveTab("settings")}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-left font-label-caps text-label-caps transition-colors cursor-pointer ${
-                activeTab === "settings" ? "bg-secondary/10 text-secondary border-l-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
+              className={`w-full flex items-center gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
+                activeTab === "settings" ? "bg-secondary/10 text-secondary border-l-2 rtl:border-l-0 rtl:border-r-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
               }`}
             >
               <span className="material-symbols-outlined text-[18px]">settings</span>
-              Settings
+              {t.sidebar.tabSettings}
             </button>
           </nav>
         </div>
         <div className="p-4 border-t border-outline-variant/10 space-y-3">
+          <button
+            onClick={toggleLocale}
+            className="w-full flex items-center justify-center gap-2 border border-outline-variant/30 hover:border-secondary hover:text-secondary text-foreground py-2.5 font-label-caps text-label-caps transition-all cursor-pointer text-xs"
+          >
+            <span className="material-symbols-outlined text-sm">language</span>
+            {locale === "en" ? "العربية (Arabic)" : "English (الإنجليزية)"}
+          </button>
           <button
             onClick={() => {
               const next = theme === "dark" ? "light" : "dark";
@@ -1536,14 +1561,14 @@ export default function AdminDashboard() {
             <span className="material-symbols-outlined text-sm">
               {theme === "light" ? "dark_mode" : "light_mode"}
             </span>
-            {theme === "light" ? "Dark Theme" : "Light Theme"}
+            {theme === "light" ? t.sidebar.themeDark : t.sidebar.themeLight}
           </button>
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 text-red-400 py-2.5 font-label-caps text-label-caps transition-all cursor-pointer text-xs"
           >
             <span className="material-symbols-outlined text-sm">logout</span>
-            Exit Console
+            {t.sidebar.exitConsole}
           </button>
         </div>
       </aside>
@@ -1555,41 +1580,41 @@ export default function AdminDashboard() {
         {activeTab === "overview" && (
           <div className="space-y-8 animate-fade-in">
             <div>
-              <h1 className="font-display-lg text-display-md text-foreground">Operational Overview</h1>
-              <p className="font-body-md text-body-md text-on-surface-variant">Real-time system health and action center.</p>
+              <h1 className="font-display-lg text-display-md text-foreground">{t.overview.title}</h1>
+              <p className="font-body-md text-body-md text-on-surface-variant">{t.overview.subtitle}</p>
             </div>
 
             {/* Quick Metrics Grid */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="bg-[#111110] border border-outline-variant/15 p-6 relative overflow-hidden">
-                <span className="material-symbols-outlined absolute right-4 top-4 text-secondary/10 text-6xl">people</span>
-                <p className="font-label-caps text-label-caps text-on-surface-variant">Total Leads</p>
+                <span className="material-symbols-outlined absolute right-4 top-4 rtl:right-auto rtl:left-4 text-secondary/10 text-6xl">people</span>
+                <p className="font-label-caps text-label-caps text-on-surface-variant">{t.overview.totalLeads}</p>
                 <p className="font-display-lg text-display-lg text-foreground mt-2">{leads.length}</p>
               </div>
               <div className="bg-[#111110] border border-outline-variant/15 p-6 relative overflow-hidden">
-                <span className="material-symbols-outlined absolute right-4 top-4 text-secondary/10 text-6xl">calendar_today</span>
-                <p className="font-label-caps text-label-caps text-on-surface-variant">Active Bookings</p>
+                <span className="material-symbols-outlined absolute right-4 top-4 rtl:right-auto rtl:left-4 text-secondary/10 text-6xl">calendar_today</span>
+                <p className="font-label-caps text-label-caps text-on-surface-variant">{t.overview.activeBookings}</p>
                 <p className="font-display-lg text-display-lg text-foreground mt-2">
                   {bookings.filter(b => b.status === "Confirmed").length}
                 </p>
               </div>
               <div className="bg-[#111110] border border-outline-variant/15 p-6 relative overflow-hidden">
-                <span className="material-symbols-outlined absolute right-4 top-4 text-secondary/10 text-6xl">mail</span>
-                <p className="font-label-caps text-label-caps text-on-surface-variant">SMTP Status</p>
+                <span className="material-symbols-outlined absolute right-4 top-4 rtl:right-auto rtl:left-4 text-secondary/10 text-6xl">mail</span>
+                <p className="font-label-caps text-label-caps text-on-surface-variant">{t.overview.smtpStatus}</p>
                 <p className="font-display-lg text-headline-lg text-emerald-400 mt-4 flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Active
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> {t.overview.smtpActive}
                 </p>
               </div>
               <div className="bg-[#111110] border border-outline-variant/15 p-6 relative overflow-hidden">
-                <span className="material-symbols-outlined absolute right-4 top-4 text-secondary/10 text-6xl">qr_code_2</span>
-                <p className="font-label-caps text-label-caps text-on-surface-variant">WhatsApp Link</p>
+                <span className="material-symbols-outlined absolute right-4 top-4 rtl:right-auto rtl:left-4 text-secondary/10 text-6xl">qr_code_2</span>
+                <p className="font-label-caps text-label-caps text-on-surface-variant">{t.overview.waLink}</p>
                 <p className={`font-display-lg text-headline-lg mt-4 flex items-center gap-2 ${
                   qrStatus === "connected" ? "text-emerald-400" : "text-amber-400"
                 }`}>
                   <span className={`w-2.5 h-2.5 rounded-full ${
                     qrStatus === "connected" ? "bg-emerald-400" : "bg-amber-400 animate-pulse"
                   }`}></span>
-                  {qrStatus === "connected" ? "Connected" : "Offline"}
+                  {qrStatus === "connected" ? t.overview.waConnected : t.overview.waOffline}
                 </p>
               </div>
             </div>
@@ -1598,7 +1623,7 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="bg-[#111110] border border-outline-variant/10 p-6">
                 <h3 className="font-display-lg text-headline-md text-foreground mb-4 pb-2 border-b border-outline-variant/10">
-                  Recent Booking Requests
+                  {locale === "ar" ? "طلبات الحجز الأخيرة" : "Recent Booking Requests"}
                 </h3>
                 <div className="space-y-4">
                   {bookings.filter(b => b.status === "Pending").map(b => (
@@ -1606,26 +1631,28 @@ export default function AdminDashboard() {
                       <div>
                         <p className="font-body-md text-foreground font-semibold">{b.clientName}</p>
                         <p className="font-body-sm text-[12px] text-on-surface-variant">
-                          Oct {b.day} at {b.timeSlot}
+                          {locale === "ar" ? "أكتوبر" : "Oct"} {b.day} {locale === "ar" ? "في" : "at"} {b.timeSlot}
                         </p>
                       </div>
                       <button
                         onClick={() => handleConfirmBooking(b.id)}
                         className="bg-secondary text-primary-container px-3 py-1.5 font-label-caps text-[10px] uppercase border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer"
                       >
-                        Confirm
+                        {locale === "ar" ? "تأكيد" : "Confirm"}
                       </button>
                     </div>
                   ))}
                   {bookings.filter(b => b.status === "Pending").length === 0 && (
-                    <p className="font-body-sm text-body-sm text-on-surface-variant text-center py-4">No pending requests.</p>
+                    <p className="font-body-sm text-body-sm text-on-surface-variant text-center py-4">
+                      {locale === "ar" ? "لا توجد طلبات معلقة." : "No pending requests."}
+                    </p>
                   )}
                 </div>
               </div>
 
               <div className="bg-[#111110] border border-outline-variant/10 p-6">
                 <h3 className="font-display-lg text-headline-md text-foreground mb-4 pb-2 border-b border-outline-variant/10">
-                  Recent Inbound Leads
+                  {locale === "ar" ? "طلبات العملاء الواردة" : "Recent Inbound Leads"}
                 </h3>
                 <div className="space-y-4">
                   {leads.slice(0, 3).map(l => (
@@ -1635,7 +1662,10 @@ export default function AdminDashboard() {
                         <p className="font-body-sm text-[12px] text-secondary">{l.company}</p>
                       </div>
                       <span className="px-2.5 py-1 text-[10px] font-label-caps uppercase border border-outline-variant/30 text-on-surface-variant bg-surface-container">
-                        {l.status}
+                        {l.status === "Pending" ? t.crm.statusPending :
+                         l.status === "Contacted" ? t.crm.statusContacted :
+                         l.status === "Qualified" ? t.crm.statusQualified :
+                         l.status === "Booked" ? t.crm.statusBooked : l.status}
                       </span>
                     </div>
                   ))}
@@ -1650,21 +1680,21 @@ export default function AdminDashboard() {
           <div className="space-y-8 animate-fade-in">
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="font-display-lg text-display-md text-foreground">Qualification Engine CRM</h1>
-                <p className="font-body-md text-body-md text-on-surface-variant">List of institutional inquiries and lead profiles.</p>
+                <h1 className="font-display-lg text-display-md text-foreground">{t.crm.title}</h1>
+                <p className="font-body-md text-body-md text-on-surface-variant">{t.crm.subtitle}</p>
               </div>
             </div>
 
             <div className="bg-[#111110] border border-outline-variant/10 overflow-hidden">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full text-left rtl:text-right border-collapse">
                 <thead>
                   <tr className="border-b border-outline-variant/15 bg-surface-container-high">
-                    <th className="p-4 font-label-caps text-label-caps text-on-surface-variant">Name</th>
-                    <th className="p-4 font-label-caps text-label-caps text-on-surface-variant">Company</th>
-                    <th className="p-4 font-label-caps text-label-caps text-on-surface-variant">Contact</th>
-                    <th className="p-4 font-label-caps text-label-caps text-on-surface-variant">Timeframe</th>
-                    <th className="p-4 font-label-caps text-label-caps text-on-surface-variant">Status</th>
-                    <th className="p-4 font-label-caps text-label-caps text-on-surface-variant text-right">Actions</th>
+                    <th className="p-4 font-label-caps text-label-caps text-on-surface-variant">{locale === "ar" ? "الاسم" : "Name"}</th>
+                    <th className="p-4 font-label-caps text-label-caps text-on-surface-variant">{locale === "ar" ? "الشركة" : "Company"}</th>
+                    <th className="p-4 font-label-caps text-label-caps text-on-surface-variant">{locale === "ar" ? "الاتصال" : "Contact"}</th>
+                    <th className="p-4 font-label-caps text-label-caps text-on-surface-variant">{locale === "ar" ? "المدى الزمني" : "Timeframe"}</th>
+                    <th className="p-4 font-label-caps text-label-caps text-on-surface-variant">{t.crm.colStatus}</th>
+                    <th className="p-4 font-label-caps text-label-caps text-on-surface-variant text-right rtl:text-left">{locale === "ar" ? "الإجراءات" : "Actions"}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-outline-variant/10">
@@ -1674,14 +1704,14 @@ export default function AdminDashboard() {
                         <div className="font-semibold flex items-center gap-2">
                           {lead.name}
                           {lead.flagged_for_followup && (
-                            <span className="material-symbols-outlined text-secondary text-sm" style={{ fontVariationSettings: "'FILL' 1" }} title="Flagged for follow-up">
+                            <span className="material-symbols-outlined text-secondary text-sm" style={{ fontVariationSettings: "'FILL' 1" }} title={t.crm.followupFlagged}>
                               flag
                             </span>
                           )}
                         </div>
                         {lead.notes && (
                           <div className="text-[10px] text-secondary mt-0.5 max-w-xs truncate italic" title={lead.notes}>
-                            Note: {lead.notes}
+                            {locale === "ar" ? "ملاحظة" : "Note"}: {lead.notes}
                           </div>
                         )}
                       </td>
@@ -1697,22 +1727,26 @@ export default function AdminDashboard() {
                           onChange={(e) => handleUpdateLeadStatus(lead.id, e.target.value as any)}
                           className="bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-1.5 focus:outline-none focus:border-secondary"
                         >
-                          <option value="Pending">Pending</option>
-                          <option value="Contacted">Contacted</option>
-                          <option value="Qualified">Qualified</option>
-                          <option value="Booked">Booked</option>
+                          <option value="Pending">{t.crm.statusPending}</option>
+                          <option value="Contacted">{t.crm.statusContacted}</option>
+                          <option value="Qualified">{t.crm.statusQualified}</option>
+                          <option value="Booked">{t.crm.statusBooked}</option>
                         </select>
                       </td>
-                      <td className="p-4 text-right">
-                        <div className="flex justify-end gap-2">
+                      <td className="p-4 text-right rtl:text-left">
+                        <div className="flex justify-end rtl:justify-start gap-2">
                           <button
                             onClick={() => {
                               setActiveReachOutLead(lead);
-                              setCustomMessageText(`Hello ${lead.name}, thank you for contacting Decision Center. We have received your inquiry.`);
+                              setCustomMessageText(
+                                locale === "ar"
+                                  ? `مرحباً ${lead.name}، شكراً لتواصلك مع مركز القرار. لقد تلقينا استفسارك.`
+                                  : `Hello ${lead.name}, thank you for contacting Decision Center. We have received your inquiry.`
+                              );
                             }}
                             className="inline-flex items-center gap-1.5 border border-secondary/20 hover:border-secondary hover:text-secondary px-2.5 py-1.5 font-label-caps text-[10px] transition-colors cursor-pointer"
                           >
-                            <span className="material-symbols-outlined text-xs">chat</span> Reach Out
+                            <span className="material-symbols-outlined text-xs">chat</span> {locale === "ar" ? "تواصل" : "Reach Out"}
                           </button>
                           <button
                             onClick={() => {
@@ -1727,7 +1761,7 @@ export default function AdminDashboard() {
                             }}
                             className="inline-flex items-center gap-1.5 border border-outline-variant/30 hover:border-secondary hover:text-secondary px-2.5 py-1.5 font-label-caps text-[10px] transition-colors cursor-pointer"
                           >
-                            <span className="material-symbols-outlined text-xs">edit</span> Edit
+                            <span className="material-symbols-outlined text-xs">edit</span> {locale === "ar" ? "تعديل" : "Edit"}
                           </button>
                         </div>
                       </td>
@@ -1741,10 +1775,10 @@ export default function AdminDashboard() {
 
         {/* TAB 3: BOOKINGS */}
         {activeTab === "bookings" && (
-          <div className="space-y-8 animate-fade-in text-left">
+          <div className="space-y-8 animate-fade-in text-left rtl:text-right">
               <div>
-                <h1 className="font-display-lg text-display-md text-foreground">Consultation Calendar</h1>
-                <p className="font-body-md text-body-md text-on-surface-variant">Manage scheduled institutional sessions and confirmation queue.</p>
+                <h1 className="font-display-lg text-display-md text-foreground">{t.bookings.title}</h1>
+                <p className="font-body-md text-body-md text-on-surface-variant">{t.bookings.subtitle}</p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -1753,18 +1787,18 @@ export default function AdminDashboard() {
                   <div className="flex justify-between items-center pb-2 border-b border-outline-variant/10">
                     <div>
                       <h3 className="font-display-lg text-headline-md text-foreground">
-                        Scheduled Bookings List
+                        {locale === "ar" ? "قائمة الحجوزات المجدولة" : "Scheduled Bookings List"}
                       </h3>
                       {selectedCalendarFilterDate && (
                         <div className="flex items-center gap-2 mt-1">
                           <p className="text-xs text-secondary font-semibold">
-                            Date: {formatFriendlyDate(selectedCalendarFilterDate)}
+                            {locale === "ar" ? "التاريخ" : "Date"}: {formatFriendlyDate(selectedCalendarFilterDate)}
                           </p>
                           <button
                             onClick={() => setSelectedCalendarFilterDate(null)}
                             className="text-[10px] text-red-400 hover:text-red-300 font-label-caps border border-red-500/20 px-1.5 py-0.5 rounded cursor-pointer"
                           >
-                            Clear Filter
+                            {locale === "ar" ? "إلغاء التصفية" : "Clear Filter"}
                           </button>
                         </div>
                       )}
@@ -1781,7 +1815,7 @@ export default function AdminDashboard() {
                       }}
                       className="inline-flex items-center gap-1 bg-secondary text-primary-container hover:bg-transparent hover:text-secondary px-3 py-1.5 font-label-caps text-[10px] border border-secondary transition-all cursor-pointer"
                     >
-                      <span className="material-symbols-outlined text-[14px]">add</span> Add Booking
+                      <span className="material-symbols-outlined text-[14px]">add</span> {t.bookings.btnCreateBooking}
                     </button>
                   </div>
                   <div className="space-y-4">
@@ -1793,15 +1827,17 @@ export default function AdminDashboard() {
                             <span className={`px-2 py-0.5 text-[8px] font-label-caps uppercase ${
                               b.status === "Confirmed" ? "border border-emerald-400/30 text-emerald-400" : "border border-amber-400/30 text-amber-400"
                             }`}>
-                              {b.status}
+                              {b.status === "Confirmed" ? t.bookings.statusConfirmed :
+                               b.status === "Pending" ? t.bookings.statusPending :
+                               b.status === "Rescheduled" ? t.bookings.statusRescheduled : b.status}
                             </span>
                           </div>
                           <p className="font-body-sm text-[12px] text-on-surface-variant mt-1">
-                            Email: {b.clientEmail} | Phone: {b.clientPhone}
+                            {locale === "ar" ? "البريد الإلكتروني" : "Email"}: {b.clientEmail} | {locale === "ar" ? "الهاتف" : "Phone"}: {b.clientPhone}
                           </p>
                           <p className="font-body-md text-body-sm text-secondary mt-2 flex items-center gap-1.5">
                             <span className="material-symbols-outlined text-[16px]">schedule</span>
-                            {formatFriendlyDate(getBookingDateString(b))} at {b.timeSlot}
+                            {formatFriendlyDate(getBookingDateString(b))} {locale === "ar" ? "في الساعة" : "at"} {b.timeSlot}
                           </p>
                         </div>
 
@@ -1811,20 +1847,22 @@ export default function AdminDashboard() {
                               onClick={() => handleConfirmBooking(b.id)}
                               className="bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] uppercase border border-secondary hover:bg-transparent hover:text-secondary transition-all cursor-pointer"
                             >
-                              Confirm
+                              {locale === "ar" ? "تأكيد" : "Confirm"}
                             </button>
                           )}
                           <button
                             onClick={() => handleRescheduleBooking(b.id)}
                             className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-4 py-2 font-label-caps text-[10px] uppercase transition-colors cursor-pointer"
                           >
-                            Reschedule
+                            {locale === "ar" ? "إعادة جدولة" : "Reschedule"}
                           </button>
                         </div>
                       </div>
                     ))}
                     {filteredBookings.length === 0 && (
-                      <p className="font-body-sm text-body-sm text-on-surface-variant text-center py-8">No scheduled sessions for this selection.</p>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant text-center py-8">
+                        {locale === "ar" ? "لا توجد جلسات مجدولة لهذا التحديد." : "No scheduled sessions for this selection."}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -1833,7 +1871,7 @@ export default function AdminDashboard() {
                 <div className="lg:col-span-5 bg-[#111110] border border-outline-variant/10 p-6 flex flex-col">
                   <div className="flex justify-between items-center border-b border-outline-variant/10 pb-2 mb-6">
                     <h3 className="font-display-lg text-headline-md text-foreground">
-                      Calendar View
+                      {locale === "ar" ? "عرض التقويم" : "Calendar View"}
                     </h3>
                     <div className="flex items-center gap-2">
                       <button
@@ -1843,7 +1881,7 @@ export default function AdminDashboard() {
                         <span className="material-symbols-outlined text-sm">chevron_left</span>
                       </button>
                       <span className="font-data-tabular text-[12px] text-foreground font-bold tracking-wider uppercase min-w-[120px] text-center">
-                        {monthNames[currentCalendarMonth]} {currentCalendarYear}
+                        {currentMonthNames[currentCalendarMonth]} {currentCalendarYear}
                       </span>
                       <button
                         onClick={handleNextMonth}
@@ -1855,7 +1893,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="border border-outline-variant/20 bg-surface-dim p-4 flex-grow">
                     <div className="grid grid-cols-7 gap-1 text-center mb-2">
-                      {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
+                      {(locale === "ar" ? ["أحد", "اثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"] : ["S", "M", "T", "W", "T", "F", "S"]).map((d, i) => (
                         <div key={i} className="font-label-caps text-label-caps text-on-surface-variant text-[10px] font-bold">
                           {d}
                         </div>
@@ -1908,8 +1946,12 @@ export default function AdminDashboard() {
         {activeTab === "settings" && (
           <div className="space-y-8 max-w-4xl animate-fade-in">
             <div>
-              <h1 className="font-display-lg text-display-md text-foreground">System Integration Settings</h1>
-              <p className="font-body-md text-body-md text-on-surface-variant">Configure SMTP emails, calendar syncing, and WhatsApp endpoints.</p>
+              <h1 className="font-display-lg text-display-md text-foreground">
+                {locale === "ar" ? "إعدادات تكامل النظام" : "System Integration Settings"}
+              </h1>
+              <p className="font-body-md text-body-md text-on-surface-variant">
+                {locale === "ar" ? "تكوين إعدادات البريد الإلكتروني (SMTP)، ومزامنة التقويم، وبوابة الواتساب." : "Configure SMTP emails, calendar syncing, and WhatsApp endpoints."}
+              </p>
             </div>
 
             {/* Settings Sub-Tab Navigation */}
@@ -1922,7 +1964,7 @@ export default function AdminDashboard() {
                     : "border-transparent text-on-surface-variant hover:text-foreground"
                 }`}
               >
-                Email Settings
+                {t.settings.subtabEmail}
               </button>
               <button
                 onClick={() => setActiveSettingsTab("calendar")}
@@ -1932,7 +1974,7 @@ export default function AdminDashboard() {
                     : "border-transparent text-on-surface-variant hover:text-foreground"
                 }`}
               >
-                Calendar Settings
+                {t.settings.subtabCalendar}
               </button>
               <button
                 onClick={() => setActiveSettingsTab("whatsapp")}
@@ -1942,7 +1984,7 @@ export default function AdminDashboard() {
                     : "border-transparent text-on-surface-variant hover:text-foreground"
                 }`}
               >
-                WhatsApp Settings
+                {t.settings.subtabWhatsapp}
               </button>
               {userRole === "manager" && (
                 <button
@@ -1953,7 +1995,7 @@ export default function AdminDashboard() {
                       : "border-transparent text-on-surface-variant hover:text-foreground"
                   }`}
                 >
-                  User Management
+                  {t.settings.subtabRbac}
                 </button>
               )}
             </div>
@@ -1964,59 +2006,62 @@ export default function AdminDashboard() {
                 {/* SMTP Settings */}
                 <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
                   <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2">
-                    Email SMTP Configuration
+                    {t.settings.email.title}
                   </h3>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    {t.settings.email.desc}
+                  </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label className="font-body-sm text-body-sm text-foreground">SMTP Server</label>
+                      <label className="font-body-sm text-body-sm text-foreground">{t.settings.email.lblHost}</label>
                       <input
                         type="text"
                         value={smtpHost}
                         onChange={(e) => setSmtpHost(e.target.value)}
-                        className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary"
+                        className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary font-mono"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="font-body-sm text-body-sm text-foreground">SMTP Port</label>
+                      <label className="font-body-sm text-body-sm text-foreground">{t.settings.email.lblPort}</label>
                       <input
                         type="text"
                         value={smtpPort}
                         onChange={(e) => setSmtpPort(e.target.value)}
-                        className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary"
+                        className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary font-mono"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="font-body-sm text-body-sm text-foreground">Username</label>
+                      <label className="font-body-sm text-body-sm text-foreground">{t.settings.email.lblUser}</label>
                       <input
                         type="text"
                         value={smtpUser}
                         onChange={(e) => setSmtpUser(e.target.value)}
-                        className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary"
+                        className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary font-mono"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="font-body-sm text-body-sm text-foreground">Password</label>
+                      <label className="font-body-sm text-body-sm text-foreground">{t.settings.email.lblPass}</label>
                       <input
                         type="password"
                         value={smtpPass}
                         onChange={(e) => setSmtpPass(e.target.value)}
-                        className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary"
+                        className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 focus:outline-none focus:border-secondary font-mono"
                       />
                     </div>
                   </div>
                   <button
-                    className="bg-secondary text-primary-container px-4 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer"
+                    className="bg-secondary text-primary-container px-4 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer text-xs font-bold"
                     onClick={handleSaveSmtpSettings}
                   >
-                    Save Mail Credentials
+                    {t.settings.email.btnSave}
                   </button>
 
                   {/* Send Test Email Card */}
                   <div className="border-t border-outline-variant/10 pt-5 space-y-4">
-                    <h4 className="font-body-md text-body-md text-foreground font-semibold">Send Test Email</h4>
+                    <h4 className="font-body-md text-body-md text-foreground font-semibold">{t.settings.email.titleTest}</h4>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
                       <div className="space-y-1 sm:col-span-2">
-                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Recipient Email Address</label>
+                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">{t.settings.email.lblTestRecipient}</label>
                         <input
                           type="email"
                           placeholder="e.g. test@example.com"
@@ -2031,7 +2076,7 @@ export default function AdminDashboard() {
                           disabled={sendingTestEmail}
                           className="w-full bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer h-[34px] flex items-center justify-center"
                         >
-                          {sendingTestEmail ? "Sending..." : "Send Test Email"}
+                          {sendingTestEmail ? t.settings.email.btnSendingTest : t.settings.email.btnSendTest}
                         </button>
                       </div>
                     </div>
@@ -2047,10 +2092,10 @@ export default function AdminDashboard() {
                 <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
                   <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2 flex items-center gap-2">
                     <span className="material-symbols-outlined text-secondary">calendar_today</span>
-                    Google Calendar OAuth Integration
+                    {t.settings.calendar.title}
                   </h3>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    Authorize Decision Center to synchronize consultation bookings directly to your Google Calendar.
+                    {t.settings.calendar.desc}
                   </p>
                   <div className="flex items-center gap-4 bg-[#181817] p-4 border border-outline-variant/10">
                     <div className="w-10 h-10 rounded-none bg-surface-container flex items-center justify-center border border-outline-variant/30 flex-shrink-0">
@@ -2060,26 +2105,28 @@ export default function AdminDashboard() {
                     </div>
                     <div>
                       <p className="font-body-md text-body-md text-foreground font-semibold">
-                        {gcalConnected ? `Connected to Google Calendar` : 'Not Connected'}
+                        {gcalConnected ? t.bookings.gcalConnected : t.bookings.gcalDisconnected}
                       </p>
                       <p className="font-body-sm text-[12px] text-on-surface-variant">
-                        {gcalConnected ? `Account: ${gcalEmail}` : 'Synchronize your events via OAuth 2.0 flow'}
+                        {gcalConnected
+                          ? `${locale === "ar" ? "الحساب" : "Account"}: ${gcalEmail}`
+                          : (locale === "ar" ? "قم بمزامنة مواعيدك عبر آلية OAuth 2.0" : "Synchronize your events via OAuth 2.0 flow")}
                       </p>
                     </div>
                   </div>
 
                   <div className="space-y-2 border-t border-outline-variant/10 pt-4">
-                    <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Calendar Timezone</label>
+                    <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">{t.settings.calendar.lblTimezone}</label>
                     <div className="flex flex-col sm:flex-row gap-3">
                       <select
                         value={calendarTimezone}
                         onChange={(e) => setCalendarTimezone(e.target.value)}
                         className="flex-grow bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2.5 focus:outline-none focus:border-secondary"
                       >
-                        <option value="Asia/Muscat">Oman (GST / UTC+4) - Default</option>
-                        <option value="Asia/Dubai">Dubai (GST / UTC+4)</option>
-                        <option value="Asia/Riyadh">Saudi Arabia (AST / UTC+3)</option>
-                        <option value="Europe/London">London (GMT/BST / UTC+0/+1)</option>
+                        <option value="Asia/Muscat">{locale === "ar" ? "سلطنة عمان (توقيت الخليج / UTC+4) - الافتراضي" : "Oman (GST / UTC+4) - Default"}</option>
+                        <option value="Asia/Dubai">{locale === "ar" ? "دبي (توقيت الخليج / UTC+4)" : "Dubai (GST / UTC+4)"}</option>
+                        <option value="Asia/Riyadh">{locale === "ar" ? "المملكة العربية السعودية (UTC+3)" : "Saudi Arabia (AST / UTC+3)"}</option>
+                        <option value="Europe/London">{locale === "ar" ? "لندن (UTC+0/+1)" : "London (GMT/BST / UTC+0/+1)"}</option>
                         <option value="UTC">UTC / GMT</option>
                       </select>
                       <button
@@ -2090,19 +2137,19 @@ export default function AdminDashboard() {
                                 .from("settings")
                                 .upsert({ key: "calendar_timezone", value: calendarTimezone }, { onConflict: "key" });
                               if (error) throw error;
-                              alert("Calendar timezone saved successfully!");
+                              alert(locale === "ar" ? "تم حفظ المنطقة الزمنية بنجاح!" : "Calendar timezone saved successfully!");
                             } catch (err) {
                               console.error(err);
-                              alert("Failed to save calendar timezone.");
+                              alert(locale === "ar" ? "فشل حفظ المنطقة الزمنية." : "Failed to save calendar timezone.");
                             }
                           } else {
                             localStorage.setItem("calendar-timezone", calendarTimezone);
-                            alert("Calendar timezone saved locally!");
+                            alert(locale === "ar" ? "تم حفظ المنطقة الزمنية محلياً!" : "Calendar timezone saved locally!");
                           }
                         }}
                         className="bg-[#181817] text-secondary border border-outline-variant/30 hover:border-secondary hover:text-primary-container hover:bg-secondary px-4 py-2.5 font-label-caps text-[10px] transition-colors cursor-pointer flex items-center justify-center whitespace-nowrap"
                       >
-                        Save Timezone
+                        {locale === "ar" ? "حفظ المنطقة الزمنية" : "Save Timezone"}
                       </button>
                     </div>
                   </div>
@@ -2114,7 +2161,7 @@ export default function AdminDashboard() {
                         onClick={handleConnectGoogleCalendar}
                         className="bg-secondary text-primary-container px-6 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-50 transition-colors cursor-pointer flex items-center gap-2"
                       >
-                        <span>{gcalLoading ? 'Connecting...' : 'Connect Google Calendar'}</span>
+                        <span>{gcalLoading ? (locale === "ar" ? "جاري الاتصال..." : "Connecting...") : t.bookings.btnConnectGcal}</span>
                       </button>
                     ) : (
                       <button
@@ -2122,7 +2169,7 @@ export default function AdminDashboard() {
                         onClick={handleDisconnectGoogleCalendar}
                         className="border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 text-red-400 px-6 py-3 font-label-caps text-label-caps disabled:opacity-50 transition-all cursor-pointer flex items-center gap-2"
                       >
-                        <span>Disconnect Calendar</span>
+                        <span>{t.bookings.btnDisconnectGcal}</span>
                       </button>
                     )}
                   </div>
@@ -2132,15 +2179,14 @@ export default function AdminDashboard() {
                 <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
                   <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2 flex items-center gap-2">
                     <span className="material-symbols-outlined text-secondary">schedule</span>
-                    Consultation Weekly Availability
+                    {t.settings.calendar.weeklyAvailability}
                   </h3>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    Define the days and active operational hours when clients can book strategic sessions.
+                    {t.settings.calendar.availDesc}
                   </p>
 
                   <div className="space-y-4">
                     {availabilities.map((avail) => {
-                      const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
                       return (
                         <div
                           key={avail.day_of_week}
@@ -2162,7 +2208,7 @@ export default function AdminDashboard() {
                                 avail.is_available ? "text-foreground" : "text-on-surface-variant line-through"
                               }`}
                             >
-                              {dayNames[avail.day_of_week]}
+                              {t.settings.calendar.dayNames[avail.day_of_week]}
                             </label>
                           </div>
 
@@ -2176,7 +2222,7 @@ export default function AdminDashboard() {
                                 }
                                 className="bg-[#111110] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2 py-1.5 focus:outline-none focus:border-secondary font-mono"
                               />
-                              <span className="text-on-surface-variant text-xs">to</span>
+                              <span className="text-on-surface-variant text-xs">{locale === "ar" ? "إلى" : "to"}</span>
                               <input
                                 type="time"
                                 value={avail.time_to}
@@ -2188,7 +2234,7 @@ export default function AdminDashboard() {
                             </div>
                           ) : (
                             <span className="text-[10px] font-label-caps text-red-400 bg-red-400/5 px-2 py-0.5 border border-red-500/20 uppercase">
-                              Closed / Unavailable
+                              {locale === "ar" ? "مغلق / غير متاح" : "Closed / Unavailable"}
                             </span>
                           )}
                         </div>
@@ -2199,9 +2245,9 @@ export default function AdminDashboard() {
                   <button
                     onClick={handleSaveAvailability}
                     disabled={savingAvailability}
-                    className="bg-secondary text-primary-container px-6 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-50 transition-colors cursor-pointer flex items-center gap-2"
+                    className="bg-secondary text-primary-container px-6 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-50 transition-colors cursor-pointer flex items-center gap-2 text-xs font-bold"
                   >
-                    <span>{savingAvailability ? "Saving..." : "Save Availability Settings"}</span>
+                    <span>{savingAvailability ? t.settings.calendar.btnSaving : t.settings.calendar.btnSaveAvailability}</span>
                   </button>
                 </div>
               </div>
@@ -2213,7 +2259,7 @@ export default function AdminDashboard() {
                 {/* WhatsApp Connection */}
                 <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
                   <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2">
-                    WhatsApp API Connection (QR Code)
+                    {locale === "ar" ? "اتصال بوابة الواتساب (رمز QR)" : "WhatsApp API Connection (QR Code)"}
                   </h3>
                   
                   <div className="flex flex-col md:flex-row items-center gap-8">
@@ -2222,13 +2268,13 @@ export default function AdminDashboard() {
                         <div className="absolute inset-0 bg-[#070707]/95 flex flex-col justify-center items-center text-center p-4 gap-2 z-10">
                           <span className="material-symbols-outlined text-amber-500 text-3xl animate-pulse">cloud_off</span>
                           <p className="font-body-sm text-[11px] text-on-surface-variant">
-                            WhatsApp Server Offline. Verify the endpoint or start the bot script.
+                            {locale === "ar" ? "خادم الواتساب غير متصل. تحقق من العنوان أو ابدأ تشغيل خادم البوت." : "WhatsApp Server Offline. Verify the endpoint or start the bot script."}
                           </p>
                           <button
                             onClick={handleRefreshStatus}
                             className="mt-1 border border-secondary/20 hover:border-secondary hover:text-secondary px-2.5 py-1 font-label-caps text-[9px] transition-colors cursor-pointer text-foreground bg-transparent"
                           >
-                            Retry Connection
+                            {locale === "ar" ? "إعادة المحاولة" : "Retry Connection"}
                           </button>
                         </div>
                       )}
@@ -2236,20 +2282,20 @@ export default function AdminDashboard() {
                         <div className="absolute inset-0 bg-[#070707]/95 flex flex-col justify-center items-center text-center p-4 gap-2 z-10">
                           <span className="material-symbols-outlined text-secondary/60 text-3xl">link_off</span>
                           <p className="font-body-sm text-[11px] text-on-surface-variant">
-                            WhatsApp Disconnected. Click below to initialize session.
+                            {locale === "ar" ? "الواتساب غير متصل. انقر أدناه لبدء الاتصال بالخادم." : "WhatsApp Disconnected. Click below to initialize session."}
                           </p>
                           <button
                             disabled={initializingWa}
                             onClick={handleConnectWhatsApp}
                             className="mt-1 bg-secondary text-primary-container hover:bg-transparent hover:text-secondary px-3 py-1.5 font-label-caps text-[9px] uppercase border border-secondary transition-colors cursor-pointer"
                           >
-                            {initializingWa ? "Initializing..." : "Connect WhatsApp"}
+                            {initializingWa ? (locale === "ar" ? "جاري التشغيل..." : "Initializing...") : (locale === "ar" ? "اتصال بالواتساب" : "Connect WhatsApp")}
                           </button>
                         </div>
                       )}
                       {qrStatus === "generating" && (
                         <div className="absolute inset-0 bg-[#070707]/90 flex items-center justify-center text-secondary animate-pulse text-xs text-center p-4">
-                          Configuring session browser instance...
+                          {locale === "ar" ? "تهيئة جلسة المتصفح الخاصة بالواتساب..." : "Configuring session browser instance..."}
                         </div>
                       )}
                       {qrStatus === "waiting" && qrImage && (
@@ -2260,16 +2306,15 @@ export default function AdminDashboard() {
                       {qrStatus === "connected" && (
                         <div className="absolute inset-0 bg-emerald-500/10 flex flex-col justify-center items-center text-center p-3">
                           <span className="material-symbols-outlined text-3xl text-emerald-400">check_circle</span>
-                          <p className="font-label-caps text-label-caps text-[11px] text-emerald-400 mt-1">Active Connection</p>
+                          <p className="font-label-caps text-label-caps text-[11px] text-emerald-400 mt-1">{t.settings.whatsapp.statusConnected}</p>
                           {connectedNumber && (
                             <p className="font-mono text-[9px] text-secondary mt-0.5 break-all max-w-full px-1">{connectedNumber}</p>
                           )}
                           <button
                             onClick={handleDisconnectWhatsApp}
-                            disabled={disconnecting}
                             className="mt-2.5 border border-red-500/30 bg-red-500/5 hover:bg-red-500/15 text-red-400 px-3 py-1 font-label-caps text-[8px] transition-all cursor-pointer disabled:opacity-50"
                           >
-                            {disconnecting ? "Disconnecting..." : "Disconnect"}
+                            {disconnecting ? t.settings.whatsapp.btnDisconnecting : t.settings.whatsapp.btnDisconnect}
                           </button>
                         </div>
                       )}
@@ -2277,7 +2322,13 @@ export default function AdminDashboard() {
 
                     <div className="flex-grow space-y-4 w-full">
                       <div className="space-y-1">
-                        <p className="font-label-caps text-label-caps text-on-surface-variant">WhatsApp Server Endpoint</p>
+                        <p className="font-label-caps text-label-caps text-on-surface-variant">{t.settings.whatsapp.title}</p>
+                        <p className="font-body-sm text-body-sm text-on-surface-variant">
+                          {t.settings.whatsapp.desc}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="font-label-caps text-label-caps text-on-surface-variant">{t.settings.whatsapp.lblServerUrl}</p>
                         <div className="flex gap-2">
                           <input
                             type="text"
@@ -2290,7 +2341,7 @@ export default function AdminDashboard() {
                             onClick={handleRefreshStatus}
                             className="border border-outline-variant/30 hover:border-secondary hover:text-secondary text-foreground px-3 py-2 font-label-caps text-[10px] transition-colors cursor-pointer"
                           >
-                            Refresh Status
+                            {locale === "ar" ? "تحديث الحالة" : "Refresh Status"}
                           </button>
                           <button
                             onClick={async () => {
@@ -2298,25 +2349,25 @@ export default function AdminDashboard() {
                                 try {
                                   const { error } = await supabase.from("settings").upsert({ key: "wa_server_url", value: waServerUrl });
                                   if (error) throw error;
-                                  alert("WhatsApp URL saved in Database!");
+                                  alert(locale === "ar" ? "تم حفظ عنوان الواتساب في قاعدة البيانات!" : "WhatsApp URL saved in Database!");
                                 } catch (err) {
                                   console.error(err);
-                                  alert("Failed to save WhatsApp URL in Database.");
+                                  alert(locale === "ar" ? "فشل حفظ عنوان الواتساب." : "Failed to save WhatsApp URL.");
                                 }
                               } else {
                                 localStorage.setItem("wa-server-url", waServerUrl);
-                                alert("WhatsApp URL saved in LocalStorage!");
+                                alert(locale === "ar" ? "تم حفظ عنوان الواتساب محلياً!" : "WhatsApp URL saved in LocalStorage!");
                               }
                             }}
                             className="bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer"
                           >
-                            Save
+                            {locale === "ar" ? "حفظ" : "Save"}
                           </button>
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <p className="font-label-caps text-label-caps text-on-surface-variant">Connection Logs</p>
-                        <div className="bg-[#181817] border border-outline-variant/10 p-3 h-24 overflow-y-auto text-xs font-mono text-secondary space-y-1">
+                        <p className="font-label-caps text-label-caps text-on-surface-variant">{t.settings.whatsapp.logsTitle}</p>
+                        <div className="bg-[#181817] border border-outline-variant/10 p-3 h-24 overflow-y-auto text-xs font-mono text-secondary space-y-1" style={{ direction: "ltr" }}>
                           {connectionLogs.map((log, index) => (
                             <div key={index} className={log.includes("Handshake") || log.includes("CONNECTED") || log.includes("connected") ? "text-emerald-400" : ""}>
                               {log}
@@ -2330,16 +2381,16 @@ export default function AdminDashboard() {
                   {/* Send Test WhatsApp Message Section */}
                   <div className="border-t border-outline-variant/10 pt-5 space-y-4">
                     <div className="flex justify-between items-center">
-                      <h4 className="font-body-md text-body-md text-foreground font-semibold">Send Test WhatsApp Message</h4>
+                      <h4 className="font-body-md text-body-md text-foreground font-semibold">{locale === "ar" ? "إرسال رسالة واتساب تجريبية" : "Send Test WhatsApp Message"}</h4>
                       {qrStatus !== "connected" && (
                         <span className="text-[10px] text-amber-500 font-label-caps bg-amber-500/5 px-2 py-0.5 border border-amber-500/20">
-                          Requires Active Connection
+                          {locale === "ar" ? "يتطلب اتصالاً نشطاً" : "Requires Active Connection"}
                         </span>
                       )}
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
                       <div className="space-y-1 sm:col-span-1">
-                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Recipient Phone Number</label>
+                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">{t.settings.whatsapp.lblTestNum}</label>
                         <input
                           type="text"
                           placeholder="e.g. 96896680001"
@@ -2349,7 +2400,7 @@ export default function AdminDashboard() {
                         />
                       </div>
                       <div className="space-y-1 sm:col-span-1">
-                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Message Text</label>
+                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">{t.settings.whatsapp.lblTestMsg}</label>
                         <input
                           type="text"
                           placeholder="Test message from Decision Center"
@@ -2362,9 +2413,9 @@ export default function AdminDashboard() {
                         <button
                           onClick={handleSendTestMessage}
                           disabled={sendingTest || qrStatus !== "connected"}
-                          className="w-full bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer h-[34px] flex items-center justify-center"
+                          className="w-full bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer h-[34px] flex items-center justify-center text-xs"
                         >
-                          {sendingTest ? "Sending..." : "Send Test Message"}
+                          {sendingTest ? t.settings.whatsapp.btnSending : (locale === "ar" ? "إرسال رسالة اختبار" : "Send Test Message")}
                         </button>
                       </div>
                     </div>
@@ -2374,20 +2425,20 @@ export default function AdminDashboard() {
                 {/* WhatsApp Preset Messages Manager */}
                 <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
                   <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2">
-                    WhatsApp Preset Messages
+                    {t.settings.whatsapp.presetsTitle}
                   </h3>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    Manage templates for reaching out to leads. You can use placeholders like <code className="text-secondary font-mono">{`{name}`}</code> and <code className="text-secondary font-mono">{`{company}`}</code>.
+                    {t.settings.whatsapp.presetsDesc}
                   </p>
 
                   {/* Add/Edit Form */}
                   <div className="bg-[#181817] p-4 border border-outline-variant/10 space-y-4">
                     <h4 className="font-body-md text-body-md text-foreground font-semibold">
-                      {editingPresetId ? "Edit Template" : "Create New Template"}
+                      {editingPresetId ? t.settings.whatsapp.btnEditTemplate : (locale === "ar" ? "إنشاء قالب جديد" : "Create New Template")}
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Template Title</label>
+                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">{t.settings.whatsapp.lblTemplateTitle}</label>
                         <input
                           type="text"
                           placeholder="e.g. Follow Up Greeting"
@@ -2397,7 +2448,7 @@ export default function AdminDashboard() {
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Template Text (with placeholders)</label>
+                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">{t.settings.whatsapp.lblTemplateText}</label>
                         <input
                           type="text"
                           placeholder="Hello {name}, regarding {company}..."
@@ -2410,16 +2461,16 @@ export default function AdminDashboard() {
                     <div className="flex gap-3">
                       <button
                         onClick={handleSavePreset}
-                        className="bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer"
+                        className="bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer text-xs"
                       >
-                        {editingPresetId ? "Update Template" : "Add Template"}
+                        {editingPresetId ? t.settings.whatsapp.btnEditTemplate : t.settings.whatsapp.btnAddTemplate}
                       </button>
                       {editingPresetId && (
                         <button
                           onClick={handleCancelEditPreset}
-                          className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-4 py-2 font-label-caps text-[10px] transition-colors cursor-pointer"
+                          className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-4 py-2 font-label-caps text-[10px] transition-colors cursor-pointer text-xs"
                         >
-                          Cancel
+                          {t.settings.whatsapp.btnCancelEdit}
                         </button>
                       )}
                     </div>
@@ -2429,7 +2480,7 @@ export default function AdminDashboard() {
                   <div className="space-y-3">
                     {presets.map((preset) => (
                       <div key={preset.id} className="border border-outline-variant/15 p-4 bg-[#181817] flex justify-between items-center gap-4">
-                        <div className="space-y-1 text-left">
+                        <div className="space-y-1 text-left rtl:text-right">
                           <p className="font-body-md text-foreground font-semibold">{preset.title}</p>
                           <p className="font-mono text-xs text-secondary break-all">{preset.text}</p>
                         </div>
@@ -2442,19 +2493,21 @@ export default function AdminDashboard() {
                             }}
                             className="border border-secondary/20 hover:border-secondary text-secondary hover:text-secondary px-2.5 py-1.5 font-label-caps text-[9px] transition-all cursor-pointer"
                           >
-                            Edit
+                            {locale === "ar" ? "تعديل" : "Edit"}
                           </button>
                           <button
                             onClick={() => handleDeletePreset(preset.id)}
                             className="border border-red-500/20 hover:border-red-500 text-red-400 px-2.5 py-1.5 font-label-caps text-[9px] transition-all cursor-pointer"
                           >
-                            Delete
+                            {locale === "ar" ? "حذف" : "Delete"}
                           </button>
                         </div>
                       </div>
                     ))}
                     {presets.length === 0 && (
-                      <p className="font-body-sm text-body-sm text-on-surface-variant text-center py-4">No custom templates defined.</p>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant text-center py-4">
+                        {locale === "ar" ? "لم يتم تحديد قوالب مخصصة." : "No custom templates defined."}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -2467,10 +2520,10 @@ export default function AdminDashboard() {
                 {/* Add Collaborator Form */}
                 <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
                   <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2">
-                    Add Team Collaborator (RBAC)
+                    {t.settings.rbac.title}
                   </h3>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    Create new user accounts. Collaborators will have read-only access (Staff), while Managers have full configuration control.
+                    {t.settings.rbac.desc}
                   </p>
 
                   {collabError && (
@@ -2488,7 +2541,7 @@ export default function AdminDashboard() {
                   <form onSubmit={handleAddCollaborator} className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="space-y-1">
-                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Email Address</label>
+                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">{t.settings.rbac.lblEmail}</label>
                         <input
                           type="email"
                           required
@@ -2499,34 +2552,34 @@ export default function AdminDashboard() {
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Initial Password</label>
+                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">{t.settings.rbac.lblPassword}</label>
                         <input
                           type="password"
                           required
                           placeholder="Min 6 characters"
                           value={newCollabPassword}
                           onChange={(e) => setNewCollabPassword(e.target.value)}
-                          className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2.5 focus:outline-none focus:border-secondary"
+                          className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2.5 focus:outline-none focus:border-secondary font-mono"
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">User Role</label>
+                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">{t.settings.rbac.lblRole}</label>
                         <select
                           value={newCollabRole}
                           onChange={(e) => setNewCollabRole(e.target.value as any)}
                           className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2.5 focus:outline-none focus:border-secondary h-[38px]"
                         >
-                          <option value="staff">Staff / Collaborator (Read-Only)</option>
-                          <option value="manager">Manager / Super User (Full Access)</option>
+                          <option value="staff">{t.settings.rbac.roleStaff}</option>
+                          <option value="manager">{t.settings.rbac.roleManager}</option>
                         </select>
                       </div>
                     </div>
                     <button
                       type="submit"
                       disabled={collabLoading}
-                      className="bg-secondary text-primary-container px-6 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-50 transition-colors cursor-pointer flex items-center gap-2"
+                      className="bg-secondary text-primary-container px-6 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-50 transition-colors cursor-pointer flex items-center gap-2 text-xs font-bold"
                     >
-                      {collabLoading ? "Registering Account..." : "Create User Profile"}
+                      {collabLoading ? t.settings.rbac.btnAddingCollab : t.settings.rbac.btnAddCollab}
                     </button>
                   </form>
                 </div>
@@ -2534,12 +2587,12 @@ export default function AdminDashboard() {
                 {/* Team Members List */}
                 <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
                   <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2">
-                    Registered Users Directory
+                    {t.settings.rbac.teamTitle}
                   </h3>
                   <div className="space-y-3">
                     {teamMembers.map((member) => (
                       <div key={member.id} className="border border-outline-variant/15 p-4 bg-[#181817] flex justify-between items-center gap-4">
-                        <div className="space-y-1 text-left">
+                        <div className="space-y-1 text-left rtl:text-right">
                           <p className="font-body-md text-foreground font-semibold flex items-center gap-2">
                             {member.email}
                             <span className={`text-[10px] uppercase font-label-caps tracking-widest px-2 py-0.5 border ${
@@ -2547,21 +2600,23 @@ export default function AdminDashboard() {
                                 ? "text-secondary border-secondary/30 bg-secondary/5"
                                 : "text-on-surface-variant border-outline-variant/30 bg-outline-variant/5"
                             }`}>
-                              {member.role}
+                              {member.role === "manager" ? t.settings.rbac.roleLabelManager : t.settings.rbac.roleLabelStaff}
                             </span>
                           </p>
-                          <p className="text-[10px] text-on-surface-variant">Registered: {new Date(member.created_at).toLocaleString()}</p>
+                          <p className="text-[10px] text-on-surface-variant">
+                            {locale === "ar" ? "تاريخ التسجيل" : "Registered"}: {new Date(member.created_at).toLocaleString(locale === "ar" ? "ar-EG" : "en-US")}
+                          </p>
                         </div>
                         <button
                           onClick={() => handleDeleteCollaborator(member.id)}
                           className="border border-red-500/20 hover:border-red-500 text-red-400 px-3 py-2 font-label-caps text-[10px] transition-all cursor-pointer flex-shrink-0"
                         >
-                          Revoke Access
+                          {t.settings.rbac.btnRemoveCollab}
                         </button>
                       </div>
                     ))}
                     {teamMembers.length === 0 && (
-                      <p className="font-body-sm text-body-sm text-on-surface-variant text-center py-4">No team members registered under Supabase.</p>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant text-center py-4">{t.settings.rbac.noTeamMembers}</p>
                     )}
                   </div>
                 </div>
@@ -2582,15 +2637,15 @@ export default function AdminDashboard() {
               </button>
 
               <div>
-                <h3 className="font-display-lg text-headline-md text-foreground">Reach Out to Lead</h3>
+                <h3 className="font-display-lg text-headline-md text-foreground">{t.modals.whatsappReach.title}</h3>
                 <p className="font-body-sm text-[12px] text-secondary mt-1 font-semibold">
-                  Name: {activeReachOutLead.name} | Company: {activeReachOutLead.company} | Phone: {activeReachOutLead.phone}
+                  {locale === "ar" ? "الاسم" : "Name"}: {activeReachOutLead.name} | {locale === "ar" ? "الشركة" : "Company"}: {activeReachOutLead.company} | {locale === "ar" ? "الهاتف" : "Phone"}: {activeReachOutLead.phone}
                 </p>
               </div>
 
               {/* Preset Messages */}
               <div className="space-y-2">
-                <p className="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-widest">Select Preset Message</p>
+                <p className="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-widest">{t.modals.whatsappReach.templateSelect}</p>
                 <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto pr-1">
                   {presets.map((preset) => {
                     const formattedText = preset.text
@@ -2602,7 +2657,7 @@ export default function AdminDashboard() {
                         key={preset.id}
                         type="button"
                         onClick={() => setCustomMessageText(formattedText)}
-                        className="w-full text-left p-2.5 border border-outline-variant/20 bg-surface-dim hover:border-secondary hover:text-secondary transition-colors text-xs cursor-pointer font-body-sm"
+                        className="w-full text-left rtl:text-right p-2.5 border border-outline-variant/20 bg-surface-dim hover:border-secondary hover:text-secondary transition-colors text-xs cursor-pointer font-body-sm"
                       >
                         <p className="font-semibold text-secondary text-[11px] mb-0.5">{preset.title}</p>
                         <p className="opacity-80 line-clamp-1">{formattedText}</p>
@@ -2610,20 +2665,22 @@ export default function AdminDashboard() {
                     );
                   })}
                   {presets.length === 0 && (
-                    <p className="font-body-sm text-[11px] text-on-surface-variant text-center py-2">No templates available. Create them in Settings.</p>
+                    <p className="font-body-sm text-[11px] text-on-surface-variant text-center py-2">
+                      {locale === "ar" ? "لا توجد قوالب رسائل متاحة. أنشئها في الإعدادات." : "No templates available. Create them in Settings."}
+                    </p>
                   )}
                 </div>
               </div>
 
               {/* Message Editing box */}
               <div className="space-y-1">
-                <label className="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-widest block">Message Text</label>
+                <label className="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-widest block">{t.modals.whatsappReach.customTextTitle}</label>
                 <textarea
                   value={customMessageText}
                   onChange={(e) => setCustomMessageText(e.target.value)}
                   rows={4}
                   className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs p-3 focus:outline-none focus:border-secondary"
-                  placeholder="Type your custom message..."
+                  placeholder={locale === "ar" ? "اكتب رسالتك المخصصة هنا..." : "Type your custom message..."}
                 />
               </div>
 
@@ -2632,7 +2689,7 @@ export default function AdminDashboard() {
                 <button
                   onClick={async () => {
                     if (!customMessageText) {
-                      alert("Please select or write a message");
+                      alert(locale === "ar" ? "يرجى اختيار رسالة أو كتابتها أولاً" : "Please select or write a message");
                       return;
                     }
                     setSendingCrmMessage(true);
@@ -2647,15 +2704,15 @@ export default function AdminDashboard() {
                       });
                       const data = await res.json();
                       if (res.ok && data.success) {
-                        alert("Message sent successfully!");
+                        alert(locale === "ar" ? "تم إرسال رسالة الواتساب بنجاح!" : "Message sent successfully!");
                         handleUpdateLeadStatus(activeReachOutLead.id, "Contacted");
                         setActiveReachOutLead(null);
                       } else {
-                        alert(`Failed to send message: ${data.error || "Unknown error"}`);
+                        alert(locale === "ar" ? `فشل إرسال الرسالة: ${data.error || "خطأ غير معروف"}` : `Failed to send message: ${data.error || "Unknown error"}`);
                       }
                     } catch (err: any) {
                       console.error(err);
-                      alert(`Error sending message: ${err.message || err}`);
+                      alert(locale === "ar" ? `حدث خطأ أثناء الإرسال: ${err.message || err}` : `Error sending message: ${err.message || err}`);
                     } finally {
                       setSendingCrmMessage(false);
                     }
@@ -2663,13 +2720,13 @@ export default function AdminDashboard() {
                   disabled={sendingCrmMessage || qrStatus !== "connected"}
                   className="flex-grow bg-secondary text-primary-container py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer text-xs"
                 >
-                  {sendingCrmMessage ? "Sending..." : qrStatus !== "connected" ? "Requires WhatsApp Link" : "Send via WhatsApp"}
+                  {sendingCrmMessage ? t.modals.whatsappReach.btnSending : qrStatus !== "connected" ? (locale === "ar" ? "يتطلب ربط الواتساب أولاً" : "Requires WhatsApp Link") : (locale === "ar" ? "إرسال عبر الواتساب" : "Send via WhatsApp")}
                 </button>
                 <button
                   onClick={() => setActiveReachOutLead(null)}
                   className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-6 py-3 font-label-caps text-label-caps transition-colors cursor-pointer text-xs"
                 >
-                  Cancel
+                  {t.modals.whatsappReach.btnCancel}
                 </button>
               </div>
             </div>
@@ -2688,13 +2745,15 @@ export default function AdminDashboard() {
               </button>
 
               <div>
-                <h3 className="font-display-lg text-headline-md text-foreground">Edit Lead Profile</h3>
-                <p className="font-body-sm text-[12px] text-on-surface-variant mt-1">Modify CRM entry information and notes.</p>
+                <h3 className="font-display-lg text-headline-md text-foreground">{t.modals.editLead.title}</h3>
+                <p className="font-body-sm text-[12px] text-on-surface-variant mt-1">
+                  {locale === "ar" ? "تعديل معلومات وتفاصيل العميل." : "Modify CRM entry information and notes."}
+                </p>
               </div>
 
               <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
                 <div className="space-y-1">
-                  <label className="font-body-sm text-body-sm text-foreground">Full Name</label>
+                  <label className="font-body-sm text-body-sm text-foreground">{t.modals.addLead.name}</label>
                   <input
                     type="text"
                     value={editLeadName}
@@ -2704,7 +2763,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-body-sm text-body-sm text-foreground">Company Name</label>
+                  <label className="font-body-sm text-body-sm text-foreground">{t.modals.addLead.company}</label>
                   <input
                     type="text"
                     value={editLeadCompany}
@@ -2715,16 +2774,16 @@ export default function AdminDashboard() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="font-body-sm text-body-sm text-foreground">Email</label>
+                    <label className="font-body-sm text-body-sm text-foreground">{t.modals.addLead.email}</label>
                     <input
                       type="email"
                       value={editLeadEmail}
                       onChange={(e) => setEditLeadEmail(e.target.value)}
-                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary font-mono"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="font-body-sm text-body-sm text-foreground">Phone</label>
+                    <label className="font-body-sm text-body-sm text-foreground">{t.modals.addLead.phone}</label>
                     <input
                       type="text"
                       value={editLeadPhone}
@@ -2735,7 +2794,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-body-sm text-body-sm text-foreground">Preferred Timeframe</label>
+                  <label className="font-body-sm text-body-sm text-foreground">{t.modals.addLead.timeframe}</label>
                   <input
                     type="text"
                     value={editLeadTimeframe}
@@ -2745,17 +2804,17 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-body-sm text-body-sm text-foreground">Internal Notes / Comments</label>
+                  <label className="font-body-sm text-body-sm text-foreground">{t.modals.addLead.notes}</label>
                   <textarea
                     value={editLeadNotes}
                     onChange={(e) => setEditLeadNotes(e.target.value)}
                     rows={3}
                     className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs p-3 focus:outline-none focus:border-secondary"
-                    placeholder="Add notes or administrative comments regarding this lead..."
+                    placeholder={locale === "ar" ? "أضف ملاحظات أو تعليقات إدارية حول هذا العميل..." : "Add notes or administrative comments regarding this lead..."}
                   />
                 </div>
 
-                <div className="flex items-center gap-2 pt-2 text-left">
+                <div className="flex items-center gap-2 pt-2 text-left rtl:text-right">
                   <input
                     type="checkbox"
                     id="flagged-followup"
@@ -2765,7 +2824,7 @@ export default function AdminDashboard() {
                   />
                   <label htmlFor="flagged-followup" className="font-body-sm text-body-sm text-foreground cursor-pointer flex items-center gap-1.5">
                     <span className="material-symbols-outlined text-sm text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>flag</span>
-                    Flag for Follow-up
+                    {locale === "ar" ? "تحديد للمتابعة العاجلة" : "Flag for Follow-up"}
                   </label>
                 </div>
               </div>
@@ -2774,15 +2833,15 @@ export default function AdminDashboard() {
                 <button
                   onClick={handleSaveLeadDetails}
                   disabled={savingLeadDetails}
-                  className="flex-grow bg-secondary text-primary-container py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer text-xs"
+                  className="flex-grow bg-secondary text-primary-container py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer text-xs font-bold"
                 >
-                  {savingLeadDetails ? "Saving..." : "Save Changes"}
+                  {savingLeadDetails ? t.modals.editLead.btnSaving : t.modals.editLead.btnSave}
                 </button>
                 <button
                   onClick={() => setActiveEditLead(null)}
                   className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-6 py-3 font-label-caps text-label-caps transition-colors cursor-pointer text-xs"
                 >
-                  Cancel
+                  {t.modals.editLead.btnClose}
                 </button>
               </div>
             </div>
@@ -2801,16 +2860,18 @@ export default function AdminDashboard() {
               </button>
 
               <div>
-                <h3 className="font-display-lg text-headline-md text-foreground">Add Custom Booking</h3>
-                <p className="font-body-sm text-[12px] text-on-surface-variant mt-1">Schedule a manual consultation slot.</p>
+                <h3 className="font-display-lg text-headline-md text-foreground">{t.modals.addBooking.title}</h3>
+                <p className="font-body-sm text-[12px] text-on-surface-variant mt-1">
+                  {locale === "ar" ? "جدولة موعد استشارة يدوياً في النظام." : "Schedule a manual consultation slot."}
+                </p>
               </div>
 
-              <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1 text-left">
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1 text-left rtl:text-right">
                 <div className="space-y-1">
-                  <label className="font-body-sm text-body-sm text-foreground">Client Name</label>
+                  <label className="font-body-sm text-body-sm text-foreground">{t.modals.addBooking.name}</label>
                   <input
                     type="text"
-                    placeholder="e.g. Salim Al Harthy"
+                    placeholder={locale === "ar" ? "مثال: سالم الحارثي" : "e.g. Salim Al Harthy"}
                     value={newBookingName}
                     onChange={(e) => setNewBookingName(e.target.value)}
                     className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
@@ -2819,17 +2880,17 @@ export default function AdminDashboard() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="font-body-sm text-body-sm text-foreground">Email</label>
+                    <label className="font-body-sm text-body-sm text-foreground">{t.modals.addBooking.email}</label>
                     <input
                       type="email"
                       placeholder="e.g. salim@example.com"
                       value={newBookingEmail}
                       onChange={(e) => setNewBookingEmail(e.target.value)}
-                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary font-mono"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="font-body-sm text-body-sm text-foreground">Phone</label>
+                    <label className="font-body-sm text-body-sm text-foreground">{t.modals.addBooking.phone}</label>
                     <input
                       type="text"
                       placeholder="e.g. 96896680001"
@@ -2842,27 +2903,27 @@ export default function AdminDashboard() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="font-body-sm text-body-sm text-foreground">Booking Date</label>
+                    <label className="font-body-sm text-body-sm text-foreground">{t.modals.addBooking.date}</label>
                     <input
                       type="date"
                       value={newBookingDate}
                       onChange={(e) => setNewBookingDate(e.target.value)}
-                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary font-mono"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="font-body-sm text-body-sm text-foreground">Time Slot</label>
+                    <label className="font-body-sm text-body-sm text-foreground">{t.modals.addBooking.slot}</label>
                     {loadingAddModalSlots ? (
-                      <div className="text-xs text-secondary animate-pulse py-2">Checking availability...</div>
+                      <div className="text-xs text-secondary animate-pulse py-2">{t.modals.addBooking.loadingSlots}</div>
                     ) : !addModalDayAvailability?.is_available ? (
-                      <div className="text-xs text-red-400 py-2 uppercase font-label-caps">No operational hours on this day</div>
+                      <div className="text-xs text-red-400 py-2 uppercase font-label-caps">{locale === "ar" ? "لا توجد ساعات عمل في هذا اليوم" : "No operational hours on this day"}</div>
                     ) : getFilteredAddModalSlots().length === 0 ? (
-                      <div className="text-xs text-amber-400 py-2 uppercase font-label-caps">All slots booked or unavailable</div>
+                      <div className="text-xs text-amber-400 py-2 uppercase font-label-caps">{locale === "ar" ? "جميع الفترات محجوزة أو غير متاحة" : "All slots booked or unavailable"}</div>
                     ) : (
                       <select
                         value={newBookingSlot}
                         onChange={(e) => setNewBookingSlot(e.target.value)}
-                        className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-2 focus:outline-none focus:border-secondary"
+                        className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-2 focus:outline-none focus:border-secondary font-mono"
                       >
                         {getFilteredAddModalSlots().map((slot) => (
                           <option key={slot} value={slot}>{slot}</option>
@@ -2873,14 +2934,14 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-body-sm text-body-sm text-foreground">Booking Status</label>
+                  <label className="font-body-sm text-body-sm text-foreground">{t.modals.addBooking.status}</label>
                   <select
                     value={newBookingStatus}
                     onChange={(e) => setNewBookingStatus(e.target.value as any)}
                     className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-2 focus:outline-none focus:border-secondary"
                   >
-                    <option value="Confirmed">Confirmed</option>
-                    <option value="Pending">Pending</option>
+                    <option value="Confirmed">{t.bookings.statusConfirmed}</option>
+                    <option value="Pending">{t.bookings.statusPending}</option>
                   </select>
                 </div>
               </div>
@@ -2889,15 +2950,15 @@ export default function AdminDashboard() {
                 <button
                   onClick={handleAddBooking}
                   disabled={savingNewBooking}
-                  className="flex-grow bg-secondary text-primary-container py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer text-xs"
+                  className="flex-grow bg-secondary text-primary-container py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer text-xs font-bold"
                 >
-                  {savingNewBooking ? "Adding..." : "Add Booking"}
+                  {savingNewBooking ? t.modals.addBooking.btnSaving : t.modals.addBooking.btnSave}
                 </button>
                 <button
                   onClick={() => setShowingAddBookingModal(false)}
                   className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-6 py-3 font-label-caps text-label-caps transition-colors cursor-pointer text-xs"
                 >
-                  Cancel
+                  {t.modals.addBooking.btnClose}
                 </button>
               </div>
             </div>
@@ -2916,34 +2977,38 @@ export default function AdminDashboard() {
               </button>
 
               <div>
-                <h3 className="font-display-lg text-headline-md text-foreground">Reschedule Booking</h3>
-                <p className="font-body-sm text-[12px] text-on-surface-variant mt-1">Select a new date and time slot for {activeRescheduleBooking.clientName}.</p>
+                <h3 className="font-display-lg text-headline-md text-foreground">{t.modals.reschedule.title}</h3>
+                <p className="font-body-sm text-[12px] text-on-surface-variant mt-1">
+                  {locale === "ar"
+                    ? `اختر تاريخاً ووقتاً جديداً للعميل ${activeRescheduleBooking.clientName}.`
+                    : `Select a new date and time slot for ${activeRescheduleBooking.clientName}.`}
+                </p>
               </div>
 
-              <div className="space-y-4 text-left">
+              <div className="space-y-4 text-left rtl:text-right">
                 <div className="space-y-1">
-                  <label className="font-body-sm text-body-sm text-foreground">New Date</label>
+                  <label className="font-body-sm text-body-sm text-foreground">{t.modals.reschedule.date}</label>
                   <input
                     type="date"
                     value={rescheduleDate}
                     onChange={(e) => setRescheduleDate(e.target.value)}
-                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary font-mono"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-body-sm text-body-sm text-foreground">New Time Slot</label>
+                  <label className="font-body-sm text-body-sm text-foreground">{t.modals.reschedule.slot}</label>
                   {loadingRescheduleModalSlots ? (
-                    <div className="text-xs text-secondary animate-pulse py-2">Checking availability...</div>
+                    <div className="text-xs text-secondary animate-pulse py-2">{t.modals.reschedule.loadingSlots}</div>
                   ) : !rescheduleModalDayAvailability?.is_available ? (
-                    <div className="text-xs text-red-400 py-2 uppercase font-label-caps">No operational hours on this day</div>
+                    <div className="text-xs text-red-400 py-2 uppercase font-label-caps">{locale === "ar" ? "لا توجد ساعات عمل في هذا اليوم" : "No operational hours on this day"}</div>
                   ) : getFilteredRescheduleModalSlots().length === 0 ? (
-                    <div className="text-xs text-amber-400 py-2 uppercase font-label-caps">All slots booked or unavailable</div>
+                    <div className="text-xs text-amber-400 py-2 uppercase font-label-caps">{locale === "ar" ? "جميع الفترات محجوزة أو غير متاحة" : "All slots booked or unavailable"}</div>
                   ) : (
                     <select
                       value={rescheduleSlot}
                       onChange={(e) => setRescheduleSlot(e.target.value)}
-                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-2 focus:outline-none focus:border-secondary"
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-2 focus:outline-none focus:border-secondary font-mono"
                     >
                       {getFilteredRescheduleModalSlots().map((slot) => (
                         <option key={slot} value={slot}>{slot}</option>
@@ -2957,15 +3022,15 @@ export default function AdminDashboard() {
                 <button
                   onClick={handleSaveReschedule}
                   disabled={savingReschedule}
-                  className="flex-grow bg-secondary text-primary-container py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer text-xs"
+                  className="flex-grow bg-secondary text-primary-container py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer text-xs font-bold"
                 >
-                  {savingReschedule ? "Rescheduling..." : "Reschedule Booking"}
+                  {savingReschedule ? t.modals.reschedule.btnSaving : t.modals.reschedule.btnSave}
                 </button>
                 <button
                   onClick={() => setActiveRescheduleBooking(null)}
                   className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-6 py-3 font-label-caps text-label-caps transition-colors cursor-pointer text-xs"
                 >
-                  Cancel
+                  {t.modals.reschedule.btnCancel}
                 </button>
               </div>
             </div>
