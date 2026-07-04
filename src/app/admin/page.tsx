@@ -56,6 +56,8 @@ export default function AdminDashboard() {
   // WhatsApp QR State
   const [waServerUrl, setWaServerUrl] = useState("https://wa.powerpod.ae");
   const [qrStatus, setQrStatus] = useState<"disconnected" | "generating" | "waiting" | "connected">("disconnected");
+  const [serverOnline, setServerOnline] = useState(true);
+  const [initializingWa, setInitializingWa] = useState(false);
   const [qrImage, setQrImage] = useState<string | null>(null);
   const [connectionLogs, setConnectionLogs] = useState<string[]>([
     "[SYSTEM] Initiating WhatsApp bot client connection checker..."
@@ -218,6 +220,7 @@ export default function AdminDashboard() {
         const res = await fetch(`${waServerUrl}/api/whatsapp-status`);
         if (!res.ok) throw new Error("Server offline");
         const data = await res.json();
+        setServerOnline(true);
         
         if (data.status === "connecting" || data.status === "initializing") {
           setQrStatus("generating");
@@ -258,6 +261,7 @@ export default function AdminDashboard() {
           setConnectedNumber(null);
         }
       } catch (err) {
+        setServerOnline(false);
         setQrStatus("disconnected");
         setQrImage(null);
         setConnectedNumber(null);
@@ -371,16 +375,17 @@ export default function AdminDashboard() {
 
   const checkGoogleCalendarStatus = async () => {
     if (!isSupabaseConfigured()) {
-      // Check local storage mock status
-      const mockConnected = localStorage.getItem("gcal-connected") === "true";
-      const mockEmail = localStorage.getItem("gcal-email") || null;
-      setGcalConnected(mockConnected);
-      setGcalEmail(mockEmail);
+      setGcalConnected(false);
+      setGcalEmail(null);
       return;
     }
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      if (!session) {
+        setGcalConnected(false);
+        setGcalEmail(null);
+        return;
+      }
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=status`,
@@ -394,9 +399,14 @@ export default function AdminDashboard() {
         const data = await response.json();
         setGcalConnected(data.connected);
         setGcalEmail(data.email);
+      } else {
+        setGcalConnected(false);
+        setGcalEmail(null);
       }
     } catch (e) {
       console.error("Error checking Google Calendar status:", e);
+      setGcalConnected(false);
+      setGcalEmail(null);
     }
   };
 
@@ -409,19 +419,17 @@ export default function AdminDashboard() {
     try {
       if (isSupabaseConfigured()) {
         const { data: { session } } = await supabase.auth.getSession();
-        const userId = session?.user?.id || "";
+        if (!session) {
+          alert("Please sign in to your DC Console account to connect Google Calendar.");
+          setGcalLoading(false);
+          return;
+        }
+        const userId = session.user.id;
         // Redirect to Edge Function login action
         window.location.href = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=login&userId=${userId}`;
       } else {
-        // Mock connection
-        setTimeout(() => {
-          setGcalConnected(true);
-          setGcalEmail("admin@dcenter.om");
-          localStorage.setItem("gcal-connected", "true");
-          localStorage.setItem("gcal-email", "admin@dcenter.om");
-          setGcalLoading(false);
-          alert("Mock Google Calendar Connected!");
-        }, 1000);
+        alert("Google Calendar integration requires a configured Supabase environment.");
+        setGcalLoading(false);
       }
     } catch (e) {
       console.error(e);
@@ -448,13 +456,11 @@ export default function AdminDashboard() {
           setGcalConnected(false);
           setGcalEmail(null);
           alert("Google Calendar disconnected.");
+        } else {
+          alert("Failed to disconnect Google Calendar.");
         }
       } else {
-        setGcalConnected(false);
-        setGcalEmail(null);
-        localStorage.removeItem("gcal-connected");
-        localStorage.removeItem("gcal-email");
-        alert("Mock Google Calendar Disconnected.");
+        alert("Google Calendar integration is not configured.");
       }
     } catch (e) {
       console.error(e);
@@ -877,6 +883,59 @@ export default function AdminDashboard() {
       alert("Error disconnecting WhatsApp.");
     } finally {
       setDisconnecting(false);
+    }
+  };
+
+  const handleConnectWhatsApp = async () => {
+    setInitializingWa(true);
+    setQrStatus("generating");
+    try {
+      const res = await fetch(`${waServerUrl}/api/init-whatsapp`);
+      if (res.ok) {
+        const data = await res.json();
+        setConnectionLogs(prev => [...prev.slice(-10), `[SYSTEM] Reconnect trigger sent: ${data.message || 'Initializing'}`]);
+      } else {
+        alert("Failed to send initialize request to WhatsApp server.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error contacting WhatsApp server for connection initialization.");
+    } finally {
+      setInitializingWa(false);
+    }
+  };
+
+  const handleRefreshStatus = async () => {
+    if (!waServerUrl) return;
+    setConnectionLogs(prev => [...prev.slice(-10), "[SYSTEM] Querying WhatsApp status..."]);
+    try {
+      const res = await fetch(`${waServerUrl}/api/whatsapp-status`);
+      if (!res.ok) throw new Error("Server offline");
+      const data = await res.json();
+      setServerOnline(true);
+      if (data.status === "connecting" || data.status === "initializing") {
+        setQrStatus("generating");
+        setConnectedNumber(null);
+      } else if (data.status === "qr_ready") {
+        setQrStatus("waiting");
+        setConnectedNumber(null);
+        if (data.qrCode) setQrImage(data.qrCode);
+      } else if (data.status === "connected") {
+        setQrStatus("connected");
+        setQrImage(null);
+        setConnectedNumber(data.connectedNumber || "Connected Device");
+      } else {
+        setQrStatus("disconnected");
+        setQrImage(null);
+        setConnectedNumber(null);
+      }
+      alert(`WhatsApp Status refreshed: ${data.status}`);
+    } catch (err) {
+      setServerOnline(false);
+      setQrStatus("disconnected");
+      setQrImage(null);
+      setConnectedNumber(null);
+      alert("Failed to refresh status. WhatsApp Server is offline.");
     }
   };
 
@@ -1524,11 +1583,33 @@ export default function AdminDashboard() {
               
               <div className="flex flex-col md:flex-row items-center gap-8">
                 <div className="w-48 h-48 bg-white flex items-center justify-center border border-secondary p-2 relative overflow-hidden">
-                  {qrStatus === "disconnected" && (
-                    <div className="absolute inset-0 bg-[#070707]/90 flex items-center justify-center text-center p-4">
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        WhatsApp Server Offline. Run the bot script to connect.
+                  {!serverOnline && (
+                    <div className="absolute inset-0 bg-[#070707]/95 flex flex-col justify-center items-center text-center p-4 gap-2 z-10">
+                      <span className="material-symbols-outlined text-amber-500 text-3xl animate-pulse">cloud_off</span>
+                      <p className="font-body-sm text-[11px] text-on-surface-variant">
+                        WhatsApp Server Offline. Verify the endpoint or start the bot script.
                       </p>
+                      <button
+                        onClick={handleRefreshStatus}
+                        className="mt-1 border border-secondary/20 hover:border-secondary hover:text-secondary px-2.5 py-1 font-label-caps text-[9px] transition-colors cursor-pointer text-foreground bg-transparent"
+                      >
+                        Retry Connection
+                      </button>
+                    </div>
+                  )}
+                  {serverOnline && qrStatus === "disconnected" && (
+                    <div className="absolute inset-0 bg-[#070707]/95 flex flex-col justify-center items-center text-center p-4 gap-2 z-10">
+                      <span className="material-symbols-outlined text-secondary/60 text-3xl">link_off</span>
+                      <p className="font-body-sm text-[11px] text-on-surface-variant">
+                        WhatsApp Disconnected. Click below to initialize session.
+                      </p>
+                      <button
+                        disabled={initializingWa}
+                        onClick={handleConnectWhatsApp}
+                        className="mt-1 bg-secondary text-primary-container hover:bg-transparent hover:text-secondary px-3 py-1.5 font-label-caps text-[9px] uppercase border border-secondary transition-colors cursor-pointer"
+                      >
+                        {initializingWa ? "Initializing..." : "Connect WhatsApp"}
+                      </button>
                     </div>
                   )}
                   {qrStatus === "generating" && (
@@ -1570,6 +1651,12 @@ export default function AdminDashboard() {
                         placeholder="e.g. http://localhost:3001"
                         className="flex-grow bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2 focus:outline-none focus:border-secondary font-mono"
                       />
+                      <button
+                        onClick={handleRefreshStatus}
+                        className="border border-outline-variant/30 hover:border-secondary hover:text-secondary text-foreground px-3 py-2 font-label-caps text-[10px] transition-colors cursor-pointer"
+                      >
+                        Refresh Status
+                      </button>
                       <button
                         onClick={async () => {
                           if (isUsingSupabase) {
