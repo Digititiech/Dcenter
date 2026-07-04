@@ -38,10 +38,18 @@ interface PresetMessage {
 export default function AdminDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"overview" | "crm" | "bookings" | "settings">("overview");
-  const [activeSettingsTab, setActiveSettingsTab] = useState<"email" | "calendar" | "whatsapp">("email");
+  const [activeSettingsTab, setActiveSettingsTab] = useState<"email" | "calendar" | "whatsapp" | "rbac">("email");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [isUsingSupabase, setIsUsingSupabase] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState<"manager" | "staff">("manager");
+  const [teamMembers, setTeamMembers] = useState<{ id: string; email: string; role: string; created_at: string }[]>([]);
+  const [newCollabEmail, setNewCollabEmail] = useState("");
+  const [newCollabPassword, setNewCollabPassword] = useState("");
+  const [newCollabRole, setNewCollabRole] = useState<"manager" | "staff">("staff");
+  const [collabError, setCollabError] = useState<string | null>(null);
+  const [collabSuccess, setCollabSuccess] = useState<string | null>(null);
+  const [collabLoading, setCollabLoading] = useState(false);
 
   // SMTP Settings State
   const [smtpHost, setSmtpHost] = useState("smtp.gmail.com");
@@ -616,6 +624,78 @@ export default function AdminDashboard() {
     },
   ];
 
+  const fetchTeamMembers = async () => {
+    if (!isSupabaseConfigured()) return;
+    try {
+      const { data, error } = await supabase
+        .from("user_profiles")
+        .select("*")
+        .order("created_at", { ascending: true });
+      if (!error && data) {
+        setTeamMembers(data);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleAddCollaborator = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCollabError(null);
+    setCollabSuccess(null);
+    setCollabLoading(true);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("You must be logged in to perform this action.");
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            email: newCollabEmail,
+            password: newCollabPassword,
+            role: newCollabRole,
+          }),
+        }
+      );
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to create collaborator.");
+      }
+
+      setCollabSuccess(`Collaborator ${newCollabEmail} added successfully!`);
+      setNewCollabEmail("");
+      setNewCollabPassword("");
+      setNewCollabRole("staff");
+      fetchTeamMembers(); // reload list
+    } catch (err: any) {
+      setCollabError(err.message || "An unexpected error occurred.");
+    } finally {
+      setCollabLoading(false);
+    }
+  };
+
+  const handleDeleteCollaborator = async (userId: string) => {
+    if (!confirm("Are you sure you want to remove this collaborator?")) return;
+    try {
+      const { error } = await supabase
+        .from("user_profiles")
+        .delete()
+        .eq("id", userId);
+      if (error) throw error;
+      fetchTeamMembers();
+    } catch (e: any) {
+      alert(e.message);
+    }
+  };
+
   useEffect(() => {
     // Authenticate Admin Session
     const supabaseConfigured = isSupabaseConfigured();
@@ -628,12 +708,34 @@ export default function AdminDashboard() {
           router.push("/admin/login");
           return;
         }
+        
+        // Fetch role from user_profiles
+        const { data: profile } = await supabase
+          .from("user_profiles")
+          .select("role")
+          .eq("id", session.user.id)
+          .maybeSingle();
+        if (profile?.role) {
+          setUserRole(profile.role as any);
+        } else {
+          setUserRole("manager"); // fallback
+        }
+
+        // Fetch other team members
+        const { data: team } = await supabase
+          .from("user_profiles")
+          .select("*")
+          .order("created_at", { ascending: true });
+        if (team) {
+          setTeamMembers(team);
+        }
       } else {
         const isMockAuth = localStorage.getItem("mock-admin-auth");
         if (isMockAuth !== "true") {
           router.push("/admin/login");
           return;
         }
+        setUserRole("manager");
       }
       setLoading(false);
       fetchData(supabaseConfigured);
@@ -749,6 +851,10 @@ export default function AdminDashboard() {
   };
 
   const handleSaveAvailability = async () => {
+    if (userRole === "staff") {
+      alert("Permission denied. Only managers can update availability settings.");
+      return;
+    }
     setSavingAvailability(true);
     try {
       if (isSupabaseConfigured()) {
@@ -818,6 +924,10 @@ export default function AdminDashboard() {
   };
 
   const handleUpdateLeadStatus = async (leadId: string, newStatus: Lead["status"]) => {
+    if (userRole === "staff") {
+      alert("Permission denied. Only managers can update lead statuses.");
+      return;
+    }
     const updated = leads.map(l => l.id === leadId ? { ...l, status: newStatus } : l);
     setLeads(updated);
 
@@ -829,6 +939,10 @@ export default function AdminDashboard() {
   };
 
   const handleConfirmBooking = async (bookingId: string) => {
+    if (userRole === "staff") {
+      alert("Permission denied. Only managers can confirm bookings.");
+      return;
+    }
     const booking = bookings.find(b => b.id === bookingId);
     const updated = bookings.map(b => b.id === bookingId ? { ...b, status: "Confirmed" as const } : b);
     setBookings(updated);
@@ -894,6 +1008,10 @@ export default function AdminDashboard() {
   };
 
   const handleSaveReschedule = async () => {
+    if (userRole === "staff") {
+      alert("Permission denied. Only managers can reschedule bookings.");
+      return;
+    }
     if (!activeRescheduleBooking) return;
     setSavingReschedule(true);
 
@@ -978,6 +1096,10 @@ export default function AdminDashboard() {
   };
 
   const handleSaveSmtpSettings = async () => {
+    if (userRole === "staff") {
+      alert("Permission denied. Only managers can update SMTP configurations.");
+      return;
+    }
     if (isUsingSupabase) {
       try {
         const payload = [
@@ -1003,6 +1125,10 @@ export default function AdminDashboard() {
   };
 
   const handleSaveLeadDetails = async () => {
+    if (userRole === "staff") {
+      alert("Permission denied. Only managers can update lead profiles.");
+      return;
+    }
     if (!activeEditLead) return;
     setSavingLeadDetails(true);
 
@@ -1048,6 +1174,10 @@ export default function AdminDashboard() {
   };
 
   const handleAddBooking = async () => {
+    if (userRole === "staff") {
+      alert("Permission denied. Only managers can create custom bookings.");
+      return;
+    }
     if (!newBookingName || !newBookingEmail || !newBookingPhone || !newBookingDate || !newBookingSlot) {
       alert("Please fill out all fields");
       return;
@@ -1094,6 +1224,10 @@ export default function AdminDashboard() {
   };
 
   const handleSavePreset = async () => {
+    if (userRole === "staff") {
+      alert("Permission denied. Only managers can edit preset templates.");
+      return;
+    }
     if (!presetTitle || !presetText) {
       alert("Please enter title and text for the preset template");
       return;
@@ -1156,6 +1290,10 @@ export default function AdminDashboard() {
   };
 
   const handleDeletePreset = async (id: string) => {
+    if (userRole === "staff") {
+      alert("Permission denied. Only managers can delete preset templates.");
+      return;
+    }
     if (!confirm("Are you sure you want to delete this preset template?")) return;
     
     if (isUsingSupabase) {
@@ -1806,6 +1944,18 @@ export default function AdminDashboard() {
               >
                 WhatsApp Settings
               </button>
+              {userRole === "manager" && (
+                <button
+                  onClick={() => setActiveSettingsTab("rbac")}
+                  className={`pb-3 font-label-caps text-[11px] uppercase tracking-wider transition-all cursor-pointer border-b-2 ${
+                    activeSettingsTab === "rbac"
+                      ? "border-secondary text-secondary font-bold"
+                      : "border-transparent text-on-surface-variant hover:text-foreground"
+                  }`}
+                >
+                  User Management
+                </button>
+              )}
             </div>
 
             {/* Sub-Tab 1: Email Configuration */}
@@ -2305,6 +2455,113 @@ export default function AdminDashboard() {
                     ))}
                     {presets.length === 0 && (
                       <p className="font-body-sm text-body-sm text-on-surface-variant text-center py-4">No custom templates defined.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Sub-Tab 4: User Management (RBAC) */}
+            {activeSettingsTab === "rbac" && userRole === "manager" && (
+              <div className="space-y-6 animate-fade-in">
+                {/* Add Collaborator Form */}
+                <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
+                  <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2">
+                    Add Team Collaborator (RBAC)
+                  </h3>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    Create new user accounts. Collaborators will have read-only access (Staff), while Managers have full configuration control.
+                  </p>
+
+                  {collabError && (
+                    <div className="p-3 border border-red-500/20 bg-red-500/5 text-red-400 font-body-sm text-xs text-center">
+                      {collabError}
+                    </div>
+                  )}
+
+                  {collabSuccess && (
+                    <div className="p-3 border border-emerald-500/20 bg-emerald-500/5 text-emerald-400 font-body-sm text-xs text-center">
+                      {collabSuccess}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleAddCollaborator} className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="space-y-1">
+                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Email Address</label>
+                        <input
+                          type="email"
+                          required
+                          placeholder="collaborator@dcenter.om"
+                          value={newCollabEmail}
+                          onChange={(e) => setNewCollabEmail(e.target.value)}
+                          className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2.5 focus:outline-none focus:border-secondary"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">Initial Password</label>
+                        <input
+                          type="password"
+                          required
+                          placeholder="Min 6 characters"
+                          value={newCollabPassword}
+                          onChange={(e) => setNewCollabPassword(e.target.value)}
+                          className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2.5 focus:outline-none focus:border-secondary"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest block">User Role</label>
+                        <select
+                          value={newCollabRole}
+                          onChange={(e) => setNewCollabRole(e.target.value as any)}
+                          className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2.5 focus:outline-none focus:border-secondary h-[38px]"
+                        >
+                          <option value="staff">Staff / Collaborator (Read-Only)</option>
+                          <option value="manager">Manager / Super User (Full Access)</option>
+                        </select>
+                      </div>
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={collabLoading}
+                      className="bg-secondary text-primary-container px-6 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-50 transition-colors cursor-pointer flex items-center gap-2"
+                    >
+                      {collabLoading ? "Registering Account..." : "Create User Profile"}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Team Members List */}
+                <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
+                  <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2">
+                    Registered Users Directory
+                  </h3>
+                  <div className="space-y-3">
+                    {teamMembers.map((member) => (
+                      <div key={member.id} className="border border-outline-variant/15 p-4 bg-[#181817] flex justify-between items-center gap-4">
+                        <div className="space-y-1 text-left">
+                          <p className="font-body-md text-foreground font-semibold flex items-center gap-2">
+                            {member.email}
+                            <span className={`text-[10px] uppercase font-label-caps tracking-widest px-2 py-0.5 border ${
+                              member.role === "manager"
+                                ? "text-secondary border-secondary/30 bg-secondary/5"
+                                : "text-on-surface-variant border-outline-variant/30 bg-outline-variant/5"
+                            }`}>
+                              {member.role}
+                            </span>
+                          </p>
+                          <p className="text-[10px] text-on-surface-variant">Registered: {new Date(member.created_at).toLocaleString()}</p>
+                        </div>
+                        <button
+                          onClick={() => handleDeleteCollaborator(member.id)}
+                          className="border border-red-500/20 hover:border-red-500 text-red-400 px-3 py-2 font-label-caps text-[10px] transition-all cursor-pointer flex-shrink-0"
+                        >
+                          Revoke Access
+                        </button>
+                      </div>
+                    ))}
+                    {teamMembers.length === 0 && (
+                      <p className="font-body-sm text-body-sm text-on-surface-variant text-center py-4">No team members registered under Supabase.</p>
                     )}
                   </div>
                 </div>
