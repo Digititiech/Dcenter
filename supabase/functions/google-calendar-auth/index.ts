@@ -8,24 +8,35 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 
-function parseDateTime(day: number, timeSlot: string) {
-  // e.g. "11:30 GST" -> hour = 11, minute = 30
+function parseDateTime(dateStr: string | undefined, day: number, timeSlot: string) {
+  let datePart = "2026-10-01";
+  if (dateStr) {
+    datePart = dateStr;
+  } else if (day) {
+    const dayStr = String(day).padStart(2, '0');
+    datePart = `2026-10-${dayStr}`;
+  }
   const timePart = timeSlot.split(" ")[0] || "09:00";
   const [hour, minute] = timePart.split(":");
-  const dayStr = String(day).padStart(2, '0');
   const hourStr = String(hour || "09").padStart(2, '0');
   const minuteStr = String(minute || "00").padStart(2, '0');
-  return `2026-10-${dayStr}T${hourStr}:${minuteStr}:00+04:00`;
+  return `${datePart}T${hourStr}:${minuteStr}:00+04:00`;
 }
 
-function parseEndDateTime(day: number, timeSlot: string) {
+function parseEndDateTime(dateStr: string | undefined, day: number, timeSlot: string) {
+  let datePart = "2026-10-01";
+  if (dateStr) {
+    datePart = dateStr;
+  } else if (day) {
+    const dayStr = String(day).padStart(2, '0');
+    datePart = `2026-10-${dayStr}`;
+  }
   const timePart = timeSlot.split(" ")[0] || "09:00";
   const [hour, minute] = timePart.split(":");
   const endHour = Number(hour || "09") + 1;
-  const dayStr = String(day).padStart(2, '0');
   const hourStr = String(endHour).padStart(2, '0');
   const minuteStr = String(minute || "00").padStart(2, '0');
-  return `2026-10-${dayStr}T${hourStr}:${minuteStr}:00+04:00`;
+  return `${datePart}T${hourStr}:${minuteStr}:00+04:00`;
 }
 
 async function refreshGoogleAccessToken(clientId: string, clientSecret: string, refreshToken: string) {
@@ -262,8 +273,8 @@ serve(async (req) => {
       const accessToken = await refreshGoogleAccessToken(clientId, clientSecret, tokenRecord.refresh_token);
 
       // Parse start and end times (GST timezone UTC+4)
-      const startIso = parseDateTime(booking.day, booking.timeSlot);
-      const endIso = parseEndDateTime(booking.day, booking.timeSlot);
+      const startIso = parseDateTime(booking.booking_date, booking.day, booking.timeSlot);
+      const endIso = parseEndDateTime(booking.booking_date, booking.day, booking.timeSlot);
 
       const gcalEvent = {
         summary: `Strategic Consultation: ${booking.clientName}`,
@@ -293,6 +304,58 @@ serve(async (req) => {
       }
 
       return new Response(JSON.stringify({ success: true, eventId: gcalResult.id }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "get-busy-slots") {
+      // 6. Public or admin query to list busy calendar events for a selected date
+      const dateParam = url.searchParams.get("date"); // YYYY-MM-DD
+      if (!dateParam) {
+        throw new Error("Missing date parameter.");
+      }
+
+      // Fetch the first token record (assumes single tenant/admin console)
+      const { data: tokenRecord, error: tokenErr } = await supabaseClient
+        .from("google_calendar_tokens")
+        .select("refresh_token")
+        .limit(1)
+        .maybeSingle();
+
+      if (tokenErr) throw tokenErr;
+      if (!tokenRecord || !tokenRecord.refresh_token) {
+        return new Response(JSON.stringify({ connected: false, busySlots: [] }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Refresh Access Token
+      const accessToken = await refreshGoogleAccessToken(clientId, clientSecret, tokenRecord.refresh_token);
+
+      // Define Muscat/Oman timezone day bounds
+      const timeMin = `${dateParam}T00:00:00+04:00`;
+      const timeMax = `${dateParam}T23:59:59+04:00`;
+
+      const gcalResponse = await fetch(
+        `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${encodeURIComponent(timeMin)}&timeMax=${encodeURIComponent(timeMax)}&singleEvents=true`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      const gcalData = await gcalResponse.json();
+      if (gcalData.error) {
+        throw new Error(`Google Calendar API Error: ${gcalData.error.message}`);
+      }
+
+      const busySlots = (gcalData.items || []).map((item: any) => ({
+        start: item.start.dateTime || item.start.date,
+        end: item.end.dateTime || item.end.date,
+      }));
+
+      return new Response(JSON.stringify({ connected: true, busySlots }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -26,6 +26,139 @@ export default function ArabicContact() {
   const [clientPhone, setClientPhone] = useState("");
   const [requestedService, setRequestedService] = useState("النمذجة والتقييم المالي");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [dayAvailability, setDayAvailability] = useState<{ is_available: boolean; time_from: string; time_to: string } | null>(null);
+  const [busyTimeSlots, setBusyTimeSlots] = useState<{ start: string; end: string }[]>([]);
+  const [dbBookings, setDbBookings] = useState<{ timeSlot: string }[]>([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+
+  const timeSlots = ["09:00 GST", "11:30 GST", "14:00 GST", "16:00 GST"];
+
+  const getFilteredTimeSlots = () => {
+    if (!dayAvailability || !dayAvailability.is_available) return [];
+    
+    return timeSlots.filter(slot => {
+      // 1. Check if within working hours
+      const slotTime = slot.split(" ")[0]; // "09:00"
+      if (slotTime < dayAvailability.time_from || slotTime > dayAvailability.time_to) {
+        return false;
+      }
+
+      // 2. Check if already booked in DB
+      const inDb = dbBookings.some(b => b.timeSlot === slot);
+      if (inDb) return false;
+
+      // 3. Check if overlaps with Google Calendar events
+      const slotStart = new Date(`${selectedDate}T${slotTime}:00+04:00`).getTime();
+      const slotEnd = slotStart + 2.5 * 60 * 60 * 1000; // assume 2.5 hour slots
+      
+      const isBusy = busyTimeSlots.some(busy => {
+        const busyStart = new Date(busy.start).getTime();
+        const busyEnd = new Date(busy.end).getTime();
+        return (slotStart >= busyStart && slotStart < busyEnd) || (slotEnd > busyStart && slotEnd <= busyEnd);
+      });
+
+      return !isBusy;
+    });
+  };
+
+  useEffect(() => {
+    const fetchSlotsAndAvailability = async () => {
+      setLoadingSlots(true);
+      const dateObj = new Date(selectedDate);
+      const dayOfWeek = dateObj.getDay();
+
+      // 1. Fetch Availability from Supabase
+      if (isSupabaseConfigured()) {
+        try {
+          const { data, error } = await supabase
+            .from("calendar_availability")
+            .select("*")
+            .eq("day_of_week", dayOfWeek)
+            .maybeSingle();
+          if (!error && data) {
+            setDayAvailability(data);
+          } else {
+            setDayAvailability({
+              is_available: dayOfWeek !== 5 && dayOfWeek !== 6,
+              time_from: "09:00",
+              time_to: "18:00",
+            });
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        const localAvail = localStorage.getItem("calendar-availability");
+        if (localAvail) {
+          const list = JSON.parse(localAvail);
+          const found = list.find((a: any) => a.day_of_week === dayOfWeek);
+          setDayAvailability(found || { is_available: dayOfWeek !== 5 && dayOfWeek !== 6, time_from: "09:00", time_to: "18:00" });
+        } else {
+          setDayAvailability({
+            is_available: dayOfWeek !== 5 && dayOfWeek !== 6,
+            time_from: "09:00",
+            time_to: "18:00",
+          });
+        }
+      }
+
+      // 2. Fetch Live Google Calendar Busy Slots
+      if (isSupabaseConfigured()) {
+        try {
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=get-busy-slots&date=${selectedDate}`
+          );
+          if (res.ok) {
+            const data = await res.json();
+            if (data.connected && data.busySlots) {
+              setBusyTimeSlots(data.busySlots);
+            } else {
+              setBusyTimeSlots([]);
+            }
+          }
+        } catch (e) {
+          console.error("Error fetching Google Calendar busy slots:", e);
+          setBusyTimeSlots([]);
+        }
+
+        // 3. Fetch Database confirmed bookings for selected date
+        try {
+          const { data: dbB, error: dbBErr } = await supabase
+            .from("bookings")
+            .select("timeSlot")
+            .eq("booking_date", selectedDate)
+            .eq("status", "Confirmed");
+          if (!dbBErr && dbB) {
+            setDbBookings(dbB);
+          } else {
+            setDbBookings([]);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        const localBookings = localStorage.getItem("bookings-slots");
+        const list = localBookings ? JSON.parse(localBookings) : [];
+        const filtered = list
+          .filter((b: any) => b.booking_date === selectedDate && b.status === "Confirmed")
+          .map((b: any) => ({ timeSlot: b.timeSlot }));
+        setDbBookings(filtered);
+        setBusyTimeSlots([]);
+      }
+      setLoadingSlots(false);
+    };
+
+    fetchSlotsAndAvailability();
+  }, [selectedDate]);
+
+  // Set default selectedSlot once filtered changes
+  useEffect(() => {
+    const filtered = getFilteredTimeSlots();
+    if (filtered.length > 0 && !filtered.includes(selectedSlot)) {
+      setSelectedSlot(filtered[0]);
+    }
+  }, [dayAvailability, busyTimeSlots, dbBookings]);
 
   const faqs: FAQ[] = [
     {
@@ -150,8 +283,6 @@ export default function ArabicContact() {
   const toggleFAQ = (id: string) => {
     setActiveFAQ(activeFAQ === id ? null : id);
   };
-
-  const timeSlots = ["09:00 GST", "11:30 GST", "14:00 GST", "16:00 GST"];
 
   return (
     <>
@@ -356,26 +487,41 @@ export default function ArabicContact() {
                   <p className="font-label-caps text-label-caps text-on-surface-variant mb-4">
                     المواعيد المتاحة ليوم {formatDate(selectedDate)}
                   </p>
-                  <div className="grid grid-cols-2 gap-3 mb-6">
-                    {timeSlots.map((slot) => {
-                      const isSelected = selectedSlot === slot;
-                      return (
-                        <button
-                          type="button"
-                          key={slot}
-                          onClick={() => setSelectedSlot(slot)}
-                          className={`border py-2 font-data-tabular text-data-tabular transition-colors cursor-pointer ${
-                            isSelected
-                              ? "border-secondary text-secondary bg-secondary/10"
-                              : "border-outline-variant/30 text-foreground bg-surface-dim hover:border-secondary hover:text-secondary"
-                          }`}
-                          dir="ltr"
-                        >
-                          {slot}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  
+                  {loadingSlots ? (
+                    <div className="py-6 text-center text-xs text-secondary animate-pulse">
+                      جاري التحقق من التوافر...
+                    </div>
+                  ) : !dayAvailability?.is_available ? (
+                    <div className="py-6 text-center text-xs text-red-400 border border-red-500/20 bg-red-500/5 font-label-caps uppercase mb-6">
+                      لا توجد ساعات عمل في هذا اليوم
+                    </div>
+                  ) : getFilteredTimeSlots().length === 0 ? (
+                    <div className="py-6 text-center text-xs text-amber-400 border border-amber-500/20 bg-amber-500/5 font-label-caps uppercase mb-6">
+                      جميع المواعيد محجوزة أو غير متاحة
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-3 mb-6">
+                      {getFilteredTimeSlots().map((slot) => {
+                        const isSelected = selectedSlot === slot;
+                        return (
+                          <button
+                            type="button"
+                            key={slot}
+                            onClick={() => setSelectedSlot(slot)}
+                            className={`border py-2 font-data-tabular text-data-tabular transition-colors cursor-pointer ${
+                              isSelected
+                                ? "border-secondary text-secondary bg-secondary/10"
+                                : "border-outline-variant/30 text-foreground bg-surface-dim hover:border-secondary hover:text-secondary"
+                            }`}
+                            dir="ltr"
+                          >
+                            {slot}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
 
                   {/* Contact Fields */}
                   <div className="space-y-4 mb-6 text-right">

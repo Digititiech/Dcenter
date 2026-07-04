@@ -115,6 +115,23 @@ export default function AdminDashboard() {
   const [editingPresetId, setEditingPresetId] = useState<string | null>(null);
   const [presetTitle, setPresetTitle] = useState("");
   const [presetText, setPresetText] = useState("");
+  interface CalendarAvailability {
+    day_of_week: number;
+    is_available: boolean;
+    time_from: string;
+    time_to: string;
+  }
+
+  const [availabilities, setAvailabilities] = useState<CalendarAvailability[]>([
+    { day_of_week: 0, is_available: true, time_from: "09:00", time_to: "18:00" },
+    { day_of_week: 1, is_available: true, time_from: "09:00", time_to: "18:00" },
+    { day_of_week: 2, is_available: true, time_from: "09:00", time_to: "18:00" },
+    { day_of_week: 3, is_available: true, time_from: "09:00", time_to: "18:00" },
+    { day_of_week: 4, is_available: true, time_from: "09:00", time_to: "18:00" },
+    { day_of_week: 5, is_available: false, time_from: "09:00", time_to: "18:00" },
+    { day_of_week: 6, is_available: false, time_from: "09:00", time_to: "18:00" },
+  ]);
+  const [savingAvailability, setSavingAvailability] = useState(false);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -144,6 +161,23 @@ export default function AdminDashboard() {
           }
         } catch (err) {
           console.error("Failed to load settings from Supabase, falling back to LocalStorage:", err);
+        }
+
+        try {
+          const { data: availData, error: availErr } = await supabase
+            .from("calendar_availability")
+            .select("*")
+            .order("day_of_week", { ascending: true });
+          if (!availErr && availData && availData.length > 0) {
+            setAvailabilities(availData);
+          }
+        } catch (e) {
+          console.error("Error loading availability settings:", e);
+        }
+      } else {
+        const savedAvail = localStorage.getItem("calendar-availability");
+        if (savedAvail) {
+          setAvailabilities(JSON.parse(savedAvail));
         }
       }
 
@@ -467,6 +501,37 @@ export default function AdminDashboard() {
     } finally {
       setGcalLoading(false);
     }
+  };
+
+  const handleSaveAvailability = async () => {
+    setSavingAvailability(true);
+    try {
+      if (isSupabaseConfigured()) {
+        for (const avail of availabilities) {
+          const { error } = await supabase.from("calendar_availability").upsert({
+            day_of_week: avail.day_of_week,
+            is_available: avail.is_available,
+            time_from: avail.time_from,
+            time_to: avail.time_to,
+          }, { onConflict: "day_of_week" });
+          if (error) throw error;
+        }
+        alert("Availability settings saved to Database successfully!");
+      } else {
+        localStorage.setItem("calendar-availability", JSON.stringify(availabilities));
+        alert("Availability settings saved to LocalStorage successfully!");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Failed to save availability settings.");
+    } finally {
+      setSavingAvailability(false);
+    }
+  };
+
+  const handleUpdateDayAvailability = (dayIndex: number, fields: Partial<CalendarAvailability>) => {
+    const updated = availabilities.map(a => a.day_of_week === dayIndex ? { ...a, ...fields } : a);
+    setAvailabilities(updated);
   };
 
   const fetchData = async (useDb: boolean) => {
@@ -1573,6 +1638,83 @@ export default function AdminDashboard() {
                   </button>
                 )}
               </div>
+            </div>
+
+            {/* Consultation Availability Settings */}
+            <div className="bg-[#111110] border border-outline-variant/10 p-6 space-y-5">
+              <h3 className="font-display-lg text-headline-md text-foreground border-b border-outline-variant/10 pb-2 flex items-center gap-2">
+                <span className="material-symbols-outlined text-secondary">schedule</span>
+                Consultation Weekly Availability
+              </h3>
+              <p className="font-body-sm text-body-sm text-on-surface-variant">
+                Define the days and active operational hours when clients can book strategic sessions.
+              </p>
+
+              <div className="space-y-4">
+                {availabilities.map((avail) => {
+                  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                  return (
+                    <div
+                      key={avail.day_of_week}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-[#181817] border border-outline-variant/10 gap-4"
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          id={`avail-check-${avail.day_of_week}`}
+                          checked={avail.is_available}
+                          onChange={(e) =>
+                            handleUpdateDayAvailability(avail.day_of_week, { is_available: e.target.checked })
+                          }
+                          className="accent-secondary h-4 w-4 rounded-none cursor-pointer"
+                        />
+                        <label
+                          htmlFor={`avail-check-${avail.day_of_week}`}
+                          className={`font-body-md text-body-md font-bold cursor-pointer ${
+                            avail.is_available ? "text-foreground" : "text-on-surface-variant line-through"
+                          }`}
+                        >
+                          {dayNames[avail.day_of_week]}
+                        </label>
+                      </div>
+
+                      {avail.is_available ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="time"
+                            value={avail.time_from}
+                            onChange={(e) =>
+                              handleUpdateDayAvailability(avail.day_of_week, { time_from: e.target.value })
+                            }
+                            className="bg-[#111110] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2 py-1.5 focus:outline-none focus:border-secondary font-mono"
+                          />
+                          <span className="text-on-surface-variant text-xs">to</span>
+                          <input
+                            type="time"
+                            value={avail.time_to}
+                            onChange={(e) =>
+                              handleUpdateDayAvailability(avail.day_of_week, { time_to: e.target.value })
+                            }
+                            className="bg-[#111110] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2 py-1.5 focus:outline-none focus:border-secondary font-mono"
+                          />
+                        </div>
+                      ) : (
+                        <span className="text-[10px] font-label-caps text-red-400 bg-red-400/5 px-2 py-0.5 border border-red-500/20 uppercase">
+                          Closed / Unavailable
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={handleSaveAvailability}
+                disabled={savingAvailability}
+                className="bg-secondary text-primary-container px-6 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-50 transition-colors cursor-pointer flex items-center gap-2"
+              >
+                <span>{savingAvailability ? "Saving..." : "Save Availability Settings"}</span>
+              </button>
             </div>
 
             {/* WhatsApp Connection */}
