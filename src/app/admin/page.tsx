@@ -100,15 +100,27 @@ export default function AdminDashboard() {
   const [newBookingEmail, setNewBookingEmail] = useState("");
   const [newBookingPhone, setNewBookingPhone] = useState("");
   const [newBookingDate, setNewBookingDate] = useState(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`);
-  const [newBookingSlot, setNewBookingSlot] = useState("09:00 AM");
+  const [newBookingSlot, setNewBookingSlot] = useState("09:00 GST");
   const [newBookingStatus, setNewBookingStatus] = useState<"Pending" | "Confirmed" | "Rescheduled">("Confirmed");
   const [savingNewBooking, setSavingNewBooking] = useState(false);
 
   // Reschedule Booking Modal State
   const [activeRescheduleBooking, setActiveRescheduleBooking] = useState<Booking | null>(null);
   const [rescheduleDate, setRescheduleDate] = useState(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`);
-  const [rescheduleSlot, setRescheduleSlot] = useState("09:00 AM");
+  const [rescheduleSlot, setRescheduleSlot] = useState("09:00 GST");
   const [savingReschedule, setSavingReschedule] = useState(false);
+
+  // Slots availability states for Add Booking Modal
+  const [addModalDayAvailability, setAddModalDayAvailability] = useState<any>(null);
+  const [addModalBusySlots, setAddModalBusySlots] = useState<{ start: string; end: string }[]>([]);
+  const [addModalDbBookings, setAddModalDbBookings] = useState<{ timeSlot: string }[]>([]);
+  const [loadingAddModalSlots, setLoadingAddModalSlots] = useState(false);
+
+  // Slots availability states for Reschedule Booking Modal
+  const [rescheduleModalDayAvailability, setRescheduleModalDayAvailability] = useState<any>(null);
+  const [rescheduleModalBusySlots, setRescheduleModalBusySlots] = useState<{ start: string; end: string }[]>([]);
+  const [rescheduleModalDbBookings, setRescheduleModalDbBookings] = useState<{ timeSlot: string }[]>([]);
+  const [loadingRescheduleModalSlots, setLoadingRescheduleModalSlots] = useState(false);
 
   // Preset Template Management State
   const [presets, setPresets] = useState<PresetMessage[]>([]);
@@ -186,6 +198,224 @@ export default function AdminDashboard() {
 
     loadSettings();
   }, [isUsingSupabase]);
+
+  const timeSlots = ["09:00 GST", "11:30 GST", "14:00 GST", "16:00 GST"];
+
+  const getFilteredAddModalSlots = () => {
+    if (!addModalDayAvailability || !addModalDayAvailability.is_available) return [];
+    return timeSlots.filter(slot => {
+      const slotTime = slot.split(" ")[0];
+      if (slotTime < addModalDayAvailability.time_from || slotTime > addModalDayAvailability.time_to) return false;
+      if (addModalDbBookings.some(b => b.timeSlot === slot)) return false;
+      const slotStart = new Date(`${newBookingDate}T${slotTime}:00+04:00`).getTime();
+      const slotEnd = slotStart + 2.5 * 60 * 60 * 1000;
+      return !addModalBusySlots.some(busy => {
+        const bStart = new Date(busy.start).getTime();
+        const bEnd = new Date(busy.end).getTime();
+        return (slotStart >= bStart && slotStart < bEnd) || (slotEnd > bStart && slotEnd <= bEnd);
+      });
+    });
+  };
+
+  const getFilteredRescheduleModalSlots = () => {
+    if (!rescheduleModalDayAvailability || !rescheduleModalDayAvailability.is_available) return [];
+    return timeSlots.filter(slot => {
+      const slotTime = slot.split(" ")[0];
+      if (slotTime < rescheduleModalDayAvailability.time_from || slotTime > rescheduleModalDayAvailability.time_to) return false;
+      if (rescheduleModalDbBookings.some(b => b.timeSlot === slot)) return false;
+      const slotStart = new Date(`${rescheduleDate}T${slotTime}:00+04:00`).getTime();
+      const slotEnd = slotStart + 2.5 * 60 * 60 * 1000;
+      return !rescheduleModalBusySlots.some(busy => {
+        const bStart = new Date(busy.start).getTime();
+        const bEnd = new Date(busy.end).getTime();
+        return (slotStart >= bStart && slotStart < bEnd) || (slotEnd > bStart && slotEnd <= bEnd);
+      });
+    });
+  };
+
+  useEffect(() => {
+    if (!showingAddBookingModal || !newBookingDate) return;
+    const fetchAddModalSlots = async () => {
+      setLoadingAddModalSlots(true);
+      const dateObj = new Date(newBookingDate);
+      const dayOfWeek = dateObj.getDay();
+
+      if (isUsingSupabase) {
+        try {
+          const { data, error } = await supabase
+            .from("calendar_availability")
+            .select("*")
+            .eq("day_of_week", dayOfWeek)
+            .maybeSingle();
+          if (!error && data) {
+            setAddModalDayAvailability(data);
+          } else {
+            setAddModalDayAvailability({
+              is_available: dayOfWeek !== 5 && dayOfWeek !== 6,
+              time_from: "09:00",
+              time_to: "18:00",
+            });
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        const localAvail = localStorage.getItem("calendar-availability");
+        if (localAvail) {
+          const list = JSON.parse(localAvail);
+          const found = list.find((a: any) => a.day_of_week === dayOfWeek);
+          setAddModalDayAvailability(found || { is_available: dayOfWeek !== 5 && dayOfWeek !== 6, time_from: "09:00", time_to: "18:00" });
+        } else {
+          setAddModalDayAvailability({
+            is_available: dayOfWeek !== 5 && dayOfWeek !== 6,
+            time_from: "09:00",
+            time_to: "18:00",
+          });
+        }
+      }
+
+      if (isUsingSupabase) {
+        try {
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=get-busy-slots&date=${newBookingDate}`
+          );
+          if (res.ok) {
+            const data = await res.json();
+            if (data.connected && data.busySlots) {
+              setAddModalBusySlots(data.busySlots);
+            } else {
+              setAddModalBusySlots([]);
+            }
+          }
+        } catch (e) {
+          console.error(e);
+          setAddModalBusySlots([]);
+        }
+
+        try {
+          const { data: dbB } = await supabase
+            .from("bookings")
+            .select("timeSlot")
+            .eq("booking_date", newBookingDate)
+            .eq("status", "Confirmed");
+          if (dbB) setAddModalDbBookings(dbB);
+          else setAddModalDbBookings([]);
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        const localBookings = localStorage.getItem("bookings-slots");
+        const list = localBookings ? JSON.parse(localBookings) : [];
+        const filtered = list
+          .filter((b: any) => b.booking_date === newBookingDate && b.status === "Confirmed")
+          .map((b: any) => ({ timeSlot: b.timeSlot }));
+        setAddModalDbBookings(filtered);
+        setAddModalBusySlots([]);
+      }
+      setLoadingAddModalSlots(false);
+    };
+
+    fetchAddModalSlots();
+  }, [newBookingDate, showingAddBookingModal]);
+
+  useEffect(() => {
+    const filtered = getFilteredAddModalSlots();
+    if (filtered.length > 0 && !filtered.includes(newBookingSlot)) {
+      setNewBookingSlot(filtered[0]);
+    }
+  }, [addModalDayAvailability, addModalBusySlots, addModalDbBookings]);
+
+  useEffect(() => {
+    if (!activeRescheduleBooking || !rescheduleDate) return;
+    const fetchRescheduleModalSlots = async () => {
+      setLoadingRescheduleModalSlots(true);
+      const dateObj = new Date(rescheduleDate);
+      const dayOfWeek = dateObj.getDay();
+
+      if (isUsingSupabase) {
+        try {
+          const { data, error } = await supabase
+            .from("calendar_availability")
+            .select("*")
+            .eq("day_of_week", dayOfWeek)
+            .maybeSingle();
+          if (!error && data) {
+            setRescheduleModalDayAvailability(data);
+          } else {
+            setRescheduleModalDayAvailability({
+              is_available: dayOfWeek !== 5 && dayOfWeek !== 6,
+              time_from: "09:00",
+              time_to: "18:00",
+            });
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        const localAvail = localStorage.getItem("calendar-availability");
+        if (localAvail) {
+          const list = JSON.parse(localAvail);
+          const found = list.find((a: any) => a.day_of_week === dayOfWeek);
+          setRescheduleModalDayAvailability(found || { is_available: dayOfWeek !== 5 && dayOfWeek !== 6, time_from: "09:00", time_to: "18:00" });
+        } else {
+          setRescheduleModalDayAvailability({
+            is_available: dayOfWeek !== 5 && dayOfWeek !== 6,
+            time_from: "09:00",
+            time_to: "18:00",
+          });
+        }
+      }
+
+      if (isUsingSupabase) {
+        try {
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=get-busy-slots&date=${rescheduleDate}`
+          );
+          if (res.ok) {
+            const data = await res.json();
+            if (data.connected && data.busySlots) {
+              setRescheduleModalBusySlots(data.busySlots);
+            } else {
+              setRescheduleModalBusySlots([]);
+            }
+          }
+        } catch (e) {
+          console.error(e);
+          setRescheduleModalBusySlots([]);
+        }
+
+        try {
+          const { data: dbB } = await supabase
+            .from("bookings")
+            .select("timeSlot")
+            .eq("booking_date", rescheduleDate)
+            .eq("status", "Confirmed");
+          if (dbB) setRescheduleModalDbBookings(dbB);
+          else setRescheduleModalDbBookings([]);
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        const localBookings = localStorage.getItem("bookings-slots");
+        const list = localBookings ? JSON.parse(localBookings) : [];
+        const filtered = list
+          .filter((b: any) => b.booking_date === rescheduleDate && b.status === "Confirmed")
+          .map((b: any) => ({ timeSlot: b.timeSlot }));
+        setRescheduleModalDbBookings(filtered);
+        setRescheduleModalBusySlots([]);
+      }
+      setLoadingRescheduleModalSlots(false);
+    };
+
+    fetchRescheduleModalSlots();
+  }, [rescheduleDate, activeRescheduleBooking]);
+
+  useEffect(() => {
+    const filtered = getFilteredRescheduleModalSlots();
+    if (filtered.length > 0 && !filtered.includes(rescheduleSlot)) {
+      setRescheduleSlot(filtered[0]);
+    }
+  }, [rescheduleModalDayAvailability, rescheduleModalBusySlots, rescheduleModalDbBookings]);
 
   useEffect(() => {
     const loadPresets = async () => {
@@ -2250,16 +2480,23 @@ export default function AdminDashboard() {
                   </div>
                   <div className="space-y-1">
                     <label className="font-body-sm text-body-sm text-foreground">Time Slot</label>
-                    <select
-                      value={newBookingSlot}
-                      onChange={(e) => setNewBookingSlot(e.target.value)}
-                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-2 focus:outline-none focus:border-secondary"
-                    >
-                      <option value="09:00 AM">09:00 AM</option>
-                      <option value="10:30 AM">10:30 AM</option>
-                      <option value="01:00 PM">01:00 PM</option>
-                      <option value="03:00 PM">03:00 PM</option>
-                    </select>
+                    {loadingAddModalSlots ? (
+                      <div className="text-xs text-secondary animate-pulse py-2">Checking availability...</div>
+                    ) : !addModalDayAvailability?.is_available ? (
+                      <div className="text-xs text-red-400 py-2 uppercase font-label-caps">No operational hours on this day</div>
+                    ) : getFilteredAddModalSlots().length === 0 ? (
+                      <div className="text-xs text-amber-400 py-2 uppercase font-label-caps">All slots booked or unavailable</div>
+                    ) : (
+                      <select
+                        value={newBookingSlot}
+                        onChange={(e) => setNewBookingSlot(e.target.value)}
+                        className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-2 focus:outline-none focus:border-secondary"
+                      >
+                        {getFilteredAddModalSlots().map((slot) => (
+                          <option key={slot} value={slot}>{slot}</option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                 </div>
 
@@ -2324,16 +2561,23 @@ export default function AdminDashboard() {
 
                 <div className="space-y-1">
                   <label className="font-body-sm text-body-sm text-foreground">New Time Slot</label>
-                  <select
-                    value={rescheduleSlot}
-                    onChange={(e) => setRescheduleSlot(e.target.value)}
-                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-2 focus:outline-none focus:border-secondary"
-                  >
-                    <option value="09:00 AM">09:00 AM</option>
-                    <option value="10:30 AM">10:30 AM</option>
-                    <option value="01:00 PM">01:00 PM</option>
-                    <option value="03:00 PM">03:00 PM</option>
-                  </select>
+                  {loadingRescheduleModalSlots ? (
+                    <div className="text-xs text-secondary animate-pulse py-2">Checking availability...</div>
+                  ) : !rescheduleModalDayAvailability?.is_available ? (
+                    <div className="text-xs text-red-400 py-2 uppercase font-label-caps">No operational hours on this day</div>
+                  ) : getFilteredRescheduleModalSlots().length === 0 ? (
+                    <div className="text-xs text-amber-400 py-2 uppercase font-label-caps">All slots booked or unavailable</div>
+                  ) : (
+                    <select
+                      value={rescheduleSlot}
+                      onChange={(e) => setRescheduleSlot(e.target.value)}
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-2 focus:outline-none focus:border-secondary"
+                    >
+                      {getFilteredRescheduleModalSlots().map((slot) => (
+                        <option key={slot} value={slot}>{slot}</option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               </div>
 
