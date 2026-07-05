@@ -276,13 +276,27 @@ export default function Contact() {
       booking_type: finalService
     };
 
+    const newLead = {
+      name: clientName,
+      email: clientEmail,
+      phone: clientPhone,
+      company: "N/A",
+      timeframe: "Immediate",
+      status: "Booked"
+    };
+
     try {
       if (isSupabaseConfigured()) {
         await supabase.from("bookings").insert(newBooking);
+        await supabase.from("leads").insert(newLead);
       } else {
         const localBookings = localStorage.getItem("bookings-slots");
         const currentBookings = localBookings ? JSON.parse(localBookings) : [];
         localStorage.setItem("bookings-slots", JSON.stringify([...currentBookings, { id: Date.now().toString(), ...newBooking }]));
+
+        const localLeads = localStorage.getItem("crm-leads");
+        const currentLeads = localLeads ? JSON.parse(localLeads) : [];
+        localStorage.setItem("crm-leads", JSON.stringify([...currentLeads, { id: Date.now().toString(), ...newLead, created_at: new Date().toISOString() }]));
       }
 
       // Send auto WhatsApp via connected WhatsApp server

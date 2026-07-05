@@ -1203,6 +1203,23 @@ export default function AdminDashboard() {
     }
     setSavingNewBooking(true);
 
+    const existingLead = leads.find(l => l.phone.trim() === newBookingPhone.trim());
+    let shouldCreateLead = true;
+
+    if (existingLead) {
+      const confirmUseExisting = window.confirm(
+        `Warning: A lead with this phone number ("${newBookingPhone}") already exists in the CRM (Name: "${existingLead.name}", Email: "${existingLead.email}").\n\n` +
+        `Click "OK" to associate this booking with the existing lead (preventing a duplicate lead).\n` +
+        `Click "Cancel" to go back and enter a different phone number.`
+      );
+
+      if (!confirmUseExisting) {
+        setSavingNewBooking(false);
+        return;
+      }
+      shouldCreateLead = false;
+    }
+
     const parsedDay = new Date(newBookingDate).getDate();
     const finalBookingType = newBookingType === "Others" ? `Other: ${newBookingTypeSpecify}` : newBookingType;
 
@@ -1221,6 +1238,25 @@ export default function AdminDashboard() {
       if (isUsingSupabase) {
         const { data, error } = await supabase.from("bookings").insert(newBooking).select().single();
         if (error) throw error;
+
+        // Auto-add new lead to CRM if it does not already exist
+        if (shouldCreateLead) {
+          const newLead = {
+            name: newBookingName,
+            email: newBookingEmail,
+            phone: newBookingPhone,
+            company: "N/A",
+            timeframe: "Immediate",
+            status: "Booked" as const,
+          };
+          const { data: leadData, error: leadError } = await supabase.from("leads").insert(newLead).select().single();
+          if (leadError) {
+            console.error("Failed to automatically add lead to CRM:", leadError);
+          } else if (leadData) {
+            setLeads(prevLeads => [leadData, ...prevLeads]);
+          }
+        }
+
         if (data) {
           setBookings([...bookings, data]);
         }
@@ -1232,6 +1268,23 @@ export default function AdminDashboard() {
         const updated = [...bookings, localBooking];
         setBookings(updated);
         localStorage.setItem("bookings-slots", JSON.stringify(updated));
+
+        // Auto-add new lead to local CRM if it does not already exist
+        if (shouldCreateLead) {
+          const localLead: Lead = {
+            id: (Date.now() + 1).toString(),
+            name: newBookingName,
+            email: newBookingEmail,
+            phone: newBookingPhone,
+            company: "N/A",
+            timeframe: "Immediate",
+            status: "Booked",
+            created_at: new Date().toISOString()
+          };
+          const updatedLeads = [localLead, ...leads];
+          setLeads(updatedLeads);
+          localStorage.setItem("crm-leads", JSON.stringify(updatedLeads));
+        }
       }
 
       alert("New booking added successfully!");

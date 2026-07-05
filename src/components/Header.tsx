@@ -97,6 +97,9 @@ export default function Header({ locale }: { locale: "en" | "ar" }) {
         <div className="hidden md:flex items-center gap-4">
           <Link
             href={altLink}
+            onClick={() => {
+              document.cookie = `NEXT_LOCALE=${locale === "en" ? "ar" : "en"}; path=/; max-age=31536000`;
+            }}
             className="flex items-center gap-2 px-3 py-1.5 border border-secondary/30 rounded-none text-secondary hover:bg-secondary/10 transition-all duration-300 font-label-caps text-label-caps"
           >
             <span className="material-symbols-outlined text-[18px]">language</span>
@@ -144,6 +147,9 @@ export default function Header({ locale }: { locale: "en" | "ar" }) {
               <div className="flex flex-col gap-4">
                 <Link
                   href={altLink}
+                  onClick={() => {
+                    document.cookie = `NEXT_LOCALE=${locale === "en" ? "ar" : "en"}; path=/; max-age=31536000`;
+                  }}
                   className="flex items-center justify-center gap-2 px-3 py-2 border border-secondary/30 rounded-none text-secondary hover:bg-secondary/10 transition-all duration-300 font-label-caps text-label-caps text-center"
                 >
                   <span className="material-symbols-outlined text-[18px]">language</span>
