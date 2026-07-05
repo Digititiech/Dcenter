@@ -9,36 +9,30 @@ export default function HeroVideo() {
     const videoEl = videoRef.current;
     if (!videoEl) return;
 
-    // Force default unmuted state
-    videoEl.muted = false;
+    // Try autoplaying on mount (video is muted in JSX to guarantee success)
+    videoEl.play().catch((err) => {
+      console.log("Autoplay check:", err);
+    });
 
-    // Try playing immediately
-    const playPromise = videoEl.play();
-    if (playPromise !== undefined) {
-      playPromise.catch((err) => {
-        console.log("Initial unmuted autoplay blocked by browser policy. Registering interaction listeners.", err);
-        
-        // Listen to first mouse move, touch, scroll, or click to start unmuted playback
-        const startVideo = () => {
-          videoEl.muted = false;
-          videoEl.play()
-            .then(() => removeListeners())
-            .catch((e) => console.log("Failed to start unmuted on interaction", e));
-        };
+    // Unmute as soon as the user interacts with the page
+    const unmuteVideo = () => {
+      if (videoEl) {
+        videoEl.muted = false;
+      }
+      removeListeners();
+    };
 
-        const removeListeners = () => {
-          window.removeEventListener("mousemove", startVideo);
-          window.removeEventListener("click", startVideo);
-          window.removeEventListener("touchstart", startVideo);
-          window.removeEventListener("scroll", startVideo);
-        };
+    const removeListeners = () => {
+      window.removeEventListener("mousemove", unmuteVideo);
+      window.removeEventListener("click", unmuteVideo);
+      window.removeEventListener("touchstart", unmuteVideo);
+      window.removeEventListener("scroll", unmuteVideo);
+    };
 
-        window.addEventListener("mousemove", startVideo, { once: true });
-        window.addEventListener("click", startVideo, { once: true });
-        window.addEventListener("touchstart", startVideo, { once: true });
-        window.addEventListener("scroll", startVideo, { once: true });
-      });
-    }
+    window.addEventListener("mousemove", unmuteVideo, { once: true });
+    window.addEventListener("click", unmuteVideo, { once: true });
+    window.addEventListener("touchstart", unmuteVideo, { once: true });
+    window.addEventListener("scroll", unmuteVideo, { once: true });
 
     // Use Intersection Observer to detect when video scrolls out of view
     const observer = new IntersectionObserver(
@@ -54,6 +48,7 @@ export default function HeroVideo() {
     observer.observe(videoEl);
 
     return () => {
+      removeListeners();
       observer.unobserve(videoEl);
     };
   }, []);
@@ -65,6 +60,7 @@ export default function HeroVideo() {
       src="/intro-video.mp4"
       controls
       autoPlay
+      muted // Required by browsers to allow autoplay
       loop
       playsInline
     />
