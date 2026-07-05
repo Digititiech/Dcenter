@@ -83,7 +83,9 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
     const clientId = Deno.env.get("GOOGLE_CLIENT_ID") || "";
     const clientSecret = Deno.env.get("GOOGLE_CLIENT_SECRET") || "";
-    const redirectUri = `${url.origin}${url.pathname}`;
+    
+    // Construct the public HTTPS redirect URI using the project URL
+    const redirectUri = `${supabaseUrl}/functions/v1/google-calendar-auth`;
 
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
 
