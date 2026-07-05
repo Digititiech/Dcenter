@@ -55,6 +55,7 @@ export default function ArabicHome() {
                 <video
                   className="w-full h-full object-cover"
                   src="/intro-video.mp4"
+                  controls
                   autoPlay
                   muted
                   loop
