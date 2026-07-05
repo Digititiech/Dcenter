@@ -9,31 +9,6 @@ export default function HeroVideo() {
     const videoEl = videoRef.current;
     if (!videoEl) return;
 
-    // Try autoplaying on mount (video is muted in JSX to guarantee success)
-    videoEl.play().catch((err) => {
-      console.log("Autoplay check:", err);
-    });
-
-    // Unmute as soon as the user interacts with the page
-    const unmuteVideo = () => {
-      if (videoEl) {
-        videoEl.muted = false;
-      }
-      removeListeners();
-    };
-
-    const removeListeners = () => {
-      window.removeEventListener("mousemove", unmuteVideo);
-      window.removeEventListener("click", unmuteVideo);
-      window.removeEventListener("touchstart", unmuteVideo);
-      window.removeEventListener("scroll", unmuteVideo);
-    };
-
-    window.addEventListener("mousemove", unmuteVideo, { once: true });
-    window.addEventListener("click", unmuteVideo, { once: true });
-    window.addEventListener("touchstart", unmuteVideo, { once: true });
-    window.addEventListener("scroll", unmuteVideo, { once: true });
-
     // Use Intersection Observer to detect when video scrolls out of view
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -48,7 +23,6 @@ export default function HeroVideo() {
     observer.observe(videoEl);
 
     return () => {
-      removeListeners();
       observer.unobserve(videoEl);
     };
   }, []);
