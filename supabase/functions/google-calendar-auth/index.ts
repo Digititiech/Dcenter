@@ -74,13 +74,16 @@ serve(async (req) => {
 
   try {
     const url = new URL(req.url);
-    const action = url.searchParams.get("action") || "login";
+    let action = url.searchParams.get("action") || "login";
+    if (url.searchParams.has("code")) {
+      action = "callback";
+    }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
     const clientId = Deno.env.get("GOOGLE_CLIENT_ID") || "";
     const clientSecret = Deno.env.get("GOOGLE_CLIENT_SECRET") || "";
-    const redirectUri = `${url.origin}${url.pathname}?action=callback`;
+    const redirectUri = `${url.origin}${url.pathname}`;
 
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
 
