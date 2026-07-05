@@ -51,7 +51,7 @@ export default function ArabicHome() {
             </div>
             <div className="md:col-span-4 mt-12 md:mt-0 relative">
               <div className="aspect-[4/5] bg-surface-container-high border border-outline-variant/30 rounded-none relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10 pointer-events-none"></div>
                 <video
                   className="w-full h-full object-cover"
                   src="/intro-video.mp4"
