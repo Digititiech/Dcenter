@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import HeroVideo from "@/components/HeroVideo";
 
 export default function ArabicHome() {
   return (
@@ -52,14 +53,7 @@ export default function ArabicHome() {
             <div className="md:col-span-4 mt-12 md:mt-0 relative">
               <div className="aspect-[4/5] bg-surface-container-high border border-outline-variant/30 rounded-none relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10 pointer-events-none"></div>
-                <video
-                  className="w-full h-full object-cover"
-                  src="/intro-video.mp4"
-                  controls
-                  autoPlay
-                  loop
-                  playsInline
-                />
+                <HeroVideo />
               </div>
               <div className="absolute -bottom-6 -right-6 w-32 h-32 border-b-4 border-r-4 border-secondary/30 -z-10"></div>
             </div>
