@@ -53,10 +53,13 @@ export default function Home() {
             <div className="md:col-span-4 mt-12 md:mt-0 relative">
               <div className="aspect-[4/5] bg-surface-container-high border border-outline-variant/30 rounded-none relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10"></div>
-                <img
-                  alt="Decision Center"
-                  className="w-full h-full object-cover transition-all duration-700"
-                  src="/Image_euujiweuujiweuuj.png"
+                <video
+                  className="w-full h-full object-cover"
+                  src="/intro-video.mp4"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
                 />
               </div>
               <div className="absolute -bottom-6 -left-6 w-32 h-32 border-b-4 border-l-4 border-secondary/30 -z-10"></div>
@@ -284,22 +287,64 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Call to Methodology Section */}
+        {/* How We Work Section */}
         <section className="py-section-gap px-margin-mobile md:px-margin-desktop bg-surface-container-low border-y border-outline-variant/20">
-          <div className="max-w-container-max mx-auto text-center">
-            <h2 className="font-display-lg text-headline-lg text-foreground mb-6">Strategic Excellence in Every Step</h2>
-            <p className="font-body-lg text-body-lg text-on-surface-variant mb-12 max-w-2xl mx-auto">
-              Our approach is built on precision, data-driven insights, and a deep understanding of the global economic
-              landscape.
-            </p>
-            <div className="flex justify-center">
-              <Link
-                className="bg-secondary text-background hover:brightness-110 transition-all duration-300 px-10 py-4 rounded-none font-label-caps text-label-caps text-center flex items-center justify-center gap-2"
-                href="/methodology"
-              >
-                Discover Our Methodology
-                <span className="material-symbols-outlined text-xl">arrow_forward</span>
-              </Link>
+          <div className="max-w-container-max mx-auto">
+            <div className="grid md:grid-cols-2 gap-16 items-center">
+              <div>
+                <h2 className="font-display-lg text-headline-lg text-foreground mb-6">Work Methodology</h2>
+                <p className="font-body-lg text-body-lg text-on-surface-variant mb-12">
+                  We follow a precise advisory path that ensures translating challenges into tangible opportunities through four integrative stages.
+                </p>
+                <div className="space-y-12">
+                  <div className="flex gap-6 items-start">
+                    <span className="font-display-lg text-5xl step-number opacity-50">01</span>
+                    <div>
+                      <h4 className="font-display-lg text-2xl text-foreground mb-2">Understanding (We Listen)</h4>
+                      <p className="text-on-surface-variant">
+                        Deep analysis of your needs and objectives to understand the operational and financial context.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-6 items-start">
+                    <span className="font-display-lg text-5xl step-number opacity-50">02</span>
+                    <div>
+                      <h4 className="font-display-lg text-2xl text-foreground mb-2">Analysis (We Diagnose)</h4>
+                      <p className="text-on-surface-variant">
+                        Using advanced analytical tools to identify gaps and latent opportunities.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-6 items-start">
+                    <span className="font-display-lg text-5xl step-number opacity-50">03</span>
+                    <div>
+                      <h4 className="font-display-lg text-2xl text-foreground mb-2">Solutions (We Build)</h4>
+                      <p className="text-on-surface-variant">
+                        Formulating customized and practically applicable financial strategies and solutions.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-6 items-start">
+                    <span className="font-display-lg text-5xl step-number opacity-50">04</span>
+                    <div>
+                      <h4 className="font-display-lg text-2xl text-foreground mb-2">Execution (We Support)</h4>
+                      <p className="text-on-surface-variant">
+                        Continuous support during the implementation phase to ensure achieving desired results.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="relative flex justify-center">
+                <div className="aspect-square bg-surface-container-high rounded-full overflow-hidden border border-outline-variant/20 p-8 w-full max-w-md relative">
+                  <div className="w-full h-full rounded-full border-4 border-dashed border-secondary/20 animate-[spin_20s_linear_infinite] absolute inset-0"></div>
+                  <img
+                    alt="Strategic Process"
+                    className="w-full h-full object-cover rounded-full opacity-70"
+                    src="/methodology_illustration.png"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </section>

@@ -28,6 +28,7 @@ interface Booking {
   timeSlot: string;
   status: "Pending" | "Confirmed" | "Rescheduled";
   booking_date?: string;
+  booking_type?: string;
 }
 
 interface PresetMessage {
@@ -120,6 +121,8 @@ export default function AdminDashboard() {
   const [newBookingDate, setNewBookingDate] = useState(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`);
   const [newBookingSlot, setNewBookingSlot] = useState("09:00 GST");
   const [newBookingStatus, setNewBookingStatus] = useState<"Pending" | "Confirmed" | "Rescheduled">("Confirmed");
+  const [newBookingType, setNewBookingType] = useState("Financial & Valuation Modeling");
+  const [newBookingTypeSpecify, setNewBookingTypeSpecify] = useState("");
   const [savingNewBooking, setSavingNewBooking] = useState(false);
 
   // Reschedule Booking Modal State
@@ -1194,9 +1197,14 @@ export default function AdminDashboard() {
       alert("Please fill out all fields");
       return;
     }
+    if (newBookingType === "Others" && !newBookingTypeSpecify) {
+      alert("Please specify the booking type");
+      return;
+    }
     setSavingNewBooking(true);
 
     const parsedDay = new Date(newBookingDate).getDate();
+    const finalBookingType = newBookingType === "Others" ? `Other: ${newBookingTypeSpecify}` : newBookingType;
 
     const newBooking: Omit<Booking, "id"> = {
       clientName: newBookingName,
@@ -1205,7 +1213,8 @@ export default function AdminDashboard() {
       day: parsedDay,
       timeSlot: newBookingSlot,
       status: newBookingStatus,
-      booking_date: newBookingDate
+      booking_date: newBookingDate,
+      booking_type: finalBookingType
     };
 
     try {
@@ -1227,6 +1236,8 @@ export default function AdminDashboard() {
 
       alert("New booking added successfully!");
       setShowingAddBookingModal(false);
+      setNewBookingType("Financial & Valuation Modeling");
+      setNewBookingTypeSpecify("");
     } catch (err) {
       console.error(err);
       alert("Error adding manual booking");
@@ -1637,6 +1648,11 @@ export default function AdminDashboard() {
                         <p className="font-body-sm text-[12px] text-on-surface-variant">
                           {locale === "ar" ? "أكتوبر" : "Oct"} {b.day} {locale === "ar" ? "في" : "at"} {b.timeSlot}
                         </p>
+                        {b.booking_type && (
+                          <p className="text-secondary text-[11px] mt-0.5">
+                            {b.booking_type}
+                          </p>
+                        )}
                       </div>
                       <button
                         onClick={() => handleConfirmBooking(b.id)}
@@ -1839,6 +1855,11 @@ export default function AdminDashboard() {
                           <p className="font-body-sm text-[12px] text-on-surface-variant mt-1">
                             {locale === "ar" ? "البريد الإلكتروني" : "Email"}: {b.clientEmail} | {locale === "ar" ? "الهاتف" : "Phone"}: {b.clientPhone}
                           </p>
+                          {b.booking_type && (
+                            <p className="font-body-sm text-[12px] text-on-surface-variant mt-1">
+                              {locale === "ar" ? "نوع الخدمة" : "Service Type"}: <span className="text-foreground">{b.booking_type}</span>
+                            </p>
+                          )}
                           <p className="font-body-md text-body-sm text-secondary mt-2 flex items-center gap-1.5">
                             <span className="material-symbols-outlined text-[16px]">schedule</span>
                             {formatFriendlyDate(getBookingDateString(b))} {locale === "ar" ? "في الساعة" : "at"} {b.timeSlot}
@@ -2936,6 +2957,35 @@ export default function AdminDashboard() {
                     )}
                   </div>
                 </div>
+
+                <div className="space-y-1">
+                  <label className="font-body-sm text-body-sm text-foreground">{locale === "ar" ? "نوع الخدمة المطلوبة" : "Requested Service"}</label>
+                  <select
+                    value={newBookingType}
+                    onChange={(e) => setNewBookingType(e.target.value)}
+                    className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-2 focus:outline-none focus:border-secondary"
+                  >
+                    <option value="Financial & Valuation Modeling">{locale === "ar" ? "النمذجة والتقييم المالي" : "Financial & Valuation Modeling"}</option>
+                    <option value="Evidentiary Feasibility Studies">{locale === "ar" ? "دراسات الجدوى المعتمدة" : "Evidentiary Feasibility Studies"}</option>
+                    <option value="Debt Restructuring & ERM">{locale === "ar" ? "إعادة هيكلة الديون وإدارة المخاطر" : "Debt Restructuring & ERM"}</option>
+                    <option value="Sovereign Policy Support">{locale === "ar" ? "دعم السياسات السيادية" : "Sovereign Policy Support"}</option>
+                    <option value="Others">{locale === "ar" ? "أخرى (تحديد)" : "Others (Specify)"}</option>
+                  </select>
+                </div>
+
+                {newBookingType === "Others" && (
+                  <div className="space-y-1">
+                    <label className="font-body-sm text-body-sm text-foreground">{locale === "ar" ? "تحديد الخدمة" : "Specify Service"}</label>
+                    <input
+                      type="text"
+                      placeholder={locale === "ar" ? "اكتب الخدمة المطلوبة..." : "Type custom service..."}
+                      value={newBookingTypeSpecify}
+                      onChange={(e) => setNewBookingTypeSpecify(e.target.value)}
+                      className="w-full bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-3 py-2 focus:outline-none focus:border-secondary"
+                      required
+                    />
+                  </div>
+                )}
 
                 <div className="space-y-1">
                   <label className="font-body-sm text-body-sm text-foreground">{t.modals.addBooking.status}</label>

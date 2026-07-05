@@ -26,6 +26,7 @@ export default function ArabicContact() {
   const [clientPhone, setClientPhone] = useState("");
   const [requestedService, setRequestedService] = useState("النمذجة والتقييم المالي");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [otherServiceSpecify, setOtherServiceSpecify] = useState("");
 
   const [dayAvailability, setDayAvailability] = useState<{ is_available: boolean; time_from: string; time_to: string } | null>(null);
   const [busyTimeSlots, setBusyTimeSlots] = useState<{ start: string; end: string }[]>([]);
@@ -260,7 +261,9 @@ export default function ArabicContact() {
     const dateObj = new Date(selectedDate);
     const day = dateObj.getDate();
 
-    const message = `مرحباً مركز القرار، أود حجز جلسة استشارية استراتيجية.\n\nتفاصيل العميل:\n- الاسم: ${clientName}\n- البريد الإلكتروني: ${clientEmail}\n- رقم الهاتف: ${clientPhone}\n- الخدمة المطلوبة: ${requestedService}\n\nالموعد المفضل: ${formatDate(selectedDate)} في الساعة ${selectedSlot}`;
+    const finalService = requestedService === "استشارات استراتيجية أخرى" ? `أخرى: ${otherServiceSpecify}` : requestedService;
+
+    const message = `مرحباً مركز القرار، أود حجز جلسة استشارية استراتيجية.\n\nتفاصيل العميل:\n- الاسم: ${clientName}\n- البريد الإلكتروني: ${clientEmail}\n- رقم الهاتف: ${clientPhone}\n- الخدمة المطلوبة: ${finalService}\n\nالموعد المفضل: ${formatDate(selectedDate)} في الساعة ${selectedSlot}`;
 
     const newBooking = {
       clientName,
@@ -269,7 +272,8 @@ export default function ArabicContact() {
       day,
       timeSlot: selectedSlot,
       status: "Pending",
-      booking_date: selectedDate
+      booking_date: selectedDate,
+      booking_type: finalService
     };
 
     try {
@@ -310,6 +314,7 @@ export default function ArabicContact() {
       setClientName("");
       setClientEmail("");
       setClientPhone("");
+      setOtherServiceSpecify("");
       setTimeout(() => {
         setShowConfirmation(false);
       }, 6000);
@@ -329,57 +334,7 @@ export default function ArabicContact() {
     <>
       <Header locale="ar" />
       <main className="flex-grow pt-20">
-        {/* Section: Conversion Header & Objection Handling */}
-        <section className="px-margin-mobile md:px-margin-desktop py-section-gap max-w-container-max mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter">
-            <div className="md:col-span-5 flex flex-col justify-center">
-              <h1 className="font-display-lg text-display-lg-mobile md:text-display-lg text-foreground mb-6">
-                امضِ قدماً <span className="text-secondary">بوضوح تام.</span>
-              </h1>
-              <p className="font-body-lg text-body-lg text-on-surface-variant mb-8">
-                هيكلية تقاريرنا ذات المستوى المؤسسي لا تدع مجالاً للغموض. وجه اهتماماتك مباشرة أدناه.
-              </p>
-            </div>
-            <div className="md:col-span-6 md:col-start-7 flex flex-col justify-center space-y-4">
-              {faqs.map((faq) => {
-                const isActive = activeFAQ === faq.id;
-                return (
-                  <div
-                    key={faq.id}
-                    className="border border-outline-variant/30 bg-surface-container-high rounded-none overflow-hidden"
-                  >
-                    <button
-                      className="w-full px-6 py-4 flex justify-between items-center text-right focus:outline-none cursor-pointer"
-                      onClick={() => toggleFAQ(faq.id)}
-                    >
-                      <span className="font-body-md text-body-md text-foreground font-semibold">
-                        {faq.question}
-                      </span>
-                      <span
-                        className={`material-symbols-outlined accordion-icon text-secondary ${
-                          isActive ? "rotate-180" : ""
-                        }`}
-                      >
-                        expand_more
-                      </span>
-                    </button>
-                    <div
-                      className={`transition-all duration-300 ${
-                        isActive ? "max-h-[500px] opacity-100 p-6 pt-0" : "max-h-0 opacity-0 overflow-hidden"
-                      } bg-surface`}
-                    >
-                      <div className="w-full h-px bg-outline-variant/10 mb-4"></div>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">{faq.answer}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
 
-        {/* Divider */}
-        <div className="w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop h-px bg-outline-variant/30"></div>
 
         {/* Section: Secure Contact & Scheduling */}
         <section className="px-margin-mobile md:px-margin-desktop py-section-gap max-w-container-max mx-auto relative">
@@ -614,6 +569,19 @@ export default function ArabicContact() {
                           <option>استشارات استراتيجية أخرى</option>
                         </select>
                       </div>
+                      {requestedService === "استشارات استراتيجية أخرى" && (
+                        <div className="mt-3">
+                          <label className="font-body-sm text-body-sm text-foreground block mb-1">يرجى تحديد الخدمة</label>
+                          <input
+                            type="text"
+                            value={otherServiceSpecify}
+                            onChange={(e) => setOtherServiceSpecify(e.target.value)}
+                            placeholder="اكتب تفاصيل الخدمة..."
+                            className="w-full bg-surface-dim border border-outline-variant/30 text-foreground font-body-sm text-body-sm px-4 py-2.5 rounded-none focus:outline-none focus:border-secondary focus:ring-0 transition-colors"
+                            required
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -631,6 +599,57 @@ export default function ArabicContact() {
                   )}
                 </form>
               </div>
+            </div>
+          </div>
+        </section>
+        {/* Divider */}
+        <div className="w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop h-px bg-outline-variant/30"></div>
+
+        {/* Section: Conversion Header & Objection Handling */}
+        <section className="px-margin-mobile md:px-margin-desktop py-section-gap max-w-container-max mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+            <div className="md:col-span-5 flex flex-col justify-center">
+              <h1 className="font-display-lg text-display-lg-mobile md:text-display-lg text-foreground mb-6">
+                امضِ قدماً <span className="text-secondary">بوضوح تام.</span>
+              </h1>
+              <p className="font-body-lg text-body-lg text-on-surface-variant mb-8">
+                هيكلية تقاريرنا ذات المستوى المؤسسي لا تدع مجالاً للغموض. وجه اهتماماتك مباشرة أدناه.
+              </p>
+            </div>
+            <div className="md:col-span-6 md:col-start-7 flex flex-col justify-center space-y-4">
+              {faqs.map((faq) => {
+                const isActive = activeFAQ === faq.id;
+                return (
+                  <div
+                    key={faq.id}
+                    className="border border-outline-variant/30 bg-surface-container-high rounded-none overflow-hidden"
+                  >
+                    <button
+                      className="w-full px-6 py-4 flex justify-between items-center text-left focus:outline-none cursor-pointer"
+                      onClick={() => toggleFAQ(faq.id)}
+                    >
+                      <span className="font-body-md text-body-md text-foreground font-semibold">
+                        {faq.question}
+                      </span>
+                      <span
+                        className={`material-symbols-outlined accordion-icon text-secondary ${
+                          isActive ? "rotate-180" : ""
+                        }`}
+                      >
+                        expand_more
+                      </span>
+                    </button>
+                    <div
+                      className={`transition-all duration-300 ${
+                        isActive ? "max-h-[500px] opacity-100 p-6 pt-0" : "max-h-0 opacity-0 overflow-hidden"
+                      } bg-surface`}
+                    >
+                      <div className="w-full h-px bg-outline-variant/10 mb-4"></div>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant">{faq.answer}</p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
