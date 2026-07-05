@@ -39,7 +39,6 @@ export default function HeroVideo() {
       src="/intro-video.mp4"
       controls
       autoPlay
-      muted
       loop
       playsInline
     />
