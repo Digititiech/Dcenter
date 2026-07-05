@@ -57,7 +57,6 @@ export default function ArabicHome() {
                   src="/intro-video.mp4"
                   controls
                   autoPlay
-                  muted
                   loop
                   playsInline
                 />
