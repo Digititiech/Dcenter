@@ -66,6 +66,7 @@ export default function AdminDashboard() {
     localStorage.setItem("admin-locale", next);
   };
   const [activeTab, setActiveTab] = useState<"overview" | "crm" | "bookings" | "settings">("overview");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSettingsTab, setActiveSettingsTab] = useState<"email" | "calendar" | "whatsapp" | "rbac">("email");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [isUsingSupabase, setIsUsingSupabase] = useState(false);
@@ -1585,20 +1586,41 @@ export default function AdminDashboard() {
       style={locale === "ar" ? { fontFamily: "var(--font-arabic), var(--font-sans)" } : {}}
       className={`flex h-screen overflow-hidden bg-[#070707] ${theme === "light" ? "light-admin" : ""}`}
     >
+      {/* Sidebar Backdrop Overlay on Mobile */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-black/80 z-30 md:hidden transition-opacity duration-300"
+        />
+      )}
+
       {/* Sidebar Navigation */}
-      <aside className="w-64 bg-[#111110] border-r rtl:border-r-0 rtl:border-l border-outline-variant/10 flex flex-col justify-between">
+      <aside
+        className={`fixed md:relative z-40 md:z-auto w-64 h-full md:h-auto bg-[#111110] border-r rtl:border-r-0 rtl:border-l border-outline-variant/10 flex flex-col justify-between transition-transform duration-300 transform 
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full rtl:translate-x-full"} 
+          md:translate-x-0`}
+      >
         <div>
-          <div className="p-6 border-b border-outline-variant/10">
-            <h2 className="font-display-lg text-headline-sm text-foreground tracking-wider">
-              {t.sidebar.portalTitle}
-            </h2>
-            <p className="font-body-sm text-[10px] text-secondary uppercase tracking-widest mt-1">
-              {isUsingSupabase ? t.sidebar.connected : t.sidebar.mockSandbox}
-            </p>
+          <div className="p-6 border-b border-outline-variant/10 flex justify-between items-center">
+            <div>
+              <h2 className="font-display-lg text-headline-sm text-foreground tracking-wider">
+                {t.sidebar.portalTitle}
+              </h2>
+              <p className="font-body-sm text-[10px] text-secondary uppercase tracking-widest mt-1">
+                {isUsingSupabase ? t.sidebar.connected : t.sidebar.mockSandbox}
+              </p>
+            </div>
+            {/* Close button for mobile */}
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="md:hidden text-on-surface-variant hover:text-foreground cursor-pointer focus:outline-none"
+            >
+              <span className="material-symbols-outlined text-[20px]">close</span>
+            </button>
           </div>
           <nav className="p-4 space-y-2">
             <button
-              onClick={() => setActiveTab("overview")}
+              onClick={() => { setActiveTab("overview"); setSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
                 activeTab === "overview" ? "bg-secondary/10 text-secondary border-l-2 rtl:border-l-0 rtl:border-r-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
               }`}
@@ -1607,7 +1629,7 @@ export default function AdminDashboard() {
               {t.sidebar.tabOverview}
             </button>
             <button
-              onClick={() => setActiveTab("crm")}
+              onClick={() => { setActiveTab("crm"); setSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
                 activeTab === "crm" ? "bg-secondary/10 text-secondary border-l-2 rtl:border-l-0 rtl:border-r-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
               }`}
@@ -1616,7 +1638,7 @@ export default function AdminDashboard() {
               {t.sidebar.tabCrm}
             </button>
             <button
-              onClick={() => setActiveTab("bookings")}
+              onClick={() => { setActiveTab("bookings"); setSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
                 activeTab === "bookings" ? "bg-secondary/10 text-secondary border-l-2 rtl:border-l-0 rtl:border-r-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
               }`}
@@ -1625,7 +1647,7 @@ export default function AdminDashboard() {
               {t.sidebar.tabBookings}
             </button>
             <button
-              onClick={() => setActiveTab("settings")}
+              onClick={() => { setActiveTab("settings"); setSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
                 activeTab === "settings" ? "bg-secondary/10 text-secondary border-l-2 rtl:border-l-0 rtl:border-r-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
               }`}
@@ -1670,8 +1692,24 @@ export default function AdminDashboard() {
         </div>
       </aside>
 
-      {/* Main Panel */}
-      <main className="flex-grow flex flex-col overflow-y-auto bg-[#070707] p-8">
+      {/* Main Panel wrapper to accommodate mobile top bar */}
+      <div className="flex-grow flex flex-col h-full overflow-hidden">
+        {/* Mobile Header Bar */}
+        <div className="md:hidden flex items-center justify-between bg-[#111110] px-6 py-4 border-b border-outline-variant/10 w-full z-20">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="text-on-surface-variant hover:text-foreground focus:outline-none flex items-center cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-2xl">menu</span>
+          </button>
+          <span className="font-display-lg text-headline-sm text-foreground tracking-wider">
+            {t.sidebar.portalTitle}
+          </span>
+          <div className="w-6"></div> {/* spacer for centering */}
+        </div>
+
+        {/* Main Panel */}
+        <main className="flex-grow flex flex-col overflow-y-auto bg-[#070707] p-4 md:p-8">
         
         {/* TAB 1: OVERVIEW */}
         {activeTab === "overview" && (
@@ -3173,6 +3211,7 @@ export default function AdminDashboard() {
           </div>
         )}
       </main>
+      </div>
     </div>
   );
 }

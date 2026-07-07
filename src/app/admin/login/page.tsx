@@ -15,6 +15,7 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [isUsingSupabase, setIsUsingSupabase] = useState(false);
   const [locale, setLocale] = useState<"en" | "ar">("en");
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     setIsUsingSupabase(isSupabaseConfigured());
@@ -184,14 +185,25 @@ export default function AdminLogin() {
                 <label className="font-body-sm text-body-sm text-foreground block">
                   {t.passwordLabel}
                 </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full bg-[#181817] border border-outline-variant/20 text-foreground font-body-sm text-body-sm px-4 py-3 rounded-none focus:outline-none focus:border-secondary transition-colors"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full bg-[#181817] border border-outline-variant/20 text-foreground font-body-sm text-body-sm px-4 py-3 pr-10 rtl:pr-4 rtl:pl-10 rounded-none focus:outline-none focus:border-secondary transition-colors"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-3 rtl:right-auto rtl:left-3 flex items-center text-on-surface-variant hover:text-secondary focus:outline-none cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">
+                      {showPassword ? "visibility_off" : "visibility"}
+                    </span>
+                  </button>
+                </div>
               </div>
             )}
 
