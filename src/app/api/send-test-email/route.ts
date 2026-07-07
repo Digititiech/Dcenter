@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
+import { supabase } from "@/lib/supabaseClient";
+
 export async function POST(req: Request) {
   try {
     const { host, port, user, pass, to } = await req.json();
@@ -12,13 +14,21 @@ export async function POST(req: Request) {
       );
     }
 
+    let finalPass = pass;
+    if (pass === "••••••••••••") {
+      const { data } = await supabase.from("settings").select("value").eq("key", "smtp_pass").maybeSingle();
+      if (data?.value) {
+        finalPass = data.value;
+      }
+    }
+
     const transporterOpts: any = {
       host,
       port: parseInt(port, 10),
       secure: parseInt(port, 10) === 465, // Use secure transport for port 465
       auth: {
         user,
-        pass
+        pass: finalPass
       },
       tls: {
         rejectUnauthorized: false

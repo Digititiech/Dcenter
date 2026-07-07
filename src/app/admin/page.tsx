@@ -67,6 +67,7 @@ export default function AdminDashboard() {
   };
   const [activeTab, setActiveTab] = useState<"overview" | "crm" | "bookings" | "settings">("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeSettingsTab, setActiveSettingsTab] = useState<"email" | "calendar" | "whatsapp" | "rbac">("email");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [isUsingSupabase, setIsUsingSupabase] = useState(false);
@@ -1603,14 +1604,14 @@ export default function AdminDashboard() {
       )}
 
       <aside
-        className={`fixed md:relative z-40 md:z-auto w-64 h-full md:h-auto bg-[#111110] border-r rtl:border-r-0 rtl:border-l border-outline-variant/10 flex flex-col justify-between transition-transform duration-300 transform 
+        className={`fixed md:relative z-40 md:z-auto ${sidebarCollapsed ? "md:w-20" : "md:w-64"} w-64 h-full md:h-auto bg-[#111110] border-r rtl:border-r-0 rtl:border-l border-outline-variant/10 flex flex-col justify-between transition-all duration-300 transform 
           left-0 rtl:left-auto rtl:right-0
           ${sidebarOpen ? "translate-x-0" : "max-md:-translate-x-full"} 
           md:translate-x-0`}
       >
         <div>
           <div className="p-6 border-b border-outline-variant/10 flex justify-between items-center">
-            <div>
+            <div className={`${sidebarCollapsed ? "md:hidden" : ""}`}>
               <h2 className="font-display-lg text-headline-sm text-foreground tracking-wider">
                 {t.sidebar.portalTitle}
               </h2>
@@ -1618,6 +1619,26 @@ export default function AdminDashboard() {
                 {isUsingSupabase ? t.sidebar.connected : t.sidebar.mockSandbox}
               </p>
             </div>
+            
+            {/* Gold emblem for collapsed view */}
+            <div className={`hidden ${sidebarCollapsed ? "md:block" : ""} text-secondary font-display-lg text-xl font-bold text-center w-full`}>
+              DC
+            </div>
+
+            {/* Collapse toggle button for desktop */}
+            <button
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="hidden md:flex text-on-surface-variant hover:text-foreground cursor-pointer outline-none focus:outline-none ml-2 rtl:ml-0 rtl:mr-2"
+              title={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+            >
+              <span className="material-symbols-outlined text-[20px]">
+                {sidebarCollapsed 
+                  ? (locale === "ar" ? "first_page" : "last_page")
+                  : (locale === "ar" ? "last_page" : "first_page")
+                }
+              </span>
+            </button>
+
             {/* Close button for mobile */}
             <button
               onClick={() => setSidebarOpen(false)}
@@ -1629,51 +1650,55 @@ export default function AdminDashboard() {
           <nav className="p-4 space-y-2">
             <button
               onClick={() => { setActiveTab("overview"); setSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
+              title={sidebarCollapsed ? t.sidebar.tabOverview : undefined}
+              className={`w-full flex items-center ${sidebarCollapsed ? "md:justify-center" : ""} gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
                 activeTab === "overview" ? "bg-secondary/10 text-secondary border-l-2 rtl:border-l-0 rtl:border-r-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
               }`}
             >
               <span className="material-symbols-outlined text-[18px]">dashboard</span>
-              {t.sidebar.tabOverview}
+              <span className={`transition-all duration-200 ${sidebarCollapsed ? "md:hidden" : ""}`}>{t.sidebar.tabOverview}</span>
             </button>
             <button
               onClick={() => { setActiveTab("crm"); setSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
+              title={sidebarCollapsed ? t.sidebar.tabCrm : undefined}
+              className={`w-full flex items-center ${sidebarCollapsed ? "md:justify-center" : ""} gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
                 activeTab === "crm" ? "bg-secondary/10 text-secondary border-l-2 rtl:border-l-0 rtl:border-r-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
               }`}
             >
               <span className="material-symbols-outlined text-[18px]">people</span>
-              {t.sidebar.tabCrm}
+              <span className={`transition-all duration-200 ${sidebarCollapsed ? "md:hidden" : ""}`}>{t.sidebar.tabCrm}</span>
             </button>
             <button
               onClick={() => { setActiveTab("bookings"); setSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
+              title={sidebarCollapsed ? t.sidebar.tabBookings : undefined}
+              className={`w-full flex items-center ${sidebarCollapsed ? "md:justify-center" : ""} gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
                 activeTab === "bookings" ? "bg-secondary/10 text-secondary border-l-2 rtl:border-l-0 rtl:border-r-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
               }`}
             >
               <span className="material-symbols-outlined text-[18px]">calendar_month</span>
-              {t.sidebar.tabBookings}
+              <span className={`transition-all duration-200 ${sidebarCollapsed ? "md:hidden" : ""}`}>{t.sidebar.tabBookings}</span>
             </button>
             <button
               onClick={() => { setActiveTab("settings"); setSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
+              title={sidebarCollapsed ? t.sidebar.tabSettings : undefined}
+              className={`w-full flex items-center ${sidebarCollapsed ? "md:justify-center" : ""} gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
                 activeTab === "settings" ? "bg-secondary/10 text-secondary border-l-2 rtl:border-l-0 rtl:border-r-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
               }`}
             >
               <span className="material-symbols-outlined text-[18px]">settings</span>
-              {t.sidebar.tabSettings}
+              <span className={`transition-all duration-200 ${sidebarCollapsed ? "md:hidden" : ""}`}>{t.sidebar.tabSettings}</span>
             </button>
           </nav>
         </div>
         <div className="p-4 border-t border-outline-variant/10 space-y-3">
-          <div className="flex gap-2">
+          <div className={`flex ${sidebarCollapsed ? "md:flex-col" : "gap-2"}`}>
             <button
               onClick={toggleLocale}
               title={locale === "en" ? "العربية" : "English"}
               className="flex-1 flex items-center justify-center gap-1.5 border border-outline-variant/30 hover:border-secondary hover:text-secondary text-foreground py-2.5 font-label-caps text-[10px] transition-all cursor-pointer"
             >
               <span className="material-symbols-outlined text-sm">language</span>
-              {locale === "en" ? "العربية" : "English"}
+              <span className={`${sidebarCollapsed ? "md:hidden" : ""}`}>{locale === "en" ? "العربية" : "English"}</span>
             </button>
             <button
               onClick={() => {
@@ -1687,15 +1712,18 @@ export default function AdminDashboard() {
               <span className="material-symbols-outlined text-sm">
                 {theme === "light" ? "dark_mode" : "light_mode"}
               </span>
-              {theme === "light" ? (locale === "ar" ? "داكن" : "Dark") : (locale === "ar" ? "مضيء" : "Light")}
+              <span className={`${sidebarCollapsed ? "md:hidden" : ""}`}>
+                {theme === "light" ? (locale === "ar" ? "داكن" : "Dark") : (locale === "ar" ? "مضيء" : "Light")}
+              </span>
             </button>
           </div>
           <button
             onClick={handleLogout}
+            title={sidebarCollapsed ? t.sidebar.exitConsole : undefined}
             className="w-full flex items-center justify-center gap-2 border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 text-red-400 py-2.5 font-label-caps text-label-caps transition-all cursor-pointer text-xs"
           >
             <span className="material-symbols-outlined text-sm">logout</span>
-            {t.sidebar.exitConsole}
+            <span className={`${sidebarCollapsed ? "md:hidden" : ""}`}>{t.sidebar.exitConsole}</span>
           </button>
         </div>
       </aside>
