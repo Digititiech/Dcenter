@@ -679,28 +679,17 @@ export default function AdminDashboard() {
     setCollabLoading(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error("You must be logged in to perform this action.");
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-user`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            email: newCollabEmail,
-            password: newCollabPassword,
-            role: newCollabRole,
-          }),
+      const { data: result, error: invokeErr } = await supabase.functions.invoke("create-user", {
+        method: "POST",
+        body: {
+          email: newCollabEmail,
+          password: newCollabPassword,
+          role: newCollabRole,
         }
-      );
+      });
 
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to create collaborator.");
+      if (invokeErr) {
+        throw new Error(invokeErr.message || "Failed to create collaborator.");
       }
 
       setCollabSuccess(`Collaborator ${newCollabEmail} added successfully!`);
@@ -961,10 +950,6 @@ export default function AdminDashboard() {
   };
 
   const handleUpdateLeadStatus = async (leadId: string, newStatus: Lead["status"]) => {
-    if (userRole === "staff") {
-      alert("Permission denied. Only managers can update lead statuses.");
-      return;
-    }
     const updated = leads.map(l => l.id === leadId ? { ...l, status: newStatus } : l);
     setLeads(updated);
 
@@ -976,10 +961,6 @@ export default function AdminDashboard() {
   };
 
   const handleConfirmBooking = async (bookingId: string) => {
-    if (userRole === "staff") {
-      alert("Permission denied. Only managers can confirm bookings.");
-      return;
-    }
     const booking = bookings.find(b => b.id === bookingId);
     const updated = bookings.map(b => b.id === bookingId ? { ...b, status: "Confirmed" as const } : b);
     setBookings(updated);
@@ -1049,10 +1030,6 @@ export default function AdminDashboard() {
   };
 
   const handleSaveReschedule = async () => {
-    if (userRole === "staff") {
-      alert("Permission denied. Only managers can reschedule bookings.");
-      return;
-    }
     if (!activeRescheduleBooking) return;
     setSavingReschedule(true);
 
@@ -1166,10 +1143,6 @@ export default function AdminDashboard() {
   };
 
   const handleSaveLeadDetails = async () => {
-    if (userRole === "staff") {
-      alert("Permission denied. Only managers can update lead profiles.");
-      return;
-    }
     if (!activeEditLead) return;
     setSavingLeadDetails(true);
 
@@ -1215,10 +1188,6 @@ export default function AdminDashboard() {
   };
 
   const handleAddBooking = async () => {
-    if (userRole === "staff") {
-      alert("Permission denied. Only managers can create custom bookings.");
-      return;
-    }
     // Make newBookingEmail optional
     if (!newBookingName || !newBookingPhone || !newBookingDate || !newBookingSlot) {
       alert(locale === "ar" ? "يرجى ملء جميع الحقول المطلوبة (البريد الإلكتروني اختياري)" : "Please fill out all required fields (Email is optional)");
@@ -1678,16 +1647,18 @@ export default function AdminDashboard() {
               <span className="material-symbols-outlined text-[18px]">calendar_month</span>
               <span className={`transition-all duration-200 ${sidebarCollapsed ? "md:hidden" : ""}`}>{t.sidebar.tabBookings}</span>
             </button>
-            <button
-              onClick={() => { setActiveTab("settings"); setSidebarOpen(false); }}
-              title={sidebarCollapsed ? t.sidebar.tabSettings : undefined}
-              className={`w-full flex items-center ${sidebarCollapsed ? "md:justify-center" : ""} gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
-                activeTab === "settings" ? "bg-secondary/10 text-secondary border-l-2 rtl:border-l-0 rtl:border-r-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
-              }`}
-            >
-              <span className="material-symbols-outlined text-[18px]">settings</span>
-              <span className={`transition-all duration-200 ${sidebarCollapsed ? "md:hidden" : ""}`}>{t.sidebar.tabSettings}</span>
-            </button>
+            {userRole === "manager" && (
+              <button
+                onClick={() => { setActiveTab("settings"); setSidebarOpen(false); }}
+                title={sidebarCollapsed ? t.sidebar.tabSettings : undefined}
+                className={`w-full flex items-center ${sidebarCollapsed ? "md:justify-center" : ""} gap-3 px-4 py-3 text-left rtl:text-right font-label-caps text-label-caps transition-colors cursor-pointer ${
+                  activeTab === "settings" ? "bg-secondary/10 text-secondary border-l-2 rtl:border-l-0 rtl:border-r-2 border-secondary" : "text-on-surface-variant hover:text-foreground"
+                }`}
+              >
+                <span className="material-symbols-outlined text-[18px]">settings</span>
+                <span className={`transition-all duration-200 ${sidebarCollapsed ? "md:hidden" : ""}`}>{t.sidebar.tabSettings}</span>
+              </button>
+            )}
           </nav>
         </div>
         <div className="p-4 border-t border-outline-variant/10 space-y-3">
@@ -2130,7 +2101,7 @@ export default function AdminDashboard() {
         )}
 
         {/* TAB 4: SETTINGS */}
-        {activeTab === "settings" && (
+        {activeTab === "settings" && userRole === "manager" && (
           <div className="space-y-8 max-w-4xl animate-fade-in">
             <div>
               <h1 className="font-display-lg text-display-md text-foreground">
