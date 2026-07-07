@@ -52,6 +52,90 @@ export default function ArabicAbout() {
           </div>
         </section>
 
+        {/* Section 3: Founder Profile */}
+        <section className="py-section-gap bg-surface-container-lowest">
+          <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+            <div className="mb-16">
+              <h2 className="font-display-lg text-headline-lg text-foreground mb-4 max-w-2xl">
+                عقود من الخبرة في قلب النظام المالي
+              </h2>
+            </div>
+            <div className="grid grid-cols-12 gap-gutter institutional-border p-0 overflow-hidden bg-background">
+              <div className="col-span-12 lg:col-span-5 h-[400px] lg:h-auto overflow-hidden relative">
+                <img
+                  className="w-full h-full object-cover transition-all duration-700"
+                  alt="Abdullah Al Rushdi"
+                  src="/founder-image.jpeg"
+                />
+                {/* MOVED METRICS BADGE */}
+                <div className="absolute bottom-6 right-6 z-20 w-64 bg-surface-container-highest border border-secondary/20 p-8 hidden md:block">
+                  <div className="text-secondary font-display-lg text-5xl mb-2">30+</div>
+                  <p className="font-label-caps text-label-caps text-on-surface-variant">
+                    عاماً من الخبرة المؤسسية المتراكمة
+                  </p>
+                </div>
+              </div>
+              <div className="col-span-12 lg:col-span-7 p-12 lg:p-16 flex flex-col justify-center">
+                <div className="mb-8">
+                  <h3 className="font-display-lg text-headline-md text-secondary">عبدالله الروشدي</h3>
+                  <p className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mt-1 font-semibold">
+                    المؤسس والرئيس التنفيذي
+                  </p>
+                </div>
+                <div className="font-body-md text-body-md text-on-surface-variant mb-10 leading-relaxed space-y-6">
+                  <p>
+                    يتمتع عبدالله الروشدي بمسيرة مهنية استثنائية تمتد لأكثر من 30 عاماً في قمة القطاع المالي والمصرفي في
+                    سلطنة عُمان والمنطقة. قبل تأسيس &quot;مركز اتخاذ القرار&quot;، شغل مناصب قيادية عليا في أبرز المؤسسات
+                    المالية، بما في ذلك بنك مسقط وبنك ظفار.
+                  </p>
+                  <p>
+                    تميزت فترة عمله بقيادة استراتيجيات التحول الكبرى، وإدارة مخاطر المؤسسات (ERM) وإدارة محافظ قروض ضخمة، وهيكلة تمويل المشاريع الوطنية الاستراتيجية.
+                  </p>
+                </div>
+                <div>
+                  <p className="font-label-caps text-label-caps text-secondary mb-6 uppercase">
+                    مجالات التركيز الاستراتيجي
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">الإدارة المصرفية العليا</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">حوكمة الشركات والامتثال والاستثمار</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">إدارة مخاطر المؤسسات (ERM)</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">هيكلة رأس المال والتمويل المعقد</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">تطوير السياسات المالية السيادية</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">استراتيجيات مواءمة الثروة والأداء</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">تحسين أداء الأرباح والخسائر والنمو</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">التحول الرقمي للقطاع المالي</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Section 2: Vision, Mission & Values */}
         <section className="bg-surface-container-lowest py-section-gap border-y border-outline-variant/10">
           <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
@@ -114,8 +198,7 @@ export default function ArabicAbout() {
                 </div>
                 <h3 className="font-display-lg text-2xl mb-4 text-foreground">الاحترافية</h3>
                 <p className="font-body-sm text-on-surface-variant">
-                  فريقنا يجسد الانضباط والخبرة التقنية العالية، مما يضمن تقديم مخرجات بمستوى يليق بكبرى المؤسسات
-                  العالمية.
+                  الاحترافية: فريقنا يجسد الانضباط والخبرة التقنية العالية، مما يضمن تقديم مخرجات بمستوى يليق بكبرى المؤسسات العالمية.
                 </p>
               </div>
               <div className="p-8 bg-background institutional-border hover:border-secondary transition-all group">
@@ -150,93 +233,6 @@ export default function ArabicAbout() {
                 <p className="font-body-sm text-on-surface-variant">
                   بناء هياكل مالية ليست فقط ناجحة اليوم، بل قادرة على الصمود والنمو المستدام للأجيال القادمة.
                 </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Section 3: Founder Profile */}
-        <section className="py-section-gap bg-surface-container-lowest">
-          <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-            <div className="mb-16">
-              <h2 className="font-display-lg text-headline-lg text-foreground mb-4 max-w-2xl">
-                عقود من الخبرة في قلب النظام المالي
-              </h2>
-            </div>
-            <div className="grid grid-cols-12 gap-gutter institutional-border p-0 overflow-hidden bg-background">
-              <div className="col-span-12 lg:col-span-5 h-[400px] lg:h-auto overflow-hidden relative">
-                <img
-                  className="w-full h-full object-cover transition-all duration-700"
-                  alt="Abdullah Al Rushdi"
-                  src="/founder-image.jpeg"
-                />
-                {/* MOVED METRICS BADGE */}
-                <div className="absolute bottom-6 left-6 z-20 w-64 bg-surface-container-highest border border-secondary/20 p-8 hidden md:block">
-                  <div className="text-secondary font-display-lg text-5xl mb-2">30+</div>
-                  <p className="font-label-caps text-label-caps text-on-surface-variant">
-                    عاماً من الخبرة المؤسسية المتراكمة
-                  </p>
-                </div>
-              </div>
-              <div className="col-span-12 lg:col-span-7 p-12 lg:p-16 flex flex-col justify-center">
-                <div className="mb-8">
-                  <h3 className="font-display-lg text-headline-md text-secondary">عبدالله الروشدي</h3>
-                  <p className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mt-1 font-semibold">
-                    المؤسس والرئيس التنفيذي
-                  </p>
-                </div>
-                <div className="font-body-md text-body-md text-on-surface-variant mb-10 leading-relaxed space-y-6">
-                  <p>
-                    يتمتع عبدالله الروشدي بمسيرة مهنية استثنائية تمتد لأكثر من 30 عاماً في قمة القطاع المالي والمصرفي في
-                    سلطنة عُمان والمنطقة. قبل تأسيس &quot;مركز اتخاذ القرار&quot;، شغل مناصب قيادية عليا في أبرز المؤسسات
-                    المالية، بما في ذلك بنك مسقط وبنك ظفار.
-                  </p>
-                  <p>
-                    تميزت فترة عمله بقيادة استراتيجيات التحول الكبرى، وإدارة محافظ قروض ضخمة، وهيكلة تمويل المشاريع
-                    الوطنية الاستراتيجية. يُعرف عبدالله بدقته التحليلية المتناهية وقدرته الفذة على إدارة المخاطر في
-                    أكثر الظروف الاقتصادية تقلباً، مما جعله مستشاراً موثوقاً للعديد من الهيئات السيادية ومجالس
-                    الإدارات.
-                  </p>
-                </div>
-                <div>
-                  <p className="font-label-caps text-label-caps text-secondary mb-6 uppercase">
-                    مجالات التركيز الاستراتيجي
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
-                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
-                      <span className="w-1.5 h-1.5 bg-secondary"></span>
-                      <span className="font-body-sm text-body-sm">الإدارة المصرفية العليا</span>
-                    </div>
-                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
-                      <span className="w-1.5 h-1.5 bg-secondary"></span>
-                      <span className="font-body-sm text-body-sm">حوكمة الشركات والامتثال والاستثمار</span>
-                    </div>
-                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
-                      <span className="w-1.5 h-1.5 bg-secondary"></span>
-                      <span className="font-body-sm text-body-sm">إدارة مخاطر المؤسسات (ERM)</span>
-                    </div>
-                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
-                      <span className="w-1.5 h-1.5 bg-secondary"></span>
-                      <span className="font-body-sm text-body-sm">هيكلة رأس المال والتمويل المعقد</span>
-                    </div>
-                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
-                      <span className="w-1.5 h-1.5 bg-secondary"></span>
-                      <span className="font-body-sm text-body-sm">تطوير السياسات المالية السيادية</span>
-                    </div>
-                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
-                      <span className="w-1.5 h-1.5 bg-secondary"></span>
-                      <span className="font-body-sm text-body-sm">استراتيجيات مواءمة الثروة والأداء</span>
-                    </div>
-                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
-                      <span className="w-1.5 h-1.5 bg-secondary"></span>
-                      <span className="font-body-sm text-body-sm">تحسين أداء الأرباح والخسائر والنمو</span>
-                    </div>
-                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
-                      <span className="w-1.5 h-1.5 bg-secondary"></span>
-                      <span className="font-body-sm text-body-sm">التحول الرقمي للقطاع المالي</span>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>

@@ -40,6 +40,86 @@ export default function About() {
           </div>
         </section>
 
+        {/* Executive Leadership */}
+        <section className="py-section-gap bg-surface-container-lowest">
+          <div className="max-w-container-max mx-auto px-margin-desktop">
+            <div className="mb-16">
+              <h2 className="font-display-lg text-headline-lg text-foreground mb-4 max-w-2xl">
+                Decades of Expertise at the Heart of the Financial System
+              </h2>
+            </div>
+            <div className="grid grid-cols-12 gap-gutter institutional-border p-0 overflow-hidden bg-background">
+              <div className="col-span-12 lg:col-span-5 h-[400px] lg:h-auto overflow-hidden relative">
+                <img
+                  className="w-full h-full object-cover transition-all duration-700"
+                  alt="Abdullah Al Rushdi"
+                  src="/founder-image.jpeg"
+                />
+                {/* MOVED METRICS BADGE */}
+                <div className="absolute bottom-6 right-6 z-20 w-64 bg-surface-container-highest border border-secondary/20 p-8 hidden md:block">
+                  <div className="text-secondary font-display-lg text-5xl mb-2">30+</div>
+                  <p className="font-label-caps text-label-caps text-on-surface-variant">
+                    Years of Institutional Expertise
+                  </p>
+                </div>
+              </div>
+              <div className="col-span-12 lg:col-span-7 p-12 lg:p-16 flex flex-col justify-center">
+                <div className="mb-8">
+                  <h3 className="font-display-lg text-headline-md text-secondary">Abdullah Al Rushdi</h3>
+                  <p className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mt-1">
+                    Founder & Chief Executive Officer
+                  </p>
+                </div>
+                <p className="font-body-md text-body-md text-on-surface-variant mb-10 leading-relaxed">
+                  Abdullah Al Rushdi brings an exceptional leadership and banking career spanning over 30 years in the
+                  financial sector in the Sultanate of Oman and the region. Before founding &apos;Decision Center&apos;, he
+                  held high-level leadership positions in prominent national banks, where he managed large operational
+                  portfolios and led institutional transformation strategies.
+                </p>
+                <div>
+                  <p className="font-label-caps text-label-caps text-secondary mb-6 uppercase">
+                    Strategic Focus Areas
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">Banking Management</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">Corporate Governance & Investment</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">Risk Management (ERM)</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">Capital Structuring & Funding</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">Strategic Policy Development</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">Performance & Loss Strategies</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">Business & Loss Improvement</span>
+                    </div>
+                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
+                      <span className="w-1.5 h-1.5 bg-secondary"></span>
+                      <span className="font-body-sm text-body-sm">Financial Digital Transformation</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Mission & Vision - Asymmetric Layout */}
         <section className="py-section-gap bg-surface-container-lowest">
           <div className="max-w-container-max mx-auto px-margin-desktop">
@@ -140,86 +220,6 @@ export default function About() {
                   Continuous pursuit of perfection in financial modeling and strategic planning, with a focus on precision
                   in every detail.
                 </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Executive Leadership */}
-        <section className="py-section-gap bg-surface-container-lowest">
-          <div className="max-w-container-max mx-auto px-margin-desktop">
-            <div className="mb-16">
-              <h2 className="font-display-lg text-headline-lg text-foreground mb-4 max-w-2xl">
-                Decades of Expertise at the Heart of the Financial System
-              </h2>
-            </div>
-            <div className="grid grid-cols-12 gap-gutter institutional-border p-0 overflow-hidden bg-background">
-              <div className="col-span-12 lg:col-span-5 h-[400px] lg:h-auto overflow-hidden relative">
-                <img
-                  className="w-full h-full object-cover transition-all duration-700"
-                  alt="Abdullah Al Rushdi"
-                  src="/founder-image.jpeg"
-                />
-                {/* MOVED METRICS BADGE */}
-                <div className="absolute bottom-6 right-6 z-20 w-64 bg-surface-container-highest border border-secondary/20 p-8 hidden md:block">
-                  <div className="text-secondary font-display-lg text-5xl mb-2">30+</div>
-                  <p className="font-label-caps text-label-caps text-on-surface-variant">
-                    Years of Institutional Expertise
-                  </p>
-                </div>
-              </div>
-              <div className="col-span-12 lg:col-span-7 p-12 lg:p-16 flex flex-col justify-center">
-                <div className="mb-8">
-                  <h3 className="font-display-lg text-headline-md text-secondary">Abdullah Al Rushdi</h3>
-                  <p className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mt-1">
-                    Founder & Chief Executive Officer
-                  </p>
-                </div>
-                <p className="font-body-md text-body-md text-on-surface-variant mb-10 leading-relaxed">
-                  Abdullah Al Rushdi brings an exceptional leadership and banking career spanning over 30 years in the
-                  financial sector in the Sultanate of Oman and the region. Before founding &apos;Decision Center&apos;, he
-                  held high-level leadership positions in prominent national banks, where he managed large operational
-                  portfolios and led institutional transformation strategies.
-                </p>
-                <div>
-                  <p className="font-label-caps text-label-caps text-secondary mb-6 uppercase">
-                    Strategic Focus Areas
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
-                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
-                      <span className="w-1.5 h-1.5 bg-secondary"></span>
-                      <span className="font-body-sm text-body-sm">Banking Management</span>
-                    </div>
-                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
-                      <span className="w-1.5 h-1.5 bg-secondary"></span>
-                      <span className="font-body-sm text-body-sm">Corporate Governance & Investment</span>
-                    </div>
-                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
-                      <span className="w-1.5 h-1.5 bg-secondary"></span>
-                      <span className="font-body-sm text-body-sm">Risk Management (ERM)</span>
-                    </div>
-                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
-                      <span className="w-1.5 h-1.5 bg-secondary"></span>
-                      <span className="font-body-sm text-body-sm">Capital Structuring & Funding</span>
-                    </div>
-                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
-                      <span className="w-1.5 h-1.5 bg-secondary"></span>
-                      <span className="font-body-sm text-body-sm">Strategic Policy Development</span>
-                    </div>
-                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
-                      <span className="w-1.5 h-1.5 bg-secondary"></span>
-                      <span className="font-body-sm text-body-sm">Performance & Loss Strategies</span>
-                    </div>
-                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
-                      <span className="w-1.5 h-1.5 bg-secondary"></span>
-                      <span className="font-body-sm text-body-sm">Business & Loss Improvement</span>
-                    </div>
-                    <div className="flex items-center gap-3 border-b border-outline-variant/10 pb-2">
-                      <span className="w-1.5 h-1.5 bg-secondary"></span>
-                      <span className="font-body-sm text-body-sm">Financial Digital Transformation</span>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
