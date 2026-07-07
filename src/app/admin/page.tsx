@@ -1318,6 +1318,13 @@ export default function AdminDashboard() {
         }
       }
 
+      // Trigger instant email/WhatsApp confirmations via backend pipeline
+      await fetch("/api/booking-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ booking: newBooking, locale })
+      }).catch(err => console.warn("Automated confirmations failed:", err));
+
       alert(locale === "ar" ? "تم إضافة الحجز بنجاح!" : "New booking added successfully!");
       setShowingAddBookingModal(false);
       setNewBookingType("Financial & Valuation Modeling");

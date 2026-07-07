@@ -331,30 +331,12 @@ export default function Contact() {
         localStorage.setItem("crm-leads", JSON.stringify([...currentLeads, { id: Date.now().toString(), ...newLead, created_at: new Date().toISOString() }]));
       }
 
-      // Send auto WhatsApp via connected WhatsApp server
-      const serverUrl = localStorage.getItem("wa-server-url") || "https://wa.powerpod.ae";
-      
-      // 1. Send confirmation to client
-      const clientMessage = `Hello ${clientName}, your strategic consultation request with Decision Center has been received for ${formatDate(selectedDate)} at ${selectedSlot}. We will review and confirm your slot shortly.`;
-      
-      await fetch(`${serverUrl}/api/send-whatsapp`, {
+      // Trigger instant email/WhatsApp confirmations via backend pipeline
+      await fetch("/api/booking-confirmation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          number: clientPhone,
-          message: clientMessage
-        })
-      });
-
-      // 2. Notify the admin
-      await fetch(`${serverUrl}/api/send-whatsapp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          number: "96896680001",
-          message: message
-        })
-      });
+        body: JSON.stringify({ booking: newBooking, locale: "en" })
+      }).catch(err => console.warn("Automated confirmations failed:", err));
 
       setShowConfirmation(true);
       setClientName("");
