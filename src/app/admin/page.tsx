@@ -677,10 +677,16 @@ export default function AdminDashboard() {
     setCollabError(null);
     setCollabSuccess(null);
     setCollabLoading(true);
-
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: Record<string, string> = {};
+      if (session) {
+        headers.Authorization = `Bearer ${session.access_token}`;
+      }
+
       const { data: result, error: invokeErr } = await supabase.functions.invoke("create-user", {
         method: "POST",
+        headers,
         body: {
           email: newCollabEmail,
           password: newCollabPassword,
