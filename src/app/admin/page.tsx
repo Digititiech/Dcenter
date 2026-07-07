@@ -114,6 +114,7 @@ export default function AdminDashboard() {
 
   // CRM Lead Editing State
   const [activeEditLead, setActiveEditLead] = useState<Lead | null>(null);
+  const [activeViewLead, setActiveViewLead] = useState<Lead | null>(null);
   const [editLeadName, setEditLeadName] = useState("");
   const [editLeadEmail, setEditLeadEmail] = useState("");
   const [editLeadPhone, setEditLeadPhone] = useState("");
@@ -1825,8 +1826,8 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="bg-[#111110] border border-outline-variant/10 overflow-hidden">
-              <table className="w-full text-left rtl:text-right border-collapse">
+            <div className="bg-[#111110] border border-outline-variant/10 overflow-x-auto">
+              <table className="w-full text-left rtl:text-right border-collapse min-w-[700px]">
                 <thead>
                   <tr className="border-b border-outline-variant/15 bg-surface-container-high">
                     <th className="p-4 font-label-caps text-label-caps text-on-surface-variant">{locale === "ar" ? "الاسم" : "Name"}</th>
@@ -1840,7 +1841,7 @@ export default function AdminDashboard() {
                 <tbody className="divide-y divide-outline-variant/10">
                   {leads.map(lead => (
                     <tr key={lead.id} className="hover:bg-surface-container-low transition-colors">
-                      <td className="p-4 font-body-md text-body-md text-foreground">
+                      <td onClick={() => setActiveViewLead(lead)} className="p-4 font-body-md text-body-md text-foreground cursor-pointer">
                         <div className="font-semibold flex items-center gap-2">
                           {lead.name}
                           {lead.flagged_for_followup && (
@@ -1855,12 +1856,12 @@ export default function AdminDashboard() {
                           </div>
                         )}
                       </td>
-                      <td className="p-4 font-body-md text-body-md text-foreground">{lead.company}</td>
-                      <td className="p-4 font-body-sm text-body-sm text-on-surface-variant">
+                      <td onClick={() => setActiveViewLead(lead)} className="p-4 font-body-md text-body-md text-foreground cursor-pointer">{lead.company}</td>
+                      <td onClick={() => setActiveViewLead(lead)} className="p-4 font-body-sm text-body-sm text-on-surface-variant cursor-pointer">
                         <div>{lead.email}</div>
                         <div className="mt-0.5">{lead.phone}</div>
                       </td>
-                      <td className="p-4 font-body-sm text-[12px] text-secondary">{lead.timeframe}</td>
+                      <td onClick={() => setActiveViewLead(lead)} className="p-4 font-body-sm text-[12px] text-secondary cursor-pointer">{lead.timeframe}</td>
                       <td className="p-4">
                         <select
                           value={lead.status}
@@ -1875,6 +1876,12 @@ export default function AdminDashboard() {
                       </td>
                       <td className="p-4 text-right rtl:text-left">
                         <div className="flex justify-end rtl:justify-start gap-2">
+                          <button
+                            onClick={() => setActiveViewLead(lead)}
+                            className="inline-flex items-center gap-1.5 border border-outline-variant/30 hover:border-secondary hover:text-secondary px-2.5 py-1.5 font-label-caps text-[10px] transition-colors cursor-pointer"
+                          >
+                            <span className="material-symbols-outlined text-xs">visibility</span> {locale === "ar" ? "عرض" : "View"}
+                          </button>
                           <button
                             onClick={() => {
                               setActiveReachOutLead(lead);
@@ -2872,6 +2879,164 @@ export default function AdminDashboard() {
                   className="border border-outline-variant/30 text-foreground hover:border-secondary hover:text-secondary px-6 py-3 font-label-caps text-label-caps transition-colors cursor-pointer text-xs"
                 >
                   {t.modals.whatsappReach.btnCancel}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* View Lead Details & Booking History Modal */}
+        {activeViewLead && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070707]/80 backdrop-blur-sm p-4 overflow-y-auto">
+            <div className="bg-[#111110] border border-secondary/30 p-6 max-w-2xl w-full relative space-y-6 text-left rtl:text-right">
+              <button
+                onClick={() => setActiveViewLead(null)}
+                className="absolute top-4 right-4 rtl:right-auto rtl:left-4 text-on-surface-variant hover:text-foreground cursor-pointer"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+
+              <div>
+                <h3 className="font-display-lg text-headline-md text-foreground">
+                  {locale === "ar" ? "تفاصيل العميل" : "Lead Profile"}
+                </h3>
+                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
+                  {locale === "ar" ? "تفاصيل الاتصال الكاملة وتاريخ حجز الجلسات" : "Full contact details and booking engagement history"}
+                </p>
+              </div>
+
+              {/* Grid Details */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-b border-outline-variant/10 py-4 font-body-sm text-body-sm text-foreground">
+                <div>
+                  <strong className="text-secondary block text-xs uppercase tracking-wider">{locale === "ar" ? "الاسم الكامل" : "Full Name"}</strong>
+                  <span className="text-base font-semibold">{activeViewLead.name}</span>
+                </div>
+                <div>
+                  <strong className="text-secondary block text-xs uppercase tracking-wider">{locale === "ar" ? "اسم الشركة" : "Company"}</strong>
+                  <span className="text-base">{activeViewLead.company}</span>
+                </div>
+                <div>
+                  <strong className="text-secondary block text-xs uppercase tracking-wider">{locale === "ar" ? "البريد الإلكتروني" : "Email Address"}</strong>
+                  <span>{activeViewLead.email}</span>
+                </div>
+                <div>
+                  <strong className="text-secondary block text-xs uppercase tracking-wider">{locale === "ar" ? "رقم الهاتف" : "Phone Number"}</strong>
+                  <span className="font-mono">{activeViewLead.phone}</span>
+                </div>
+                <div>
+                  <strong className="text-secondary block text-xs uppercase tracking-wider">{locale === "ar" ? "المدى الزمني للمشروع" : "Preferred Timeframe"}</strong>
+                  <span>{activeViewLead.timeframe}</span>
+                </div>
+                <div>
+                  <strong className="text-secondary block text-xs uppercase tracking-wider">{t.crm.colStatus}</strong>
+                  <div className="mt-1">
+                    <select
+                      value={activeViewLead.status}
+                      onChange={(e) => {
+                        handleUpdateLeadStatus(activeViewLead.id, e.target.value as any);
+                        setActiveViewLead({ ...activeViewLead, status: e.target.value as any });
+                      }}
+                      className="bg-[#181817] border border-outline-variant/30 text-foreground font-body-sm text-xs px-2.5 py-1.5 focus:outline-none focus:border-secondary"
+                    >
+                      <option value="Pending">{t.crm.statusPending}</option>
+                      <option value="Contacted">{t.crm.statusContacted}</option>
+                      <option value="Qualified">{t.crm.statusQualified}</option>
+                      <option value="Booked">{t.crm.statusBooked}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div>
+                <strong className="text-secondary block text-xs uppercase tracking-wider mb-1">{locale === "ar" ? "ملاحظات" : "Notes"}</strong>
+                <p className="bg-[#181817] border border-outline-variant/15 p-3 italic text-on-surface-variant font-body-sm">
+                  {activeViewLead.notes || (locale === "ar" ? "لا توجد ملاحظات مضافة" : "No notes written yet")}
+                </p>
+              </div>
+
+              {/* Booking History Section */}
+              <div className="space-y-3">
+                <h4 className="font-display-lg text-headline-sm text-foreground flex items-center gap-2">
+                  <span className="material-symbols-outlined text-secondary">history</span>
+                  {locale === "ar" ? "سجل الحجوزات" : "Booking History"}
+                </h4>
+                
+                {(() => {
+                  const history = bookings.filter(
+                    b => b.clientPhone.trim() === activeViewLead.phone.trim() || 
+                         (activeViewLead.email && b.clientEmail.trim() === activeViewLead.email.trim())
+                  );
+
+                  if (history.length === 0) {
+                    return (
+                      <p className="text-xs text-on-surface-variant italic">
+                        {locale === "ar" ? "لم يتم العثور على حجوزات سابقة لهذا العميل" : "No booking history found for this lead"}
+                      </p>
+                    );
+                  }
+
+                  return (
+                    <div className="border border-outline-variant/10 max-h-[180px] overflow-y-auto divide-y divide-outline-variant/10 bg-[#181817]">
+                      {history.map(b => (
+                        <div key={b.id} className="p-3 flex justify-between items-center text-xs">
+                          <div>
+                            <div className="font-semibold text-foreground">{b.booking_type || (locale === "ar" ? "استشارة عامة" : "General Consultation")}</div>
+                            <div className="text-on-surface-variant mt-0.5">
+                              {b.booking_date || `${locale === "ar" ? "أكتوبر" : "October"} ${b.day}`} | {b.timeSlot}
+                            </div>
+                          </div>
+                          <span className={`px-2 py-0.5 rounded-none font-bold uppercase ${
+                            b.status === "Confirmed" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                          }`}>
+                            {b.status === "Confirmed" ? (locale === "ar" ? "مؤكد" : "Confirmed") : (locale === "ar" ? "معلق" : "Pending")}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Action Buttons inside Details Popup */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => {
+                    setActiveReachOutLead(activeViewLead);
+                    setCustomMessageText(
+                      locale === "ar"
+                        ? `مرحباً ${activeViewLead.name}، شكراً لتواصلك مع مركز القرار. لقد تلقينا استفسارك.`
+                        : `Hello ${activeViewLead.name}, thank you for contacting Decision Center. We have received your inquiry.`
+                    );
+                    setActiveViewLead(null);
+                  }}
+                  className="flex-grow inline-flex items-center justify-center gap-1.5 bg-secondary text-primary-container hover:bg-transparent hover:text-secondary border border-secondary py-3 font-label-caps text-xs font-bold transition-all cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-sm">chat</span>
+                  {locale === "ar" ? "تواصل واتساب" : "WhatsApp Reach Out"}
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveEditLead(activeViewLead);
+                    setEditLeadName(activeViewLead.name);
+                    setEditLeadEmail(activeViewLead.email);
+                    setEditLeadPhone(activeViewLead.phone);
+                    setEditLeadCompany(activeViewLead.company);
+                    setEditLeadTimeframe(activeViewLead.timeframe);
+                    setEditLeadNotes(activeViewLead.notes || "");
+                    setEditLeadFlagged(!!activeViewLead.flagged_for_followup);
+                    setActiveViewLead(null);
+                  }}
+                  className="flex-grow inline-flex items-center justify-center gap-1.5 border border-outline-variant/30 hover:border-secondary hover:text-secondary py-3 font-label-caps text-xs transition-all cursor-pointer text-foreground"
+                >
+                  <span className="material-symbols-outlined text-sm">edit</span>
+                  {locale === "ar" ? "تعديل الملف" : "Edit Profile"}
+                </button>
+                <button
+                  onClick={() => setActiveViewLead(null)}
+                  className="border border-outline-variant/30 hover:bg-surface-container text-foreground px-6 py-3 font-label-caps text-xs transition-all cursor-pointer"
+                >
+                  {locale === "ar" ? "إغلاق" : "Close"}
                 </button>
               </div>
             </div>
