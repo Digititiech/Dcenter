@@ -168,6 +168,7 @@ export default function AIAssistant() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          locale: "en",
           messages: updatedMessages.map((m) => ({
             role: m.sender === "ai" ? "ai" : "user",
             text: m.text,

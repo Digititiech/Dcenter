@@ -168,6 +168,7 @@ export default function ArabicAIAssistant() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          locale: "ar",
           messages: updatedMessages.map((m) => ({
             role: m.sender === "ai" ? "ai" : "user",
             text: m.text,
