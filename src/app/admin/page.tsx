@@ -1605,7 +1605,7 @@ export default function AdminDashboard() {
       <aside
         className={`fixed md:relative z-40 md:z-auto w-64 h-full md:h-auto bg-[#111110] border-r rtl:border-r-0 rtl:border-l border-outline-variant/10 flex flex-col justify-between transition-transform duration-300 transform 
           left-0 rtl:left-auto rtl:right-0
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} 
+          ${sidebarOpen ? "translate-x-0" : "max-md:-translate-x-full"} 
           md:translate-x-0`}
       >
         <div>
