@@ -6,6 +6,25 @@ import Link from "next/link";
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 import { adminTranslations } from "@/lib/adminTranslations";
 
+const formatOmanPhone = (phone: string) => {
+  let cleaned = phone.trim().replace(/\s+/g, '');
+  if (!cleaned.startsWith('+')) {
+    if (cleaned.startsWith('00')) {
+      cleaned = '+' + cleaned.slice(2);
+    } else {
+      if (cleaned.startsWith('968') && cleaned.length >= 8) {
+        cleaned = '+' + cleaned;
+      } else {
+        if (cleaned.startsWith('0')) {
+          cleaned = cleaned.slice(1);
+        }
+        cleaned = '+968' + cleaned;
+      }
+    }
+  }
+  return cleaned;
+};
+
 interface Lead {
   id: string;
   name: string;
@@ -998,12 +1017,16 @@ export default function AdminDashboard() {
     // Try to trigger automated WhatsApp confirmation message
     if (booking) {
       try {
-        const msg = `Hello ${booking.clientName}, your strategic consultation slot with Decision Center is confirmed for October ${booking.day} at ${booking.timeSlot}. We look forward to our session.`;
+        const formattedPhone = formatOmanPhone(booking.clientPhone);
+        const msg = locale === "ar"
+          ? `مرحباً ${booking.clientName}، تم تأكيد موعد الاستشارة الاستراتيجية الخاصة بك مع مركز القرار ليوم ${booking.booking_date || (booking.day + ' أكتوبر')} الساعة ${booking.timeSlot}. نتطلع إلى لقائنا.`
+          : `Hello ${booking.clientName}, your strategic consultation slot with Decision Center is confirmed for ${booking.booking_date || ('October ' + booking.day)} at ${booking.timeSlot}. We look forward to our session.`;
+          
         await fetch(`${waServerUrl}/api/send-whatsapp`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            number: booking.clientPhone,
+            number: formattedPhone,
             message: msg
           })
         });
@@ -1193,24 +1216,30 @@ export default function AdminDashboard() {
       alert("Permission denied. Only managers can create custom bookings.");
       return;
     }
-    if (!newBookingName || !newBookingEmail || !newBookingPhone || !newBookingDate || !newBookingSlot) {
-      alert("Please fill out all fields");
+    // Make newBookingEmail optional
+    if (!newBookingName || !newBookingPhone || !newBookingDate || !newBookingSlot) {
+      alert(locale === "ar" ? "يرجى ملء جميع الحقول المطلوبة (البريد الإلكتروني اختياري)" : "Please fill out all required fields (Email is optional)");
       return;
     }
     if (newBookingType === "Others" && !newBookingTypeSpecify) {
-      alert("Please specify the booking type");
+      alert(locale === "ar" ? "يرجى تحديد نوع الحجز" : "Please specify the booking type");
       return;
     }
     setSavingNewBooking(true);
 
-    const existingLead = leads.find(l => l.phone.trim() === newBookingPhone.trim());
+    const formattedPhone = formatOmanPhone(newBookingPhone);
+    const existingLead = leads.find(l => l.phone.trim() === formattedPhone.trim());
     let shouldCreateLead = true;
 
     if (existingLead) {
       const confirmUseExisting = window.confirm(
-        `Warning: A lead with this phone number ("${newBookingPhone}") already exists in the CRM (Name: "${existingLead.name}", Email: "${existingLead.email}").\n\n` +
-        `Click "OK" to associate this booking with the existing lead (preventing a duplicate lead).\n` +
-        `Click "Cancel" to go back and enter a different phone number.`
+        locale === "ar"
+          ? `تنبيه: يوجد بالفعل عميل مسجل برقم الهاتف هذا ("${formattedPhone}") في نظام إدارة العملاء (الاسم: "${existingLead.name}"، البريد الإلكتروني: "${existingLead.email || 'غير متوفر'}").\n\n` +
+            `اضغط "موافق" لربط هذا الحجز بالعميل الحالي (تجنباً لتكرار بيانات العميل).\n` +
+            `اضغط "إلغاء" للرجوع وتغيير رقم الهاتف.`
+          : `Warning: A lead with this phone number ("${formattedPhone}") already exists in the CRM (Name: "${existingLead.name}", Email: "${existingLead.email || 'N/A'}").\n\n` +
+            `Click "OK" to associate this booking with the existing lead (preventing a duplicate lead).\n` +
+            `Click "Cancel" to go back and enter a different phone number.`
       );
 
       if (!confirmUseExisting) {
@@ -1225,8 +1254,8 @@ export default function AdminDashboard() {
 
     const newBooking: Omit<Booking, "id"> = {
       clientName: newBookingName,
-      clientEmail: newBookingEmail,
-      clientPhone: newBookingPhone,
+      clientEmail: newBookingEmail || "N/A",
+      clientPhone: formattedPhone,
       day: parsedDay,
       timeSlot: newBookingSlot,
       status: newBookingStatus,
@@ -1243,8 +1272,8 @@ export default function AdminDashboard() {
         if (shouldCreateLead) {
           const newLead = {
             name: newBookingName,
-            email: newBookingEmail,
-            phone: newBookingPhone,
+            email: newBookingEmail || "N/A",
+            phone: formattedPhone,
             company: "N/A",
             timeframe: "Immediate",
             status: "Booked" as const,
@@ -1274,8 +1303,8 @@ export default function AdminDashboard() {
           const localLead: Lead = {
             id: (Date.now() + 1).toString(),
             name: newBookingName,
-            email: newBookingEmail,
-            phone: newBookingPhone,
+            email: newBookingEmail || "N/A",
+            phone: formattedPhone,
             company: "N/A",
             timeframe: "Immediate",
             status: "Booked",
@@ -1287,13 +1316,13 @@ export default function AdminDashboard() {
         }
       }
 
-      alert("New booking added successfully!");
+      alert(locale === "ar" ? "تم إضافة الحجز بنجاح!" : "New booking added successfully!");
       setShowingAddBookingModal(false);
       setNewBookingType("Financial & Valuation Modeling");
       setNewBookingTypeSpecify("");
     } catch (err) {
       console.error(err);
-      alert("Error adding manual booking");
+      alert(locale === "ar" ? "خطأ في إضافة الحجز يدوياً" : "Error adding manual booking");
     } finally {
       setSavingNewBooking(false);
     }
@@ -1882,7 +1911,7 @@ export default function AdminDashboard() {
                         setNewBookingEmail("");
                         setNewBookingPhone("");
                         setNewBookingDate(`${currentCalendarYear}-${String(currentCalendarMonth + 1).padStart(2, "0")}-01`);
-                        setNewBookingSlot("09:00 AM");
+                        setNewBookingSlot("09:00 GST");
                         setNewBookingStatus("Confirmed");
                         setShowingAddBookingModal(true);
                       }}

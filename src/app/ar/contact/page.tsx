@@ -6,6 +6,25 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 
+const formatOmanPhone = (phone: string) => {
+  let cleaned = phone.trim().replace(/\s+/g, '');
+  if (!cleaned.startsWith('+')) {
+    if (cleaned.startsWith('00')) {
+      cleaned = '+' + cleaned.slice(2);
+    } else {
+      if (cleaned.startsWith('968') && cleaned.length >= 8) {
+        cleaned = '+' + cleaned;
+      } else {
+        if (cleaned.startsWith('0')) {
+          cleaned = cleaned.slice(1);
+        }
+        cleaned = '+968' + cleaned;
+      }
+    }
+  }
+  return cleaned;
+};
+
 interface FAQ {
   id: string;
   question: string;
@@ -263,12 +282,14 @@ export default function ArabicContact() {
 
     const finalService = requestedService === "استشارات استراتيجية أخرى" ? `أخرى: ${otherServiceSpecify}` : requestedService;
 
-    const message = `مرحباً مركز القرار، أود حجز جلسة استشارية استراتيجية.\n\nتفاصيل العميل:\n- الاسم: ${clientName}\n- البريد الإلكتروني: ${clientEmail}\n- رقم الهاتف: ${clientPhone}\n- الخدمة المطلوبة: ${finalService}\n\nالموعد المفضل: ${formatDate(selectedDate)} في الساعة ${selectedSlot}`;
+    const formattedPhone = formatOmanPhone(clientPhone);
+
+    const message = `مرحباً مركز القرار، أود حجز جلسة استشارية استراتيجية.\n\nتفاصيل العميل:\n- الاسم: ${clientName}\n- البريد الإلكتروني: ${clientEmail}\n- رقم الهاتف: ${formattedPhone}\n- الخدمة المطلوبة: ${finalService}\n\nالموعد المفضل: ${formatDate(selectedDate)} في الساعة ${selectedSlot}`;
 
     const newBooking = {
       clientName,
       clientEmail,
-      clientPhone,
+      clientPhone: formattedPhone,
       day,
       timeSlot: selectedSlot,
       status: "Pending",
@@ -279,7 +300,7 @@ export default function ArabicContact() {
     const newLead = {
       name: clientName,
       email: clientEmail,
-      phone: clientPhone,
+      phone: formattedPhone,
       company: "N/A",
       timeframe: "Immediate",
       status: "Booked"

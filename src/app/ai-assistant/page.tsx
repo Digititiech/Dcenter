@@ -6,6 +6,25 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 
+const formatOmanPhone = (phone: string) => {
+  let cleaned = phone.trim().replace(/\s+/g, '');
+  if (!cleaned.startsWith('+')) {
+    if (cleaned.startsWith('00')) {
+      cleaned = '+' + cleaned.slice(2);
+    } else {
+      if (cleaned.startsWith('968') && cleaned.length >= 8) {
+        cleaned = '+' + cleaned;
+      } else {
+        if (cleaned.startsWith('0')) {
+          cleaned = cleaned.slice(1);
+        }
+        cleaned = '+968' + cleaned;
+      }
+    }
+  }
+  return cleaned;
+};
+
 interface Message {
   sender: "ai" | "user";
   text: string;
@@ -59,12 +78,14 @@ export default function AIAssistant() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const message = `Hello Decision Center, I would like to request a secure consulting session.\nName: ${name}\nCompany: ${company}\nEmail: ${email}\nPhone: ${phone}\nPreferred Timeframe: ${timeframe}`;
+    const formattedPhone = formatOmanPhone(phone);
+
+    const message = `Hello Decision Center, I would like to request a secure consulting session.\nName: ${name}\nCompany: ${company}\nEmail: ${email}\nPhone: ${formattedPhone}\nPreferred Timeframe: ${timeframe}`;
 
     const newLead = {
       name,
       email,
-      phone,
+      phone: formattedPhone,
       company,
       timeframe,
       status: "Pending"
