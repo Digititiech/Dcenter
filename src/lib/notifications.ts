@@ -57,15 +57,24 @@ export async function sendEmail({
   }
 
   try {
-    const transporter = nodemailer.createTransport({
+    const transporterOpts: any = {
       host: smtp.host,
       port: smtp.port,
       secure: smtp.port === 465,
       auth: {
         user: smtp.user,
         pass: smtp.pass
+      },
+      tls: {
+        rejectUnauthorized: false
       }
-    });
+    };
+
+    if (smtp.host.toLowerCase().includes("gmail")) {
+      transporterOpts.service = "gmail";
+    }
+
+    const transporter = nodemailer.createTransport(transporterOpts);
 
     await transporter.sendMail({
       from: `"Decision Center" <${smtp.user}>`,

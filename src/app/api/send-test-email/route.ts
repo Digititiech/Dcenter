@@ -12,15 +12,24 @@ export async function POST(req: Request) {
       );
     }
 
-    const transporter = nodemailer.createTransport({
+    const transporterOpts: any = {
       host,
       port: parseInt(port, 10),
       secure: parseInt(port, 10) === 465, // Use secure transport for port 465
       auth: {
         user,
         pass
+      },
+      tls: {
+        rejectUnauthorized: false
       }
-    });
+    };
+
+    if (host.toLowerCase().includes("gmail")) {
+      transporterOpts.service = "gmail";
+    }
+
+    const transporter = nodemailer.createTransport(transporterOpts);
 
     // Verify SMTP connection
     await transporter.verify();
