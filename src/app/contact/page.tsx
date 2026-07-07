@@ -68,12 +68,23 @@ export default function Contact() {
     return "+04:00";
   };
 
-  const baseSlots = ["09:00", "11:30", "14:00", "16:00"];
-
   const getFilteredTimeSlots = () => {
-    if (!dayAvailability || !dayAvailability.is_available) return [];
+    if (!dayAvailability || !dayAvailability.is_available || !dayAvailability.time_from || !dayAvailability.time_to) return [];
     
-    const slots = baseSlots.map(time => `${time} ${timezoneLabel}`);
+    // Dynamically generate hourly slots
+    const dynamicBaseSlots: string[] = [];
+    const [fromH, fromM] = dayAvailability.time_from.split(":").map(Number);
+    const [toH, toM] = dayAvailability.time_to.split(":").map(Number);
+    const endMinutes = toH * 60 + toM;
+
+    let currentHour = fromH;
+    let currentMin = fromM;
+    while (currentHour * 60 + currentMin + 60 <= endMinutes) {
+      dynamicBaseSlots.push(`${String(currentHour).padStart(2, "0")}:${String(currentMin).padStart(2, "0")}`);
+      currentHour += 1;
+    }
+    
+    const slots = dynamicBaseSlots.map(time => `${time} ${timezoneLabel}`);
     return slots.filter(slot => {
       // 1. Check if within working hours
       const slotTime = slot.split(" ")[0]; // "09:00"
@@ -85,10 +96,10 @@ export default function Contact() {
       const inDb = dbBookings.some(b => b.timeSlot === slot);
       if (inDb) return false;
 
-      // 3. Check if overlaps with Google Calendar events
+      // 3. Check if overlaps with Google Calendar events (1 hour slot interval)
       const offset = getTimezoneOffset(timezoneValue);
       const slotStart = new Date(`${selectedDate}T${slotTime}:00${offset}`).getTime();
-      const slotEnd = slotStart + 2.5 * 60 * 60 * 1000; // assume 2.5 hour slots
+      const slotEnd = slotStart + 1 * 60 * 60 * 1000; // 1 hour slots
       
       const isBusy = busyTimeSlots.some(busy => {
         const busyStart = new Date(busy.start).getTime();
