@@ -93,7 +93,7 @@ export default function ArabicContact() {
       const isBusy = busyTimeSlots.some(busy => {
         const busyStart = new Date(busy.start).getTime();
         const busyEnd = new Date(busy.end).getTime();
-        return (slotStart >= busyStart && slotStart < busyEnd) || (slotEnd > busyStart && slotEnd <= busyEnd);
+        return slotStart < busyEnd && slotEnd > busyStart;
       });
 
       return !isBusy;
