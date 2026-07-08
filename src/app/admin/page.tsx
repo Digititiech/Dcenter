@@ -1109,6 +1109,7 @@ export default function AdminDashboard() {
   };
 
   const handleSendTestEmail = async () => {
+    console.log("handleSendTestEmail called!");
     if (!smtpHost || !smtpPort || !smtpUser || !smtpPass || !testEmailRecipient) {
       alert("Please fill out all SMTP credentials and the recipient email field");
       return;
@@ -1141,6 +1142,7 @@ export default function AdminDashboard() {
   };
 
   const handleSaveSmtpSettings = async () => {
+    console.log("handleSaveSmtpSettings called!");
     if (userRole === "staff") {
       alert("Permission denied. Only managers can update SMTP configurations.");
       return;
@@ -2235,6 +2237,7 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <button
+                    id="save-smtp-btn"
                     className="bg-secondary text-primary-container px-4 py-3 font-label-caps text-label-caps border border-secondary hover:bg-transparent hover:text-secondary transition-colors cursor-pointer text-xs font-bold"
                     onClick={handleSaveSmtpSettings}
                   >
@@ -2257,7 +2260,8 @@ export default function AdminDashboard() {
                       </div>
                       <div className="sm:col-span-1">
                         <button
-                          onClick={handleSaveSmtpSettings}
+                          id="send-test-email-btn"
+                          onClick={handleSendTestEmail}
                           disabled={sendingTestEmail}
                           className="w-full bg-secondary text-primary-container px-4 py-2 font-label-caps text-[10px] border border-secondary hover:bg-transparent hover:text-secondary disabled:opacity-40 disabled:hover:bg-secondary disabled:hover:text-primary-container transition-colors cursor-pointer h-[34px] flex items-center justify-center"
                         >
