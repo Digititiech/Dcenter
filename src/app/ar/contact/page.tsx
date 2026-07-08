@@ -408,7 +408,7 @@ export default function ArabicContact() {
                   </span>
                   <div>
                     <p className="font-label-caps text-label-caps text-on-surface-variant mb-1">بريدنا الإلكتروني</p>
-                    <p className="font-body-md text-body-md text-foreground">dcenterfe@gmail.com</p>
+                    <p className="font-body-md text-body-md text-foreground">info@dcenterfe.com</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-4 space-x-reverse">

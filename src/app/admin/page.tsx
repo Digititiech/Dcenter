@@ -84,7 +84,7 @@ export default function AdminDashboard() {
   // SMTP Settings State
   const [smtpHost, setSmtpHost] = useState("smtp.gmail.com");
   const [smtpPort, setSmtpPort] = useState("587");
-  const [smtpUser, setSmtpUser] = useState("dcenterfe@gmail.com");
+  const [smtpUser, setSmtpUser] = useState("info@dcenterfe.com");
   const [smtpPass, setSmtpPass] = useState("••••••••••••");
   const [calendarUrl, setCalendarUrl] = useState("https://calendar.google.com/calendar/ical/dcenter...");
   

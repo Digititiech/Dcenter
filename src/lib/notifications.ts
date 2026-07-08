@@ -22,7 +22,7 @@ export async function fetchSMTPSettings() {
     return {
       host: settings.smtp_host || "smtp.gmail.com",
       port: parseInt(settings.smtp_port || "587", 10),
-      user: settings.smtp_user || "dcenterfe@gmail.com",
+      user: settings.smtp_user || "info@dcenterfe.com",
       pass: settings.smtp_pass || "",
     };
   } catch (err) {

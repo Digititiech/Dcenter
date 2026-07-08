@@ -404,7 +404,7 @@ export default function Contact() {
                   </span>
                   <div>
                     <p className="font-label-caps text-label-caps text-on-surface-variant mb-1">Email Us</p>
-                    <p className="font-body-md text-body-md text-foreground">dcenterfe@gmail.com</p>
+                    <p className="font-body-md text-body-md text-foreground">info@dcenterfe.com</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">

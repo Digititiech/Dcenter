@@ -70,10 +70,10 @@ export default function Footer({ locale }: { locale: "en" | "ar" }) {
             <li>
               <a
                 className="text-on-surface-variant hover:text-secondary transition-colors flex items-center gap-2"
-                href="mailto:dcenterfe@gmail.com"
+                href="mailto:info@dcenterfe.com"
               >
                 <span className="material-symbols-outlined text-[18px]">mail</span>
-                <span>dcenterfe@gmail.com</span>
+                <span>info@dcenterfe.com</span>
               </a>
             </li>
             <li>
