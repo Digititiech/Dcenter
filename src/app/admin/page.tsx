@@ -332,8 +332,17 @@ export default function AdminDashboard() {
 
       if (isUsingSupabase) {
         try {
+          const { data: { session } } = await supabase.auth.getSession();
+          const headers: Record<string, string> = {
+            apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+          };
+          if (session) {
+            headers.Authorization = `Bearer ${session.access_token}`;
+          }
+
           const res = await fetch(
-            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=get-busy-slots&date=${newBookingDate}`
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=get-busy-slots&date=${newBookingDate}`,
+            { headers }
           );
           if (res.ok) {
             const data = await res.json();
@@ -424,8 +433,17 @@ export default function AdminDashboard() {
 
       if (isUsingSupabase) {
         try {
+          const { data: { session } } = await supabase.auth.getSession();
+          const headers: Record<string, string> = {
+            apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+          };
+          if (session) {
+            headers.Authorization = `Bearer ${session.access_token}`;
+          }
+
           const res = await fetch(
-            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=get-busy-slots&date=${rescheduleDate}`
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=get-busy-slots&date=${rescheduleDate}`,
+            { headers }
           );
           if (res.ok) {
             const data = await res.json();
@@ -805,6 +823,7 @@ export default function AdminDashboard() {
         {
           headers: {
             Authorization: `Bearer ${session.access_token}`,
+            apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
           },
         }
       );
@@ -839,7 +858,7 @@ export default function AdminDashboard() {
         }
         const userId = session.user.id;
         // Redirect to Edge Function login action
-        window.location.href = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=login&userId=${userId}`;
+        window.location.href = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=login&userId=${userId}&apikey=${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""}`;
       } else {
         alert("Google Calendar integration requires a configured Supabase environment.");
         setGcalLoading(false);
@@ -862,6 +881,7 @@ export default function AdminDashboard() {
             method: "POST",
             headers: {
               Authorization: `Bearer ${session.access_token}`,
+              apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
             },
           }
         );
@@ -984,6 +1004,7 @@ export default function AdminDashboard() {
               method: "POST",
               headers: {
                 Authorization: `Bearer ${session.access_token}`,
+                apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({ bookingId }),
