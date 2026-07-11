@@ -274,7 +274,7 @@ export default function Home() {
                 <span className="material-symbols-outlined text-4xl text-secondary mb-6">psychology</span>
                 <h3 className="font-display-lg text-headline-md text-foreground mb-4 text-2xl">Economic Intelligence</h3>
                 <p className="text-on-surface-variant">
-                  Transforming data into executive decisions that support your organization's competitive edge.
+                  Transforming data into executive decisions that support your organization&apos;s competitive edge.
                 </p>
               </div>
             </div>

@@ -15,7 +15,7 @@ export async function fetchSMTPSettings() {
     if (error || !data) return null;
     
     const settings: Record<string, string> = {};
-    data.forEach((row: any) => {
+    data.forEach((row: { key: string; value: string }) => {
       settings[row.key] = row.value;
     });
     
@@ -33,7 +33,7 @@ export async function fetchSMTPSettings() {
 
 export async function fetchWhatsAppSettings() {
   try {
-    const { data } = await supabase.from("settings").select("*").eq("key", "wa-server-url").maybeSingle();
+    const { data } = await supabase.from("settings").select("*").eq("key", "wa_server_url").maybeSingle();
     return data?.value || "https://wa.powerpod.ae";
   } catch (err) {
     console.error("Failed to fetch WhatsApp settings:", err);
@@ -57,6 +57,7 @@ export async function sendEmail({
   }
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const transporterOpts: any = {
       host: smtp.host,
       port: smtp.port,

@@ -56,6 +56,60 @@ interface PresetMessage {
   text: string;
 }
 
+const mockLeads: Lead[] = [
+  {
+    id: "1",
+    name: "Abdullah Al Rushdi",
+    email: "a.rushdi@muscatfund.om",
+    phone: "+968 96680101",
+    company: "Muscat Sovereign Fund",
+    timeframe: "Immediate (1-3 Business Days)",
+    status: "Qualified",
+    created_at: "2026-07-02T12:00:00Z",
+  },
+  {
+    id: "2",
+    name: "Fatma Al Balushi",
+    email: "fatma@soharport.co.om",
+    phone: "+968 91122334",
+    company: "Sohar Logistics Hub",
+    timeframe: "Standard (1-2 Weeks)",
+    status: "Pending",
+    created_at: "2026-07-01T15:30:00Z",
+  },
+  {
+    id: "3",
+    name: "Salim Al Habsi",
+    email: "salim@habsigroup.com",
+    phone: "+968 99887766",
+    company: "Al Habsi Energy Partners",
+    timeframe: "Exploratory (Q3 2026)",
+    status: "Contacted",
+    created_at: "2026-06-30T09:15:00Z",
+  },
+];
+
+const mockBookings: Booking[] = [
+  {
+    id: "1",
+    clientName: "Abdullah Al Rushdi",
+    clientEmail: "a.rushdi@muscatfund.om",
+    clientPhone: "+968 96680101",
+    day: 8,
+    timeSlot: "11:30 GST",
+    status: "Confirmed",
+  },
+  {
+    id: "2",
+    clientName: "Fatma Al Balushi",
+    clientEmail: "fatma@soharport.co.om",
+    clientPhone: "+968 91122334",
+    day: 9,
+    timeSlot: "14:00 GST",
+    status: "Pending",
+  },
+];
+
 export default function AdminDashboard() {
   const router = useRouter();
   const [locale, setLocale] = useState<"en" | "ar">("en");
@@ -251,7 +305,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const savedTheme = localStorage.getItem("admin-theme");
     if (savedTheme === "light") {
-      setTheme("light");
+      Promise.resolve().then(() => setTheme("light"));
     }
   }, []);
 
@@ -386,7 +440,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const filtered = getFilteredAddModalSlots();
     if (filtered.length > 0 && !filtered.includes(newBookingSlot)) {
-      setNewBookingSlot(filtered[0]);
+      Promise.resolve().then(() => setNewBookingSlot(filtered[0]));
     }
   }, [addModalDayAvailability, addModalBusySlots, addModalDbBookings]);
 
@@ -487,7 +541,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const filtered = getFilteredRescheduleModalSlots();
     if (filtered.length > 0 && !filtered.includes(rescheduleSlot)) {
-      setRescheduleSlot(filtered[0]);
+      Promise.resolve().then(() => setRescheduleSlot(filtered[0]));
     }
   }, [rescheduleModalDayAvailability, rescheduleModalBusySlots, rescheduleModalDbBookings]);
 
@@ -620,60 +674,45 @@ export default function AdminDashboard() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
 
-  // Sample data to seed if DB is empty or not configured
-  const mockLeads: Lead[] = [
-    {
-      id: "1",
-      name: "Abdullah Al Rushdi",
-      email: "a.rushdi@muscatfund.om",
-      phone: "+968 96680101",
-      company: "Muscat Sovereign Fund",
-      timeframe: "Immediate (1-3 Business Days)",
-      status: "Qualified",
-      created_at: "2026-07-02T12:00:00Z",
-    },
-    {
-      id: "2",
-      name: "Fatma Al Balushi",
-      email: "fatma@soharport.co.om",
-      phone: "+968 91122334",
-      company: "Sohar Logistics Hub",
-      timeframe: "Standard (1-2 Weeks)",
-      status: "Pending",
-      created_at: "2026-07-01T15:30:00Z",
-    },
-    {
-      id: "3",
-      name: "Salim Al Habsi",
-      email: "salim@habsigroup.com",
-      phone: "+968 99887766",
-      company: "Al Habsi Energy Partners",
-      timeframe: "Exploratory (Q3 2026)",
-      status: "Contacted",
-      created_at: "2026-06-30T09:15:00Z",
-    },
-  ];
+  async function fetchData(useDb: boolean) {
+    if (useDb) {
+      try {
+        // Fetch from Supabase tables
+        const { data: dbLeads, error: leadsErr } = await supabase.from("leads").select("*").order("created_at", { ascending: false });
+        const { data: dbBookings, error: bookingsErr } = await supabase.from("bookings").select("*");
 
-  const mockBookings: Booking[] = [
-    {
-      id: "1",
-      clientName: "Abdullah Al Rushdi",
-      clientEmail: "a.rushdi@muscatfund.om",
-      clientPhone: "+968 96680101",
-      day: 8,
-      timeSlot: "11:30 GST",
-      status: "Confirmed",
-    },
-    {
-      id: "2",
-      clientName: "Fatma Al Balushi",
-      clientEmail: "fatma@soharport.co.om",
-      clientPhone: "+968 91122334",
-      day: 9,
-      timeSlot: "14:00 GST",
-      status: "Pending",
-    },
-  ];
+        if (!leadsErr && dbLeads) setLeads(dbLeads);
+        else setLeads(mockLeads);
+
+        if (!bookingsErr && dbBookings) setBookings(dbBookings);
+        else setBookings(mockBookings);
+      } catch (e) {
+        console.error("Failed to fetch Supabase data:", e);
+        setLeads(mockLeads);
+        setBookings(mockBookings);
+      }
+    } else {
+      // Load from LocalStorage or Fallback Mock
+      const localLeads = localStorage.getItem("crm-leads");
+      const localBookings = localStorage.getItem("bookings-slots");
+      
+      if (localLeads) {
+        setLeads(JSON.parse(localLeads));
+      } else {
+        setLeads(mockLeads);
+        localStorage.setItem("crm-leads", JSON.stringify(mockLeads));
+      }
+
+      if (localBookings) {
+        setBookings(JSON.parse(localBookings));
+      } else {
+        setBookings(mockBookings);
+        localStorage.setItem("bookings-slots", JSON.stringify(mockBookings));
+      }
+    }
+  }
+
+  // Sample data to seed if DB is empty or not configured
 
   const fetchTeamMembers = async () => {
     if (!isSupabaseConfigured()) return;
@@ -743,15 +782,15 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    const savedLocale = localStorage.getItem("admin-locale") as "en" | "ar" | null;
-    if (savedLocale === "ar" || savedLocale === "en") {
-      setLocale(savedLocale);
-    }
-    // Authenticate Admin Session
-    const supabaseConfigured = isSupabaseConfigured();
-    setIsUsingSupabase(supabaseConfigured);
-
     const checkSession = async () => {
+      const savedLocale = localStorage.getItem("admin-locale") as "en" | "ar" | null;
+      if (savedLocale === "ar" || savedLocale === "en") {
+        setLocale(savedLocale);
+      }
+      // Authenticate Admin Session
+      const supabaseConfigured = isSupabaseConfigured();
+      setIsUsingSupabase(supabaseConfigured);
+
       if (supabaseConfigured) {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
@@ -791,7 +830,9 @@ export default function AdminDashboard() {
       fetchData(supabaseConfigured);
     };
 
-    checkSession();
+    Promise.resolve().then(() => {
+      checkSession();
+    });
   }, []);
 
   useEffect(() => {
@@ -843,7 +884,9 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    checkGoogleCalendarStatus();
+    Promise.resolve().then(() => {
+      checkGoogleCalendarStatus();
+    });
   }, [isUsingSupabase]);
 
   const handleConnectGoogleCalendar = async () => {
@@ -937,43 +980,7 @@ export default function AdminDashboard() {
     setAvailabilities(updated);
   };
 
-  const fetchData = async (useDb: boolean) => {
-    if (useDb) {
-      try {
-        // Fetch from Supabase tables
-        const { data: dbLeads, error: leadsErr } = await supabase.from("leads").select("*").order("created_at", { ascending: false });
-        const { data: dbBookings, error: bookingsErr } = await supabase.from("bookings").select("*");
 
-        if (!leadsErr && dbLeads) setLeads(dbLeads);
-        else setLeads(mockLeads);
-
-        if (!bookingsErr && dbBookings) setBookings(dbBookings);
-        else setBookings(mockBookings);
-      } catch (e) {
-        console.error("Failed to fetch Supabase data:", e);
-        setLeads(mockLeads);
-        setBookings(mockBookings);
-      }
-    } else {
-      // Load from LocalStorage or Fallback Mock
-      const localLeads = localStorage.getItem("crm-leads");
-      const localBookings = localStorage.getItem("bookings-slots");
-      
-      if (localLeads) {
-        setLeads(JSON.parse(localLeads));
-      } else {
-        setLeads(mockLeads);
-        localStorage.setItem("crm-leads", JSON.stringify(mockLeads));
-      }
-
-      if (localBookings) {
-        setBookings(JSON.parse(localBookings));
-      } else {
-        setBookings(mockBookings);
-        localStorage.setItem("bookings-slots", JSON.stringify(mockBookings));
-      }
-    }
-  };
 
   const handleUpdateLeadStatus = async (leadId: string, newStatus: Lead["status"]) => {
     const updated = leads.map(l => l.id === leadId ? { ...l, status: newStatus } : l);

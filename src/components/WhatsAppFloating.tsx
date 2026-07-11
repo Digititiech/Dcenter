@@ -1,17 +1,26 @@
 "use client";
-
+ 
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-
+import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
+ 
 export default function WhatsAppFloating() {
   const pathname = usePathname();
   const isArabic = pathname ? pathname.startsWith("/ar") : false;
   const [waNumber, setWaNumber] = useState("96896680001");
-
+ 
   useEffect(() => {
     const fetchWaNumber = async () => {
       try {
-        const serverUrl = localStorage.getItem("wa-server-url") || "https://wa.powerpod.ae";
+        let serverUrl = "https://wa.powerpod.ae";
+        if (isSupabaseConfigured()) {
+          const { data } = await supabase.from("settings").select("value").eq("key", "wa_server_url").maybeSingle();
+          if (data?.value) {
+            serverUrl = data.value;
+          }
+        } else {
+          serverUrl = localStorage.getItem("wa-server-url") || "https://wa.powerpod.ae";
+        }
         const res = await fetch(`${serverUrl}/api/whatsapp-status`);
         if (res.ok) {
           const data = await res.json();

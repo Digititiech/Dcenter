@@ -179,7 +179,12 @@ export default function ArabicContact() {
       if (isSupabaseConfigured()) {
         try {
           const res = await fetch(
-            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=get-busy-slots&date=${selectedDate}`
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-calendar-auth?action=get-busy-slots&date=${selectedDate}`,
+            {
+              headers: {
+                apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+              },
+            }
           );
           if (res.ok) {
             const data = await res.json();
@@ -228,7 +233,7 @@ export default function ArabicContact() {
   useEffect(() => {
     const filtered = getFilteredTimeSlots();
     if (filtered.length > 0 && !filtered.includes(selectedSlot)) {
-      setSelectedSlot(filtered[0]);
+      Promise.resolve().then(() => setSelectedSlot(filtered[0]));
     }
   }, [dayAvailability, busyTimeSlots, dbBookings]);
 

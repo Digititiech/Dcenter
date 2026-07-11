@@ -18,11 +18,13 @@ export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    setIsUsingSupabase(isSupabaseConfigured());
-    const savedLocale = localStorage.getItem("admin-locale") as "en" | "ar" | null;
-    if (savedLocale === "ar" || savedLocale === "en") {
-      setLocale(savedLocale);
-    }
+    Promise.resolve().then(() => {
+      setIsUsingSupabase(isSupabaseConfigured());
+      const savedLocale = localStorage.getItem("admin-locale") as "en" | "ar" | null;
+      if (savedLocale === "ar" || savedLocale === "en") {
+        setLocale(savedLocale);
+      }
+    });
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
