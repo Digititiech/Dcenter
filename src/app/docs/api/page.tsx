@@ -12,7 +12,7 @@ export default function ApiDocs() {
             Developer API Documentation
           </h1>
           <p className="font-body-lg text-body-lg text-on-surface-variant mb-8">
-            Access Decision Center's expert AI financial consulting engine programmatically. 
+            Access Decision Center&apos;s expert AI financial consulting engine programmatically. 
             We expose a secure, RESTful endpoint for conversational analysis, structural restructuring, and advisory tasks.
           </p>
 

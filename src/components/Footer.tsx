@@ -40,7 +40,7 @@ export default function Footer({ locale }: { locale: "en" | "ar" }) {
             href={locale === "en" ? "/" : "/ar"}
             className="flex items-center gap-3"
           >
-            <img src="/dc-logo.png" alt="Decision Center Logo" className="h-10 w-auto object-contain" />
+            <img src="/dc-logo.png" alt="Decision Center Logo" className="h-10 w-auto object-contain" loading="lazy" />
             <span className="font-display-lg text-headline-md font-bold text-secondary">{brandName}</span>
           </Link>
           <p className="font-body-sm text-body-sm text-on-surface-variant max-w-sm">

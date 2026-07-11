@@ -68,7 +68,7 @@ export default function Header({ locale }: { locale: "en" | "ar" }) {
           href={locale === "en" ? "/" : "/ar"}
           className="flex items-center gap-3"
         >
-          <img src="/dc-logo.png" alt="Decision Center Logo" className="h-10 w-auto object-contain" />
+          <img src="/dc-logo.png" alt="Decision Center Logo" className="h-10 w-auto object-contain" fetchPriority="high" />
           <span className="font-display-lg text-headline-md font-bold text-foreground tracking-tighter">{brandName}</span>
         </Link>
 
@@ -124,7 +124,7 @@ export default function Header({ locale }: { locale: "en" | "ar" }) {
               className="w-[280px] bg-background border-outline-variant/20 p-6 flex flex-col gap-6"
             >
               <div className="flex items-center gap-3 mb-4">
-                <img src="/dc-logo.png" alt="Decision Center Logo" className="h-8 w-auto object-contain" />
+                <img src="/dc-logo.png" alt="Decision Center Logo" className="h-8 w-auto object-contain" fetchPriority="high" />
                 <span className="font-display-lg text-headline-md font-bold text-foreground tracking-tighter">{brandName}</span>
               </div>
               <div className="flex flex-col gap-4 flex-grow">

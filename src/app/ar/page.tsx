@@ -327,6 +327,7 @@ export default function ArabicHome() {
                     alt="Strategic Process"
                     className="w-full h-full object-cover rounded-full opacity-70"
                     src="/methodology_illustration.png"
+                    loading="lazy"
                   />
                 </div>
               </div>
