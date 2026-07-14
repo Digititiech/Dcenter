@@ -23,6 +23,11 @@ function startBot() {
     qrTimeout: 0,
     authTimeout: 0,
     headless: true,
+    useChrome: true,
+    chromiumArgs: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox'
+    ],
     qrCallback: (base64Qr) => {
       qrCodeBase64 = base64Qr;
       currentStatus = 'SCAN_QR';
@@ -154,7 +159,7 @@ const server = http.createServer((req, res) => {
   }
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3002;
 server.listen(PORT, () => {
   console.log(`WhatsApp automation server listening on port ${PORT}`);
 });
