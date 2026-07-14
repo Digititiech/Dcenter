@@ -47,15 +47,6 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  async rewrites() {
-    return [
-      // Ensure Hostinger routes the webmanifest through Next.js
-      {
-        source: "/manifest.webmanifest",
-        destination: "/api/manifest",
-      },
-    ];
-  },
 };
 
 export default nextConfig;
