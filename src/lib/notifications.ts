@@ -34,10 +34,10 @@ export async function fetchSMTPSettings() {
 export async function fetchWhatsAppSettings() {
   try {
     const { data } = await supabase.from("settings").select("*").eq("key", "wa_server_url").maybeSingle();
-    return data?.value || "https://wa.powerpod.ae";
+    return data?.value || "https://wa.dcenterfe.com";
   } catch (err) {
     console.error("Failed to fetch WhatsApp settings:", err);
-    return "https://wa.powerpod.ae";
+    return "https://wa.dcenterfe.com";
   }
 }
 

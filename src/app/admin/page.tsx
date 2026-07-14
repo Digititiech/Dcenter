@@ -148,7 +148,7 @@ export default function AdminDashboard() {
   const [gcalLoading, setGcalLoading] = useState(false);
 
   // WhatsApp QR State
-  const [waServerUrl, setWaServerUrl] = useState("https://wa.powerpod.ae");
+  const [waServerUrl, setWaServerUrl] = useState("https://wa.dcenterfe.com");
   const [qrStatus, setQrStatus] = useState<"disconnected" | "generating" | "waiting" | "connected">("disconnected");
   const [serverOnline, setServerOnline] = useState(true);
   const [initializingWa, setInitializingWa] = useState(false);
@@ -246,7 +246,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const loadSettings = async () => {
       // LocalStorage WhatsApp endpoint fallback
-      let resolvedUrl = "https://wa.powerpod.ae";
+      let resolvedUrl = "https://wa.dcenterfe.com";
       const savedUrl = localStorage.getItem("wa-server-url");
       if (savedUrl) resolvedUrl = savedUrl;
 

@@ -47,7 +47,7 @@ export default function AIAssistant() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [waNumber, setWaNumber] = useState("96896680001");
-  const [waServerUrl, setWaServerUrl] = useState("https://wa.powerpod.ae");
+  const [waServerUrl, setWaServerUrl] = useState("https://wa.dcenterfe.com");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -57,14 +57,14 @@ export default function AIAssistant() {
   useEffect(() => {
     const fetchWaNumber = async () => {
       try {
-        let serverUrl = "https://wa.powerpod.ae";
+        let serverUrl = "https://wa.dcenterfe.com";
         if (isSupabaseConfigured()) {
           const { data } = await supabase.from("settings").select("value").eq("key", "wa_server_url").maybeSingle();
           if (data?.value) {
             serverUrl = data.value;
           }
         } else {
-          serverUrl = localStorage.getItem("wa-server-url") || "https://wa.powerpod.ae";
+          serverUrl = localStorage.getItem("wa-server-url") || "https://wa.dcenterfe.com";
         }
         setWaServerUrl(serverUrl);
         const res = await fetch(`${serverUrl}/api/whatsapp-status`);
